@@ -1,4 +1,4 @@
-package com.misw.medisupply.ui.theme
+package com.medisupply.android.ui.theme
 
 import android.app.Activity
 import android.os.Build

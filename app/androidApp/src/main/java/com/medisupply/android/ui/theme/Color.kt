@@ -1,4 +1,4 @@
-package com.misw.medisupply.ui.theme
+package com.medisupply.android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -225,10 +225,3 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF1C2024)
 val surfaceContainerDarkHighContrast = Color(0xFF2D3135)
 val surfaceContainerHighDarkHighContrast = Color(0xFF383C40)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF43474B)
-
-
-
-
-
-
-
