@@ -2,6 +2,181 @@ package com.misw.medisupply.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+/**
+ * MediSupply Color System
+ */
+
+// ============================================================================
+// BRAND COLORS (Colores de marca y funcionales)
+// ============================================================================
+
+/** Primary brand color */
+val ColorPrimary = Color(0xFF005DB7)  // rgba(0, 93, 183, 1)
+
+/** Secondary brand color */
+val ColorSecondary = Color(0xFF4B6173)  // rgba(75, 97, 115, 1)
+
+/** Tertiary brand color */
+val ColorTertiary = Color(0xFF006B5F)  // rgba(0, 107, 95, 1)
+
+/** Error color */
+val ColorError = Color(0xFFB4271F)  // rgba(180, 39, 31, 1)
+
+// ============================================================================
+// NEUTRAL COLORS (Colores neutros y de texto)
+// ============================================================================
+
+/** Pure white */
+val ColorWhite = Color(0xFFFFFFFF)  // rgba(255, 255, 255, 1)
+
+/** Pure black */
+val ColorBlack = Color(0xFF000000)  // rgba(0, 0, 0, 1)
+
+/** Background color  */
+val ColorBackground = Color(0xFFF9F9FF)  // rgba(249, 249, 255, 1)
+
+/** Surface color  */
+val ColorSurface = Color(0xFFFCF8F8)  // rgba(252, 248, 248, 1)
+
+/** Text on surface */
+val ColorTextOnSurface = Color(0xFF1C1B1C)  // rgba(28, 27, 28, 1)
+
+/** Text on primary */
+val ColorTextOnPrimary = Color(0xFFFFFFFF)  // rgba(255, 255, 255, 1)
+
+/** Outline color */
+val ColorOutline = Color(0xFF73787B)  // rgba(115, 120, 123, 1)
+
+// ============================================================================
+// LIGHT THEME COLORS (Tema Claro)
+// ============================================================================
+
+/** Primary color for light theme */
+val ColorPrimaryLight = Color(0xFF004D99)  // rgba(0, 77, 153, 1)
+
+/** Text on primary for light theme */
+val ColorOnPrimaryLight = Color(0xFFFFFFFF)  // rgba(255, 255, 255, 1)
+
+/** Background for light theme */
+val ColorBackgroundLight = Color(0xFFF9F9FF)  // rgba(249, 249, 255, 1)
+
+/** Text on background for light theme */
+val ColorOnBackgroundLight = Color(0xFF191C21)  // rgba(25, 28, 33, 1)
+
+/** Surface for light theme */
+val ColorSurfaceLight = Color(0xFFFCF8F8)  // rgba(252, 248, 248, 1)
+
+/** Text on surface for light theme */
+val ColorOnSurfaceLight = Color(0xFF1C1B1C)  // rgba(28, 27, 28, 1)
+
+/** Outline for light theme */
+val ColorOutlineLight = Color(0xFF73787B)  // rgba(115, 120, 123, 1)
+
+// ============================================================================
+// EXTENDED COLORS (Colores adicionales del sistema)
+// ============================================================================
+
+/** Accent color - Bright blue for CTAs and interactive elements */
+val ColorAccent = Color(0xFF2B9AF3)  // rgba(43, 154, 243, 1) - From design justification
+
+/** Primary dark variant - Deeper blue */
+val ColorPrimaryDark = Color(0xFF1E63A8)  // rgba(30, 99, 168, 1) - From design justification
+
+/** Success color - Green for positive states */
+val ColorSuccess = Color(0xFF16A34A)  // rgba(22, 163, 74, 1)
+
+/** Warning color - Amber for caution states */
+val ColorWarning = Color(0xFFF59E0B)  // rgba(245, 158, 11, 1)
+
+/** Surface variant - Subtle blue-gray */
+val ColorSurfaceVariant = Color(0xFFF7FAFC)  // rgba(247, 250, 252, 1)
+
+/** Border color - Light blue-gray */
+val ColorBorder = Color(0xFFE6EEF9)  // rgba(230, 238, 249, 1)
+
+/** Text secondary - Medium gray for less important text */
+val ColorTextSecondary = Color(0xFF6B7280)  // rgba(107, 114, 128, 1)
+
+/** Text primary - Very dark blue-gray */
+val ColorTextPrimary = Color(0xFF0F1724)  // rgba(15, 23, 36, 1)
+
+// ============================================================================
+// BUTTON COLORS
+// ============================================================================
+
+/** Primary button background */
+val ButtonPrimaryBg = Color(0xFF2B9AF3)  // --btn-primary-bg
+
+/** Primary button foreground/text */
+val ButtonPrimaryFg = Color(0xFFFFFFFF)  // --btn-primary-fg
+
+/** Ghost/Outlined button background */
+val ButtonGhostBg = Color(0xFFFFFFFF)  // --btn-ghost-bg
+
+/** Ghost/Outlined button border */
+val ButtonGhostBorder = Color(0xFFE6EEF9)  // --btn-ghost-bd
+
+/** Ghost/Outlined button text */
+val ButtonGhostFg = Color(0xFF0B3A66)  // --btn-ghost-fg
+
+/** Danger/Destructive button background */
+val ButtonDangerBg = Color(0xFFDC2626)  // --btn-danger-bg
+
+/** Danger/Destructive button text */
+val ButtonDangerFg = Color(0xFFFFFFFF)  // --btn-danger-fg
+
+// ============================================================================
+// FOCUS AND INTERACTION STATES
+// ============================================================================
+
+/** Focus ring color - Accessible blue with transparency */
+val FocusRing = Color(0x522B9AF3)  // rgba(43, 154, 243, 0.32) - 3px ring
+
+/** Hover overlay - Subtle darkening */
+val HoverOverlay = Color(0x14000000)  // rgba(0, 0, 0, 0.08)
+
+/** Pressed overlay - More prominent darkening */
+val PressedOverlay = Color(0x1F000000)  // rgba(0, 0, 0, 0.12)
+
+// ============================================================================
+// NAVIGATION BAR (Configuración específica del navbar)
+// ============================================================================
+
+/** Navigation bar background */
+val NavBarBackground = Color(0xFFECF0FF)
+
+/** Navigation bar icon blue - for Inicio and Pedidos */
+val NavBarIconBlue = Color(0xFF1565C0)  // rgba(21, 101, 192, 1)
+
+/** Navigation bar icon green - for Visitas and Cuenta */
+val NavBarIconGreen = Color(0xFF008678)  // rgba(0, 134, 120, 1)
+
+// ============================================================================
+// STATUS COLORS (Para chips y estados)
+// ============================================================================
+
+/** Stock available - Success state */
+val StatusStockAvailable = Color(0xFF16A34A)
+
+/** Stock unavailable - Error state */
+val StatusStockUnavailable = Color(0xFFDC2626)
+
+/** Order pending - Warning state */
+val StatusOrderPending = Color(0xFFF59E0B)
+
+/** Order confirmed - Success state */
+val StatusOrderConfirmed = Color(0xFF16A34A)
+
+/** Visit scheduled - Info state */
+val StatusVisitScheduled = Color(0xFF2B9AF3)
+
+/** Visit completed - Success state */
+val StatusVisitCompleted = Color(0xFF16A34A)
+
+// ============================================================================
+// LEGACY COLORS (Material Theme defaults)
+// ============================================================================
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

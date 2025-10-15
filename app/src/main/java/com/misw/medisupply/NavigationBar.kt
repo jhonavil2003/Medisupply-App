@@ -7,19 +7,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.filled.Route
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.Route
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,8 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
+import com.misw.medisupply.ui.theme.NavBarBackground
+import com.misw.medisupply.ui.theme.NavBarIconBlue
+import com.misw.medisupply.ui.theme.NavBarIconGreen
 
 @Composable
 fun NavigationBarWithScaffold() {
@@ -49,9 +55,9 @@ fun NavigationBarWithScaffold() {
         ) {
             items(50) {
                 ListItem(
-                    headlineContent = { Text(text = "Item $it") },
+                    headlineContent = { Text(text = "Suministro médico $it") },
                     leadingContent = {
-                        Icon(imageVector = Icons.Default.Face, contentDescription = null)
+                        Icon(imageVector = Icons.Filled.Archive, contentDescription = null)
                     }
                 )
             }
@@ -64,32 +70,38 @@ fun NavigationBarM3() {
     var selectedItem by remember { mutableStateOf(0) }
     val barItems = listOf(
         BarItem(
-            title = "Home",
+            title = "Inicio",
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
-            route = "home"
+            route = "home",
+            iconColor = NavBarIconBlue
         ),
         BarItem(
-            title = "Contacts",
-            selectedIcon = Icons.Filled.Face,
-            unselectedIcon = Icons.Outlined.Face,
-            route = "contacts"
+            title = "Visitas",
+            selectedIcon = Icons.Filled.Route,
+            unselectedIcon = Icons.Outlined.Route,
+            route = "visitas",
+            iconColor = NavBarIconGreen
         ),
         BarItem(
-            title = "Settings",
-            selectedIcon = Icons.Filled.Settings,
-            unselectedIcon = Icons.Outlined.Settings,
-            route = "setting"
+            title = "Pedidos",
+            selectedIcon = Icons.Filled.Archive,
+            unselectedIcon = Icons.Outlined.Archive,
+            route = "pedidos",
+            iconColor = NavBarIconBlue
         ),
         BarItem(
-            title = "Shop",
-            selectedIcon = Icons.Filled.ShoppingCart,
-            unselectedIcon = Icons.Outlined.ShoppingCart,
-            route = "shop"
+            title = "Cuenta",
+            selectedIcon = Icons.Filled.Search,
+            unselectedIcon = Icons.Outlined.Search,
+            route = "cuenta",
+            iconColor = NavBarIconGreen
         )
     )
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = NavBarBackground
+    ) {
         barItems.forEachIndexed { index, barItem ->
             val selected = selectedItem == index
             NavigationBarItem(
@@ -101,11 +113,20 @@ fun NavigationBarM3() {
                 icon = {
                     Icon(
                         imageVector = if (selected) barItem.selectedIcon else barItem.unselectedIcon,
-                        contentDescription = barItem.title
+                        contentDescription = barItem.title,
+                        tint = barItem.iconColor,
+                        modifier = Modifier.size(28.dp)
                     )
                 },
                 label = { Text(text = barItem.title) },
-                alwaysShowLabel = selected
+                alwaysShowLabel = true,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = barItem.iconColor,
+                    unselectedIconColor = barItem.iconColor,
+                    selectedTextColor = barItem.iconColor,
+                    unselectedTextColor = barItem.iconColor,
+                    indicatorColor = NavBarBackground
+                )
             )
         }
     }
@@ -115,5 +136,6 @@ data class BarItem(
     val title: String,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-    val route: String
+    val route: String,
+    val iconColor: Color
 )
