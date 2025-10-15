@@ -1,4 +1,4 @@
-package com.misw.medisupply
+package com.appsmoviles.grupo15.medisupply_app.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
