@@ -61,7 +61,8 @@ import com.misw.medisupply.domain.model.order.Order
 @Composable
 fun MyOrdersScreen(
     viewModel: MyOrdersViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToEditOrder: (String) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -129,8 +130,7 @@ fun MyOrdersScreen(
                                     viewModel.onEvent(MyOrdersEvent.SelectOrder(order))
                                 },
                                 onEditClick = { order: Order ->
-                                    // TODO: Navigate to edit
-                                    viewModel.onEvent(MyOrdersEvent.SelectOrder(order))
+                                    onNavigateToEditOrder(order.id.toString())
                                 }
                             )
                         }
