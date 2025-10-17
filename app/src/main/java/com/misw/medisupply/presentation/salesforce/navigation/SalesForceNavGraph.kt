@@ -10,6 +10,7 @@ import com.misw.medisupply.presentation.salesforce.screens.home.SalesForceHomeSc
 import com.misw.medisupply.presentation.salesforce.screens.orders.CreateOrderScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.CustomerListScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.MyOrdersScreen
+import com.misw.medisupply.presentation.salesforce.screens.orders.MyOrdersViewModel
 import com.misw.medisupply.presentation.salesforce.screens.orders.OrdersScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.OrdersViewModel
 import com.misw.medisupply.presentation.salesforce.screens.performance.PerformanceScreen
@@ -76,7 +77,9 @@ fun SalesForceNavGraph(
         
         // My Orders Screen - Mis pedidos
         composable(route = SalesForceRoutes.MY_ORDERS) {
+            val viewModel: MyOrdersViewModel = hiltViewModel()
             MyOrdersScreen(
+                viewModel = viewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

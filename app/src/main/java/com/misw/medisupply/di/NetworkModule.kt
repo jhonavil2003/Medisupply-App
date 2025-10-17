@@ -3,6 +3,7 @@ package com.misw.medisupply.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.misw.medisupply.data.remote.api.customer.CustomerApiService
+import com.misw.medisupply.data.remote.api.order.OrderApiService
 import com.misw.medisupply.core.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -78,5 +79,14 @@ object NetworkModule {
     @Singleton
     fun provideCustomerApiService(retrofit: Retrofit): CustomerApiService {
         return retrofit.create(CustomerApiService::class.java)
+    }
+    
+    /**
+     * Provides OrderApiService
+     */
+    @Provides
+    @Singleton
+    fun provideOrderApiService(retrofit: Retrofit): OrderApiService {
+        return retrofit.create(OrderApiService::class.java)
     }
 }
