@@ -17,7 +17,7 @@ val ColorPrimary = Color(0xFF005DB7)  // rgba(0, 93, 183, 1)
 val ColorSecondary = Color(0xFF4B6173)  // rgba(75, 97, 115, 1)
 
 /** Tertiary brand color */
-val ColorTertiary = Color(0xFF006B5F)  // rgba(0, 107, 95, 1)
+val ColorTertiary = Color(0xff008678)  // rgba(0, 107, 95, 1)
 
 /** Error color */
 val ColorError = Color(0xFFB4271F)  // rgba(180, 39, 31, 1)
@@ -105,7 +105,7 @@ val ColorTextPrimary = Color(0xFF0F1724)  // rgba(15, 23, 36, 1)
 // ============================================================================
 
 /** Primary button background */
-val ButtonPrimaryBg = Color(0xFF2B9AF3)  // --btn-primary-bg
+val ButtonPrimaryBg = Color(0xffdae5ff)  // --btn-primary-bg
 
 /** Primary button foreground/text */
 val ButtonPrimaryFg = Color(0xFFFFFFFF)  // --btn-primary-fg
@@ -184,6 +184,8 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+val bgTertiary = Color(0xffb4fff1)
 
 val primaryLight = Color(0xFF405F90)
 val onPrimaryLight = Color(0xFFFFFFFF)

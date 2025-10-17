@@ -1,146 +1,145 @@
 package com.misw.medisupply.presentation.salesforce.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import com.misw.medisupply.ui.theme.ButtonPrimaryBg
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.misw.medisupply.ui.theme.ColorTertiary
+import com.misw.medisupply.ui.theme.bgTertiary
+import com.misw.medisupply.ui.theme.ColorPrimaryLight
 
 /**
- * Card component to display order information
+ * Card component to display order information in compact horizontal layout
  */
 @Composable
 fun OrderCard(
     order: Order,
-    onClick: () -> Unit,
+    onDetailClick: () -> Unit,
+    onEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Order number and status
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = order.orderNumber,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                
-                OrderStatusBadge(status = order.status)
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Order date
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            // Icon
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(bgTertiary),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.CalendarToday,
+                    imageVector = Icons.Default.Description,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                        .format(order.orderDate),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = ColorTertiary,
+                    modifier = Modifier.size(28.dp)
                 )
             }
             
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             
-            // Delivery location
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            // Order info
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(end = 8.dp)
+                Text(
+                    text = "${order.orderNumber} - ${order.deliveryCity}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    color = Color(0xFF212121)
                 )
                 Text(
-                    text = "${order.deliveryCity}, ${order.deliveryDepartment}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(order.orderDate)} Estado: ${getStatusText(order.status)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = Color(0xff8d9194)
+                )
+                Text(
+                    text = "Total: ${order.getFormattedTotal()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = Color(0xff8d9194)
                 )
             }
             
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             
-            // Items count
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            // Action button
+            val buttonText = if (order.status == OrderStatus.CONFIRMED) "Detalle" else "Editar"
+            val buttonAction = if (order.status == OrderStatus.CONFIRMED) onDetailClick else onEditClick
+            
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(ButtonPrimaryBg)
             ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = "${order.getProductCount()} productos (${order.getTotalItems()} unidades)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Total amount
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Total:",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = order.getFormattedTotal(),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                TextButton(
+                    onClick = buttonAction,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = buttonText,
+                        color = ColorPrimaryLight,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
+    }
+}
+
+/**
+ * Get status text in Spanish
+ */
+private fun getStatusText(status: OrderStatus): String {
+    return when (status) {
+        OrderStatus.PENDING -> "Pendiente"
+        OrderStatus.CONFIRMED -> "Confirmado"
+        OrderStatus.PROCESSING -> "En proceso"
+        OrderStatus.SHIPPED -> "Enviado"
+        OrderStatus.DELIVERED -> "Entregado"
+        OrderStatus.CANCELLED -> "Cancelado"
     }
 }
 
