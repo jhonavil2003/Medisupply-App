@@ -209,7 +209,7 @@ class EditOrderViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 isDeleting = false,
-                                successMessage = "Pedido eliminado exitosamente"
+                                successMessage = "La orden de compra ha sido eliminada"
                             )
                         }
                     }

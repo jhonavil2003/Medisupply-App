@@ -1,6 +1,7 @@
 package com.misw.medisupply.presentation.salesforce.screens.orders
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -94,20 +97,20 @@ fun EditOrderScreen(
                 onNavigateBack = onNavigateBack
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
-        if (state.isLoading) {
-            LoadingIndicator()
-        } else if (state.order != null) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (state.isLoading) {
+                LoadingIndicator()
+            } else if (state.order != null) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 16.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                 // Customer information card
                 item {
                     CustomerInfoCard(order = state.order!!)
@@ -154,6 +157,43 @@ fun EditOrderScreen(
                         onDelete = { viewModel.onEvent(EditOrderEvent.ShowDeleteConfirmation) }
                     )
                 }
+                }
+            }
+            
+            // Custom Snackbar in top-right corner
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 80.dp, end = 16.dp)
+            ) { data ->
+                Card(
+                    modifier = Modifier.padding(8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF4CAF50)
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = data.visuals.message,
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }
@@ -163,7 +203,7 @@ fun EditOrderScreen(
  * Customer information card
  */
 @Composable
-private fun CustomerInfoCard(
+fun CustomerInfoCard(
     order: com.misw.medisupply.domain.model.order.Order,
     modifier: Modifier = Modifier
 ) {
@@ -202,7 +242,7 @@ private fun CustomerInfoCard(
  * Order information card
  */
 @Composable
-private fun OrderInfoCard(
+fun OrderInfoCard(
     order: com.misw.medisupply.domain.model.order.Order,
     modifier: Modifier = Modifier
 ) {
@@ -269,7 +309,7 @@ private fun OrderInfoCard(
  * Product search bar
  */
 @Composable
-private fun ProductSearchBar(
+fun ProductSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -294,7 +334,7 @@ private fun ProductSearchBar(
  * Order footer with summary and action buttons
  */
 @Composable
-private fun OrderFooter(
+fun OrderFooter(
     productLinesCount: Int,
     totalAmount: String,
     canConfirm: Boolean,
@@ -390,7 +430,7 @@ private fun OrderFooter(
  * Info row helper component
  */
 @Composable
-private fun InfoRow(
+fun InfoRow(
     label: String,
     value: String,
     modifier: Modifier = Modifier
@@ -420,7 +460,7 @@ private fun InfoRow(
  * Delete confirmation dialog
  */
 @Composable
-private fun DeleteConfirmationDialog(
+fun DeleteConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
