@@ -68,6 +68,11 @@ fun MyOrdersScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
     
+    // Reload orders when screen is displayed
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(MyOrdersEvent.LoadOrders)
+    }
+    
     // Show error in snackbar
     LaunchedEffect(state.error) {
         state.error?.let { error ->

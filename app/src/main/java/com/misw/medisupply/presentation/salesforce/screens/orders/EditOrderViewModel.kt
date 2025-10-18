@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditOrderViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
+    private val deleteOrderUseCase: DeleteOrderUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     
@@ -189,20 +191,40 @@ class EditOrderViewModel @Inject constructor(
      * Delete order
      */
     private fun deleteOrder() {
-        viewModelScope.launch {
-            _state.update { it.copy(isDeleting = true, error = null, showDeleteConfirmation = false) }
-            
-            // TODO: Implement delete order use case
-            // Simulate API call
-            kotlinx.coroutines.delay(1000)
-            
-            _state.update {
-                it.copy(
-                    isDeleting = false,
-                    successMessage = "Pedido eliminado exitosamente"
-                )
+        val currentOrder = _state.value.order ?: return
+        
+        deleteOrderUseCase(currentOrder.id)
+            .onEach { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _state.update { 
+                            it.copy(
+                                isDeleting = true, 
+                                error = null, 
+                                showDeleteConfirmation = false
+                            ) 
+                        }
+                    }
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                isDeleting = false,
+                                successMessage = "Pedido eliminado exitosamente"
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                isDeleting = false,
+                                error = resource.message ?: "Error al eliminar el pedido",
+                                showDeleteConfirmation = false
+                            )
+                        }
+                    }
+                }
             }
-        }
+            .launchIn(viewModelScope)
     }
     
     /**
