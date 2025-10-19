@@ -2,10 +2,6 @@ package com.misw.medisupply.presentation.salesforce.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -160,27 +156,14 @@ fun SalesForceNavGraph(
         }
         
         // My Orders Screen - Mis pedidos
-        composable(
-            route = "${SalesForceRoutes.MY_ORDERS}?deletedOrder={deletedOrder}",
-            arguments = listOf(
-                navArgument("deletedOrder") { 
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) { backStackEntry ->
-            val deletedOrder = backStackEntry.arguments?.getString("deletedOrder")
-            val message = deletedOrder?.let { "La orden $it ha sido eliminada exitosamente" }
-            
+        composable(route = SalesForceRoutes.MY_ORDERS) {
             MyOrdersScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onNavigateToEditOrder = { orderId ->
                     navController.navigate("${SalesForceRoutes.ORDER_DETAIL}/$orderId")
-                },
-                deletedOrderMessage = message
+                }
             )
         }
         
@@ -196,14 +179,6 @@ fun SalesForceNavGraph(
                 orderId = orderId,
                 onNavigateBack = {
                     navController.popBackStack()
-                },
-                onOrderDeleted = { orderNumber ->
-                    // Navigate back with the deleted order number as parameter
-                    navController.navigate("${SalesForceRoutes.MY_ORDERS}?deletedOrder=$orderNumber") {
-                        popUpTo(SalesForceRoutes.MY_ORDERS) {
-                            inclusive = true
-                        }
-                    }
                 }
             )
         }
