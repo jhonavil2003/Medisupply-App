@@ -2,9 +2,8 @@ package com.misw.medisupply.presentation.salesforce.screens.orders.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.misw.medisupply.core.base.Resource
-import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.usecase.order.GetOrderByIdUseCase
+import com.misw.medisupply.core.base.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +22,26 @@ class OrderDetailViewModel @Inject constructor(
     
     private val _state = MutableStateFlow(OrderDetailState())
     val state: StateFlow<OrderDetailState> = _state.asStateFlow()
+    
+    /**
+     * Handle events from the UI
+     */
+    fun onEvent(event: OrderDetailEvent) {
+        when (event) {
+            is OrderDetailEvent.LoadOrderDetail -> {
+                loadOrderDetail(event.orderId)
+            }
+            is OrderDetailEvent.RetryLoad -> {
+                // Retry with the current order ID if available
+                _state.value.order?.id?.let { orderId ->
+                    loadOrderDetail(orderId.toString())
+                }
+            }
+            is OrderDetailEvent.ClearError -> {
+                _state.update { it.copy(error = null) }
+            }
+        }
+    }
     
     /**
      * Load order detail by ID
@@ -58,12 +77,3 @@ class OrderDetailViewModel @Inject constructor(
         }
     }
 }
-
-/**
- * State for Order Detail Screen
- */
-data class OrderDetailState(
-    val isLoading: Boolean = false,
-    val order: Order? = null,
-    val error: String? = null
-)
