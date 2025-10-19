@@ -41,6 +41,20 @@ interface OrderRepository {
         preferredDistributionCenter: String?,
         notes: String?
     ): Flow<Resource<Order>>
+    
+    /**
+     * Get list of orders with optional filters
+     * 
+     * @param sellerId Filter by seller ID
+     * @param customerId Filter by customer ID
+     * @param status Filter by order status
+     * @return Flow emitting Resource with list of orders
+     */
+    fun getOrders(
+        sellerId: String? = null,
+        customerId: Int? = null,
+        status: String? = null
+    ): Flow<Resource<List<Order>>>
 }
 
 /**
