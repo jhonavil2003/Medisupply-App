@@ -18,6 +18,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+ 
 
 rootProject.name = "Medisupply"
 include(":app")

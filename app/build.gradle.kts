@@ -36,6 +36,12 @@ android {
     kotlinOptions {
         jvmTarget = "21"
     }
+    // Prefer Gradle toolchain for reproducible Java 21 usage across environments
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    }
     buildFeatures {
         compose = true
     }
@@ -90,10 +96,17 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("com.google.truth:truth:1.4.4")
+    testImplementation("io.mockk:mockk:1.13.13")
+    testImplementation("app.cash.turbine:turbine:1.2.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation("io.mockk:mockk-android:1.13.13")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.54")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:2.54")
     
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
