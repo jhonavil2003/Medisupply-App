@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.customermanagement.screens.shop
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +26,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,7 +76,11 @@ fun ShopScreen(
             orders = uiState.orders,
             isLoading = uiState.isLoading,
             error = uiState.error,
-            onRetry = { viewModel.retryLoadOrders() }
+            onRetry = { viewModel.retryLoadOrders() },
+            ordersToShow = uiState.ordersToShow,
+            availablePageSizes = uiState.availablePageSizes,
+            onChangePageSize = { newSize -> viewModel.changeOrdersToShow(newSize) },
+            getPageSizeDisplayText = { size -> viewModel.getPageSizeDisplayText(size) }
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -126,7 +136,11 @@ private fun HistorySection(
     orders: List<Order>,
     isLoading: Boolean,
     error: String?,
-    onRetry: () -> Unit
+    ordersToShow: Int,
+    availablePageSizes: List<Int>,
+    onRetry: () -> Unit,
+    onChangePageSize: (Int) -> Unit,
+    getPageSizeDisplayText: (Int) -> String
 ) {
     Column {
         // Header
@@ -145,23 +159,50 @@ private fun HistorySection(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                var showDropdown by remember { mutableStateOf(false) }
+                
                 Text(
                     text = "Mostrar",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "3",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Dropdown",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
+                
+                Box {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { showDropdown = true }
+                    ) {
+                        Text(
+                            text = getPageSizeDisplayText(ordersToShow),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Dropdown",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    
+                    DropdownMenu(
+                        expanded = showDropdown,
+                        onDismissRequest = { showDropdown = false }
+                    ) {
+                        availablePageSizes.forEach { size ->
+                            DropdownMenuItem(
+                                text = { 
+                                    Text(getPageSizeDisplayText(size))
+                                },
+                                onClick = {
+                                    onChangePageSize(size)
+                                    showDropdown = false
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
         
@@ -187,10 +228,11 @@ private fun HistorySection(
                 EmptyOrdersView()
             }
             else -> {
+                val ordersToDisplay = if (ordersToShow == -1) orders else orders.take(ordersToShow)
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(orders.take(3)) { order ->
+                    items(ordersToDisplay) { order ->
                         OrderCard(order = order)
                     }
                 }

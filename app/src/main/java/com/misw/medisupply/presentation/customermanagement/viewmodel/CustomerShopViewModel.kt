@@ -68,6 +68,20 @@ class CustomerShopViewModel @Inject constructor(
     fun retryLoadOrders() {
         loadCustomerOrders()
     }
+    
+    /**
+     * Change the number of orders to show
+     */
+    fun changeOrdersToShow(count: Int) {
+        _uiState.value = _uiState.value.copy(ordersToShow = count)
+    }
+    
+    /**
+     * Get the display text for page size
+     */
+    fun getPageSizeDisplayText(size: Int): String {
+        return if (size == -1) "Todas" else size.toString()
+    }
 }
 
 /**
@@ -76,5 +90,7 @@ class CustomerShopViewModel @Inject constructor(
 data class CustomerShopUiState(
     val isLoading: Boolean = false,
     val orders: List<Order> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val ordersToShow: Int = 3, // Cantidad de órdenes a mostrar
+    val availablePageSizes: List<Int> = listOf(3, 5, 10, -1) // -1 significa "Todas"
 )
