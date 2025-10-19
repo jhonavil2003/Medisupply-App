@@ -47,6 +47,11 @@ class MyOrdersViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         getOrdersUseCase = mockk()
+        
+        // Configure default mock behavior for init block
+        coEvery { 
+            getOrdersUseCase(any(), any(), any()) 
+        } returns flowOf(Resource.Loading())
     }
 
     @After
@@ -56,8 +61,14 @@ class MyOrdersViewModelTest {
 
     @Test
     fun `initial state is correct`() = runTest {
+        // Given - configure mock to return empty list
+        coEvery { 
+            getOrdersUseCase(any(), any(), any()) 
+        } returns flowOf(Resource.Success(emptyList()))
+        
         // When
         viewModel = MyOrdersViewModel(getOrdersUseCase)
+        advanceUntilIdle()
 
         // Then
         viewModel.state.test {
@@ -148,7 +159,12 @@ class MyOrdersViewModelTest {
     @Test
     fun `FilterByStatus updates selected status`() = runTest {
         // Given
+        coEvery { 
+            getOrdersUseCase(any(), any(), any()) 
+        } returns flowOf(Resource.Success(emptyList()))
+        
         viewModel = MyOrdersViewModel(getOrdersUseCase)
+        advanceUntilIdle()
 
         // When
         viewModel.onEvent(MyOrdersEvent.FilterByStatus(OrderStatus.CONFIRMED))
@@ -164,7 +180,13 @@ class MyOrdersViewModelTest {
     @Test
     fun `FilterByStatus with null clears filter`() = runTest {
         // Given
+        coEvery { 
+            getOrdersUseCase(any(), any(), any()) 
+        } returns flowOf(Resource.Success(emptyList()))
+        
         viewModel = MyOrdersViewModel(getOrdersUseCase)
+        advanceUntilIdle()
+        
         viewModel.onEvent(MyOrdersEvent.FilterByStatus(OrderStatus.CONFIRMED))
         advanceUntilIdle()
 
@@ -235,8 +257,13 @@ class MyOrdersViewModelTest {
     @Test
     fun `SelectOrder event updates selected order`() = runTest {
         // Given
+        coEvery { 
+            getOrdersUseCase(any(), any(), any()) 
+        } returns flowOf(Resource.Success(emptyList()))
+        
         val mockOrder = createMockOrder(1)
         viewModel = MyOrdersViewModel(getOrdersUseCase)
+        advanceUntilIdle()
 
         // When
         viewModel.onEvent(MyOrdersEvent.SelectOrder(mockOrder))
@@ -294,7 +321,12 @@ class MyOrdersViewModelTest {
     @Test
     fun `hasOrders returns false when no orders exist`() = runTest {
         // Given
+        coEvery { 
+            getOrdersUseCase(any(), any(), any()) 
+        } returns flowOf(Resource.Success(emptyList()))
+        
         viewModel = MyOrdersViewModel(getOrdersUseCase)
+        advanceUntilIdle()
 
         // When/Then
         viewModel.state.test {

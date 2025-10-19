@@ -171,7 +171,7 @@ class OrderRepositoryImplTest {
         assertThat(results[1]).isInstanceOf(Resource.Error::class.java)
         
         val errorResult = results[1] as Resource.Error
-        assertThat(errorResult.message).contains("Error")
+        assertThat(errorResult.message).contains("Network error")
     }
 
     // ============ DELETE ORDER TESTS ============
@@ -263,7 +263,7 @@ class OrderRepositoryImplTest {
         assertThat(results[1]).isInstanceOf(Resource.Error::class.java)
         
         val errorResult = results[1] as Resource.Error
-        assertThat(errorResult.message).contains("Error del servidor")
+        assertThat(errorResult.message).contains("Error en el servidor")
     }
 
     // ============ HELPER METHODS ============
