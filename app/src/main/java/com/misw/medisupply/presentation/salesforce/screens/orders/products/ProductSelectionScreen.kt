@@ -114,12 +114,12 @@ fun ProductSelectionScreen(
                     .fillMaxSize()
                     .padding(horizontal = 24.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 
                 // Customer Information Card
                 CustomerInfoCard(customer = customer)
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 
                 // Search Bar
                 SearchBar(
@@ -218,15 +218,12 @@ fun ProductSelectionScreen(
     }
 }
 
-/**
- * Customer information card displaying basic details
- */
 @Composable
 private fun CustomerInfoCard(customer: Customer) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -234,37 +231,37 @@ private fun CustomerInfoCard(customer: Customer) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(12.dp)
         ) {
             Text(
                 text = "Cliente Seleccionado",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.primary
             )
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
             // Customer details
             CustomerDetailRow(
                 label = "Nombre:",
                 value = customer.getDisplayName()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             
             CustomerDetailRow(
                 label = "NIT:",
                 value = customer.documentNumber
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             
             CustomerDetailRow(
                 label = "Código:",
                 value = customer.id.toString()
             )
-            Spacer(modifier = Modifier.height(8.dp))
             
             customer.contactEmail?.let { email ->
+                Spacer(modifier = Modifier.height(6.dp))
                 CustomerDetailRow(
                     label = "Correo:",
                     value = email
@@ -274,34 +271,33 @@ private fun CustomerInfoCard(customer: Customer) {
     }
 }
 
-/**
- * Customer detail row with label and value
- */
+
 @Composable
 private fun CustomerDetailRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-/**
- * Search bar for filtering products by name
- */
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Search bar component - Compact design
+ */
 @Composable
 private fun SearchBar(
     searchText: String,
@@ -314,28 +310,41 @@ private fun SearchBar(
     OutlinedTextField(
         value = searchText,
         onValueChange = onSearchTextChange,
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Buscar productos...") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        placeholder = { 
+            Text(
+                "Buscar productos...",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
             )
         },
         trailingIcon = {
             if (searchText.isNotEmpty()) {
-                IconButton(onClick = onClearSearch) {
+                IconButton(
+                    onClick = onClearSearch,
+                    modifier = Modifier.size(32.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "Limpiar búsqueda",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
         },
         singleLine = true,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
+        textStyle = MaterialTheme.typography.bodyMedium,
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Search
         ),
@@ -348,12 +357,6 @@ private fun SearchBar(
     )
 }
 
-/**
- * Filter chips row for quick filtering
- */
-/**
- * Products list with pagination controls
- */
 @Composable
 private fun ProductsList(
     products: List<Product>,
@@ -413,9 +416,7 @@ private fun ProductsList(
     }
 }
 
-/**
- * Individual product card with cart controls
- */
+
 @Composable
 private fun ProductCard(
     product: Product,
@@ -431,7 +432,7 @@ private fun ProductCard(
     
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -440,7 +441,7 @@ private fun ProductCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
             // Product name and SKU with stock badge
             Row(
@@ -451,14 +452,14 @@ private fun ProductCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = product.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = "SKU: ${product.sku}",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -471,49 +472,32 @@ private fun ProductCard(
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
-            // Category and price
+            // Price and cold chain indicator in row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = product.category,
-                    style = MaterialTheme.typography.bodySmall,
+                    text = product.getFormattedPrice(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 
-                Text(
-                    text = product.getFormattedPrice(),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                // Cold chain indicator
+                if (product.requiresColdChain) {
+                    Text(
+                        text = "❄️ Cadena de frío",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
             }
             
-            // Cold chain indicator
-            if (product.requiresColdChain) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "❄️ Requiere cadena de frío",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-            }
-            
-            // Supplier info
-            product.supplierName?.let { supplier ->
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Proveedor: $supplier",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             // Cart controls
             CartControls(
@@ -527,9 +511,6 @@ private fun ProductCard(
     }
 }
 
-/**
- * Pagination control buttons
- */
 @Composable
 private fun PaginationButtons(
     hasPrev: Boolean,
@@ -539,29 +520,38 @@ private fun PaginationButtons(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
+        // Previous button - Compact text button
+        TextButton(
             onClick = onPreviousClick,
-            modifier = Modifier.weight(1f),
-            enabled = hasPrev
+            enabled = hasPrev,
+            modifier = Modifier.height(32.dp)
         ) {
-            Text("Anterior")
+            Text(
+                "← Anterior",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium
+            )
         }
         
-        Button(
+        Spacer(modifier = Modifier.width(24.dp))
+        
+        // Next button - Compact text button
+        TextButton(
             onClick = onNextClick,
-            modifier = Modifier.weight(1f),
-            enabled = hasNext
+            enabled = hasNext,
+            modifier = Modifier.height(32.dp)
         ) {
-            Text("Siguiente")
+            Text(
+                "Siguiente →",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
-
-/**
- * Error message with retry button
- */
 @Composable
 private fun ErrorMessage(
     message: String,
@@ -591,9 +581,6 @@ private fun ErrorMessage(
     }
 }
 
-/**
- * Empty products message
- */
 @Composable
 private fun EmptyProductsMessage(modifier: Modifier = Modifier) {
     Column(
@@ -619,10 +606,6 @@ private fun EmptyProductsMessage(modifier: Modifier = Modifier) {
         )
     }
 }
-
-/**
- * Stock badge showing availability status
- */
 @Composable
 private fun StockBadge(stockLevel: com.misw.medisupply.domain.model.stock.StockLevel) {
     val (backgroundColor, textColor, text) = when {
@@ -660,9 +643,6 @@ private fun StockBadge(stockLevel: com.misw.medisupply.domain.model.stock.StockL
     }
 }
 
-/**
- * Stock not available badge (shown when there's an error)
- */
 @Composable
 private fun StockNotAvailableBadge() {
     Card(
@@ -682,9 +662,6 @@ private fun StockNotAvailableBadge() {
     }
 }
 
-/**
- * Stock error banner with retry option
- */
 @Composable
 private fun StockErrorBanner(
     errorMessage: String,
@@ -748,9 +725,6 @@ private fun StockErrorBanner(
     }
 }
 
-/**
- * Cart controls for adding/removing products
- */
 @Composable
 private fun CartControls(
     cartQuantity: Int,
@@ -762,16 +736,14 @@ private fun CartControls(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Always show quantity controls in (-)  (qty)  (+) format
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            // Remove button
             OutlinedIconButton(
                 onClick = onRemoveFromCart,
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(36.dp),
                 enabled = cartQuantity > 0,
                 colors = IconButtonDefaults.outlinedIconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary,
@@ -781,11 +753,10 @@ private fun CartControls(
                 Icon(
                     imageVector = Icons.Default.Remove,
                     contentDescription = "Quitar del carrito",
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
             
-            // Quantity display
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = if (cartQuantity > 0) {
@@ -794,12 +765,12 @@ private fun CartControls(
                         MaterialTheme.colorScheme.surfaceVariant
                     }
                 ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.width(80.dp)
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.width(60.dp)
             ) {
                 Text(
                     text = "$cartQuantity",
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (cartQuantity > 0) {
                         MaterialTheme.colorScheme.onPrimaryContainer
@@ -807,16 +778,15 @@ private fun CartControls(
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
                     modifier = Modifier
-                        .padding(vertical = 12.dp)
+                        .padding(vertical = 8.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
             }
             
-            // Add button
             FilledIconButton(
                 onClick = onAddToCart,
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(36.dp),
                 enabled = !isOutOfStock && (stockAvailable == null || cartQuantity < stockAvailable),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -828,7 +798,7 @@ private fun CartControls(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Agregar al carrito",
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
@@ -856,9 +826,6 @@ private fun CartControls(
     }
 }
 
-/**
- * Bottom bar showing cart summary and confirm button
- */
 @Composable
 private fun CartBottomBar(
     itemCount: Int,
@@ -867,7 +834,7 @@ private fun CartBottomBar(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -876,62 +843,61 @@ private fun CartBottomBar(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // Items count and total
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Text(
                         text = "$itemCount ${if (itemCount == 1) "producto" else "productos"}",
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Text(
-                        text = "en el carrito",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
                 
-                Column(
-                    horizontalAlignment = Alignment.End
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "Total",
-                        style = MaterialTheme.typography.bodySmall,
+                        text = "Total:",
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = "${"$%,.0f".format(totalAmount)}",
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
-            // Confirm order button
             Button(
                 onClick = onConfirmOrder,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                shape = RoundedCornerShape(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Confirmar Pedido",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
             }
