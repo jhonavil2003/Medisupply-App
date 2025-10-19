@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -60,20 +62,41 @@ import com.misw.medisupply.presentation.salesforce.components.OrderCard
 fun MyOrdersScreen(
     viewModel: MyOrdersViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToEditOrder: (String) -> Unit = {}
+    onNavigateToEditOrder: (String) -> Unit = {},
+    deletedOrderMessage: String? = null
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
+    var isSuccessMessage by remember { mutableStateOf(false) }
+    var pendingSuccessMessage by remember { mutableStateOf<String?>(null) }
     
-    // Reload orders when screen is displayed
-    LaunchedEffect(Unit) {
+    // Reload orders when screen is displayed or when returning from delete
+    LaunchedEffect(deletedOrderMessage) {
+        if (deletedOrderMessage != null) {
+            // Store the message to show after reload
+            pendingSuccessMessage = deletedOrderMessage
+        }
         viewModel.onEvent(MyOrdersEvent.LoadOrders)
+    }
+    
+    // Show success message after orders are loaded
+    LaunchedEffect(state.isLoading, pendingSuccessMessage) {
+        if (!state.isLoading && pendingSuccessMessage != null) {
+            isSuccessMessage = true
+            snackbarHostState.showSnackbar(
+                message = pendingSuccessMessage!!,
+                withDismissAction = true
+            )
+            isSuccessMessage = false
+            pendingSuccessMessage = null
+        }
     }
     
     // Show error in snackbar
     LaunchedEffect(state.error) {
         state.error?.let { error ->
+            isSuccessMessage = false
             snackbarHostState.showSnackbar(error)
             viewModel.onEvent(MyOrdersEvent.ClearError)
         }
@@ -87,7 +110,30 @@ fun MyOrdersScreen(
                 onNavigateBack = onNavigateBack
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { 
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp, end = 16.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.widthIn(max = 400.dp)
+                ) { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = if (isSuccessMessage) {
+                            Color(0xFF008376)
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        },
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                }
+            }
+        },
         containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
         PullToRefreshBox(

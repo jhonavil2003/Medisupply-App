@@ -69,7 +69,8 @@ import java.util.Locale
 fun OrderDetailScreen(
     orderId: String,
     viewModel: OrderDetailViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onOrderDeleted: (String) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -87,7 +88,18 @@ fun OrderDetailScreen(
     
     LaunchedEffect(state.deleteSuccess) {
         if (state.deleteSuccess) {
-            onNavigateBack()
+            // Close dialog first
+            showDeleteDialog = false
+            // Get order number and trigger callback (callback handles navigation)
+            val orderNumber = state.order?.orderNumber ?: "N/A"
+            onOrderDeleted(orderNumber)
+        }
+    }
+    
+    // Close dialog on error
+    LaunchedEffect(state.error, state.isDeleting) {
+        if (state.error != null && !state.isDeleting) {
+            showDeleteDialog = false
         }
     }
     
@@ -134,15 +146,17 @@ fun OrderDetailScreen(
     }
     
     // Delete confirmation dialog
-    if (showDeleteDialog) {
+    if (showDeleteDialog && !state.deleteSuccess) {
         DeleteConfirmationDialog(
             order = state.order,
+            isDeleting = state.isDeleting,
             onConfirm = {
                 viewModel.onEvent(OrderDetailEvent.DeleteOrder)
-                showDeleteDialog = false
             },
             onDismiss = {
-                showDeleteDialog = false
+                if (!state.isDeleting) {
+                    showDeleteDialog = false
+                }
             }
         )
     }
@@ -815,11 +829,12 @@ private fun ActionButtons(
 @Composable
 private fun DeleteConfirmationDialog(
     order: Order?,
+    isDeleting: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isDeleting) onDismiss() },
         title = {
             Text(
                 text = "¿Eliminar pedido?",
@@ -828,55 +843,79 @@ private fun DeleteConfirmationDialog(
         },
         text = {
             Column {
-                Text(
-                    text = "Esta acción no se puede deshacer.",
-                    fontWeight = FontWeight.Medium
-                )
-                
-                order?.let {
+                if (isDeleting) {
+                    // Show loading state
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Eliminando pedido...",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "Esta acción no se puede deshacer.",
+                        fontWeight = FontWeight.Medium
+                    )
+                    
+                    order?.let {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Order info
+                        Text(
+                            text = "Pedido: ${it.orderNumber ?: "N/A"}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF424242)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Estado: ${it.status.displayName}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF424242)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Total: ${it.getFormattedTotal()}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF424242)
+                        )
+                    }
+                    
                     Spacer(modifier = Modifier.height(12.dp))
                     
-                    // Order info
                     Text(
-                        text = "Pedido: ${it.orderNumber ?: "N/A"}",
-                        fontSize = 14.sp,
-                        color = Color(0xFF424242)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Estado: ${it.status.displayName}",
-                        fontSize = 14.sp,
-                        color = Color(0xFF424242)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Total: ${it.getFormattedTotal()}",
-                        fontSize = 14.sp,
-                        color = Color(0xFF424242)
+                        text = "¿Está seguro de que desea continuar?",
+                        fontWeight = FontWeight.Medium
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Text(
-                    text = "¿Está seguro de que desea continuar?",
-                    fontWeight = FontWeight.Medium
-                )
             }
         },
         confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFD32F2F)
-                )
-            ) {
-                Text("Eliminar")
+            if (!isDeleting) {
+                Button(
+                    onClick = onConfirm,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFD32F2F)
+                    )
+                ) {
+                    Text("Eliminar")
+                }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+            if (!isDeleting) {
+                TextButton(onClick = onDismiss) {
+                    Text("Cancelar")
+                }
             }
         }
     )
