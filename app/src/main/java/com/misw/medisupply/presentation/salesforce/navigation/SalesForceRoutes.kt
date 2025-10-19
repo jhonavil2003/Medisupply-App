@@ -16,9 +16,9 @@ object SalesForceRoutes {
     const val MY_ORDERS = "salesforce_my_orders"
     const val PRODUCT_SELECTION = "salesforce_product_selection"
     const val ORDER_REVIEW = "salesforce_order_review"
+    const val ORDER_DETAIL = "salesforce_order_detail" // Changed from comment to actual route
     
     // Future routes for detail screens
-    const val ORDER_DETAIL = "salesforce_order_detail"
     const val VISIT_DETAIL = "salesforce_visit_detail"
     const val CUSTOMER_DETAIL = "salesforce_customer_detail"
 }

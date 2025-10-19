@@ -55,6 +55,14 @@ interface OrderRepository {
         customerId: Int? = null,
         status: String? = null
     ): Flow<Resource<List<Order>>>
+    
+    /**
+     * Get a single order by ID
+     * 
+     * @param orderId ID of the order to retrieve
+     * @return Flow emitting Resource with order data
+     */
+    fun getOrderById(orderId: Int): Flow<Resource<Order>>
 }
 
 /**

@@ -150,4 +150,53 @@ class OrderRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
         }
     }
+    
+    override fun getOrderById(orderId: Int): Flow<Resource<Order>> = flow {
+        try {
+            // Emit loading state
+            emit(Resource.Loading())
+            
+            // Make API call
+            val response = apiService.getOrderById(orderId)
+            
+            // Handle response
+            if (response.isSuccessful) {
+                val orderDto = response.body()
+                if (orderDto != null) {
+                    // Convert DTO to domain model
+                    emit(Resource.Success(orderDto.toDomain()))
+                } else {
+                    emit(Resource.Error(Constants.ErrorMessages.NO_DATA))
+                }
+            } else {
+                // Handle HTTP errors
+                val errorMessage = when (response.code()) {
+                    401 -> Constants.ErrorMessages.UNAUTHORIZED
+                    404 -> "Pedido no encontrado"
+                    500 -> Constants.ErrorMessages.SERVER_ERROR
+                    else -> "${Constants.ErrorMessages.SERVER_ERROR} (${response.code()})"
+                }
+                emit(Resource.Error(errorMessage))
+            }
+            
+        } catch (e: HttpException) {
+            // HTTP exceptions (4xx, 5xx responses)
+            val errorMessage = when (e.code()) {
+                401 -> Constants.ErrorMessages.UNAUTHORIZED
+                404 -> "Pedido no encontrado"
+                408 -> Constants.ErrorMessages.TIMEOUT
+                500, 502, 503 -> Constants.ErrorMessages.SERVER_ERROR
+                else -> Constants.ErrorMessages.UNKNOWN_ERROR
+            }
+            emit(Resource.Error(errorMessage))
+            
+        } catch (e: IOException) {
+            // Network errors (no connection, timeout, etc.)
+            emit(Resource.Error(Constants.ErrorMessages.NETWORK_ERROR))
+            
+        } catch (e: Exception) {
+            // Unknown errors
+            emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
+        }
+    }
 }

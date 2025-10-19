@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -40,4 +41,15 @@ interface OrderApiService {
         @Query("customer_id") customerId: Int? = null,
         @Query("status") status: String? = null
     ): Response<OrdersResponse>
+    
+    /**
+     * Get a single order by ID
+     * 
+     * @param orderId ID of the order to retrieve
+     * @return Response containing OrderDto with order details
+     */
+    @GET("orders/{id}")
+    suspend fun getOrderById(
+        @Path("id") orderId: Int
+    ): Response<OrderDto>
 }
