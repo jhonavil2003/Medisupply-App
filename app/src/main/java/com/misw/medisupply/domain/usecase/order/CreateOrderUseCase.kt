@@ -42,6 +42,7 @@ class CreateOrderUseCase @Inject constructor(
         deliveryAddress: String? = null,
         deliveryCity: String? = null,
         deliveryDepartment: String? = null,
+        deliveryDate: String? = null,
         preferredDistributionCenter: String? = null,
         notes: String? = null
     ): Flow<Resource<Order>> {
@@ -55,6 +56,7 @@ class CreateOrderUseCase @Inject constructor(
             deliveryAddress = deliveryAddress,
             deliveryCity = deliveryCity,
             deliveryDepartment = deliveryDepartment,
+            deliveryDate = deliveryDate,
             preferredDistributionCenter = preferredDistributionCenter,
             notes = notes
         )

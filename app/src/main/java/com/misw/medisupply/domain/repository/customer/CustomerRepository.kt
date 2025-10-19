@@ -27,4 +27,42 @@ interface CustomerRepository {
      * @return Flow emitting Resource with customer data
      */
     fun getCustomerById(customerId: Int): Flow<Resource<Customer>>
+    
+    /**
+     * Validate if a document number is already registered
+     * 
+     * @param documentNumber The document number to validate
+     * @param documentType The type of document (NIT, CC, etc.)
+     * @return Flow emitting Resource with validation result (true if exists, false if available)
+     */
+    fun validateDocumentNumber(
+        documentNumber: String,
+        documentType: String = "NIT"
+    ): Flow<Resource<Boolean>>
+    
+    /**
+     * Register a new customer
+     * 
+     * @param businessName Company/Institution name
+     * @param documentNumber NIT/RUC or identification number
+     * @param documentType Type of document (NIT, CC, etc.)
+     * @param contactEmail Contact email address
+     * @param contactPhone Contact phone number
+     * @param address Physical address
+     * @param city City (optional)
+     * @param department Department/State (optional)
+     * @param customerType Type of customer (HOSPITAL, CLINICA, etc.)
+     * @return Flow emitting Resource with created customer
+     */
+    fun registerCustomer(
+        businessName: String,
+        documentNumber: String,
+        documentType: String = "NIT",
+        contactEmail: String,
+        contactPhone: String,
+        address: String,
+        city: String? = null,
+        department: String? = null,
+        customerType: String = "HOSPITAL"
+    ): Flow<Resource<Customer>>
 }

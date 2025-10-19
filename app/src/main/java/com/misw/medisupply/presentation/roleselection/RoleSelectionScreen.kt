@@ -20,6 +20,7 @@ import com.misw.medisupply.core.session.UserRole
 @Composable
 fun RoleSelectionScreen(
     onRoleSelected: (UserRole) -> Unit,
+    onRegisterClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -69,6 +70,29 @@ fun RoleSelectionScreen(
                 onClick = { onRoleSelected(UserRole.CUSTOMER_MANAGEMENT) },
                 modifier = Modifier.fillMaxWidth()
             )
+            
+            // Register Link
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "¿Nuevo cliente? ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                TextButton(
+                    onClick = onRegisterClick
+                ) {
+                    Text(
+                        text = "Registrarse",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
             
             Spacer(modifier = Modifier.height(32.dp))
             

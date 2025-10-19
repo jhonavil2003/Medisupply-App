@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.misw.medisupply.core.session.UserRole
 import com.misw.medisupply.presentation.customermanagement.navigation.CustomerManagementNavigation
+import com.misw.medisupply.presentation.registration.screens.CustomerRegistrationScreen
 import com.misw.medisupply.presentation.roleselection.RoleSelectionScreen
 import com.misw.medisupply.presentation.salesforce.navigation.SalesForceNavigation
 
@@ -19,6 +20,7 @@ object MainRoutes {
     const val ROLE_SELECTION = "role_selection"
     const val SALES_FORCE_FLOW = "salesforce_flow"
     const val CUSTOMER_MANAGEMENT_FLOW = "customer_management_flow"
+    const val CUSTOMER_REGISTRATION = "customer_registration"
 }
 
 /**
@@ -44,6 +46,28 @@ fun MainNavGraph(
                         UserRole.CUSTOMER_MANAGEMENT -> MainRoutes.CUSTOMER_MANAGEMENT_FLOW
                     }
                     navController.navigate(destination) {
+                        popUpTo(MainRoutes.ROLE_SELECTION) { 
+                            inclusive = true 
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onRegisterClick = {
+                    navController.navigate(MainRoutes.CUSTOMER_REGISTRATION) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        
+        // Customer Registration Screen
+        composable(MainRoutes.CUSTOMER_REGISTRATION) {
+            CustomerRegistrationScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onRegistrationComplete = {
+                    navController.navigate(MainRoutes.CUSTOMER_MANAGEMENT_FLOW) {
                         popUpTo(MainRoutes.ROLE_SELECTION) { 
                             inclusive = true 
                         }
