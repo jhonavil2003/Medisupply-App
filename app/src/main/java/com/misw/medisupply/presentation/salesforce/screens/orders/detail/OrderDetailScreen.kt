@@ -136,6 +136,7 @@ fun OrderDetailScreen(
     // Delete confirmation dialog
     if (showDeleteDialog) {
         DeleteConfirmationDialog(
+            order = state.order,
             onConfirm = {
                 viewModel.onEvent(OrderDetailEvent.DeleteOrder)
                 showDeleteDialog = false
@@ -515,7 +516,7 @@ private fun EditableProductItemCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     OutlinedTextField(
                         value = quantityText,
-                        onValueChange = { newValue ->
+                        onValueChange = { newValue: String ->
                             quantityText = newValue
                             newValue.toIntOrNull()?.let { qty ->
                                 if (qty >= 0) {
@@ -525,7 +526,9 @@ private fun EditableProductItemCard(
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
-                        modifier = Modifier.width(100.dp),
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(56.dp),
                         textStyle = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -764,7 +767,7 @@ private fun ActionButtons(
                 )
             } else {
                 Text(
-                    text = if (isModified) "Confirmar cambios" else "Sin cambios",
+                    text = if (isModified) "Confirmar pedido" else "Sin cambios",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -811,6 +814,7 @@ private fun ActionButtons(
  */
 @Composable
 private fun DeleteConfirmationDialog(
+    order: Order?,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -823,9 +827,42 @@ private fun DeleteConfirmationDialog(
             )
         },
         text = {
-            Text(
-                text = "Esta acción no se puede deshacer. ¿Está seguro de que desea eliminar este pedido?"
-            )
+            Column {
+                Text(
+                    text = "Esta acción no se puede deshacer.",
+                    fontWeight = FontWeight.Medium
+                )
+                
+                order?.let {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    // Order info
+                    Text(
+                        text = "Pedido: ${it.orderNumber ?: "N/A"}",
+                        fontSize = 14.sp,
+                        color = Color(0xFF424242)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Estado: ${it.status.displayName}",
+                        fontSize = 14.sp,
+                        color = Color(0xFF424242)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Total: ${it.getFormattedTotal()}",
+                        fontSize = 14.sp,
+                        color = Color(0xFF424242)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Text(
+                    text = "¿Está seguro de que desea continuar?",
+                    fontWeight = FontWeight.Medium
+                )
+            }
         },
         confirmButton = {
             Button(

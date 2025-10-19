@@ -199,4 +199,51 @@ class OrderRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
         }
     }
+    
+    override fun deleteOrder(orderId: Int): Flow<Resource<Unit>> = flow {
+        try {
+            // Emit loading state
+            emit(Resource.Loading())
+            
+            // Make API call
+            val response = apiService.deleteOrder(orderId)
+            
+            // Handle response
+            if (response.isSuccessful) {
+                emit(Resource.Success(Unit))
+            } else {
+                // Handle HTTP errors
+                val errorMessage = when (response.code()) {
+                    400 -> "No se puede eliminar. Solo se pueden eliminar pedidos en estado Pendiente o Cancelado"
+                    401 -> Constants.ErrorMessages.UNAUTHORIZED
+                    403 -> "No tiene permisos para eliminar este pedido"
+                    404 -> "Pedido no encontrado"
+                    500 -> Constants.ErrorMessages.SERVER_ERROR
+                    else -> "${Constants.ErrorMessages.SERVER_ERROR} (${response.code()})"
+                }
+                emit(Resource.Error(errorMessage))
+            }
+            
+        } catch (e: HttpException) {
+            // HTTP exceptions (4xx, 5xx responses)
+            val errorMessage = when (e.code()) {
+                400 -> "No se puede eliminar. Solo se pueden eliminar pedidos en estado Pendiente o Cancelado"
+                401 -> Constants.ErrorMessages.UNAUTHORIZED
+                403 -> "No tiene permisos para eliminar este pedido"
+                404 -> "Pedido no encontrado"
+                408 -> Constants.ErrorMessages.TIMEOUT
+                500, 502, 503 -> Constants.ErrorMessages.SERVER_ERROR
+                else -> Constants.ErrorMessages.UNKNOWN_ERROR
+            }
+            emit(Resource.Error(errorMessage))
+            
+        } catch (e: IOException) {
+            // Network errors (no connection, timeout, etc.)
+            emit(Resource.Error(Constants.ErrorMessages.NETWORK_ERROR))
+            
+        } catch (e: Exception) {
+            // Unknown errors
+            emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
+        }
+    }
 }

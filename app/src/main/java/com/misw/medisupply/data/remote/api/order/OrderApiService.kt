@@ -5,6 +5,7 @@ import com.misw.medisupply.data.remote.dto.order.OrderDto
 import com.misw.medisupply.data.remote.dto.order.OrdersResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -52,4 +53,15 @@ interface OrderApiService {
     suspend fun getOrderById(
         @Path("id") orderId: Int
     ): Response<OrderDto>
+    
+    /**
+     * Delete an order by ID
+     * 
+     * @param orderId ID of the order to delete
+     * @return Response indicating success or failure
+     */
+    @DELETE("orders/{id}")
+    suspend fun deleteOrder(
+        @Path("id") orderId: Int
+    ): Response<Unit>
 }

@@ -63,6 +63,14 @@ interface OrderRepository {
      * @return Flow emitting Resource with order data
      */
     fun getOrderById(orderId: Int): Flow<Resource<Order>>
+    
+    /**
+     * Delete an order by ID
+     * 
+     * @param orderId ID of the order to delete
+     * @return Flow emitting Resource with deletion result
+     */
+    fun deleteOrder(orderId: Int): Flow<Resource<Unit>>
 }
 
 /**

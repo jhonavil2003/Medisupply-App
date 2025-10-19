@@ -3,6 +3,7 @@ package com.misw.medisupply.presentation.salesforce.screens.orders.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.domain.model.order.OrderItem
+import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrderByIdUseCase
 import com.misw.medisupply.core.base.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +19,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OrderDetailViewModel @Inject constructor(
-    private val getOrderByIdUseCase: GetOrderByIdUseCase
-    // TODO: Add UpdateOrderUseCase and DeleteOrderUseCase when available
+    private val getOrderByIdUseCase: GetOrderByIdUseCase,
+    private val deleteOrderUseCase: DeleteOrderUseCase
+    // TODO: Add UpdateOrderUseCase when available
 ) : ViewModel() {
     
     private val _state = MutableStateFlow(OrderDetailState())
@@ -159,22 +161,36 @@ class OrderDetailViewModel @Inject constructor(
     
     /**
      * Delete entire order
-     * TODO: Implement actual API call when DeleteOrderUseCase is available
      */
     private fun deleteOrder() {
         viewModelScope.launch {
+            val orderId = _state.value.order?.id ?: return@launch
+            
             _state.update { it.copy(isDeleting = true, error = null) }
             
-            // TODO: Call DeleteOrderUseCase here
-            // For now, just simulate success
-            kotlinx.coroutines.delay(1000)
-            
-            _state.update { 
-                it.copy(
-                    isDeleting = false,
-                    deleteSuccess = true,
-                    error = null
-                )
+            deleteOrderUseCase(orderId).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isDeleting = true) }
+                    }
+                    is Resource.Success -> {
+                        _state.update { 
+                            it.copy(
+                                isDeleting = false,
+                                deleteSuccess = true,
+                                error = null
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update { 
+                            it.copy(
+                                isDeleting = false,
+                                error = resource.message ?: "Error al eliminar el pedido"
+                            )
+                        }
+                    }
+                }
             }
         }
     }
