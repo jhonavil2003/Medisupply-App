@@ -41,6 +41,36 @@ interface OrderRepository {
         preferredDistributionCenter: String?,
         notes: String?
     ): Flow<Resource<Order>>
+    
+    /**
+     * Get list of orders with optional filters
+     * 
+     * @param sellerId Filter by seller ID
+     * @param customerId Filter by customer ID
+     * @param status Filter by order status
+     * @return Flow emitting Resource with list of orders
+     */
+    fun getOrders(
+        sellerId: String? = null,
+        customerId: Int? = null,
+        status: String? = null
+    ): Flow<Resource<List<Order>>>
+    
+    /**
+     * Get a single order by ID
+     * 
+     * @param orderId ID of the order to retrieve
+     * @return Flow emitting Resource with order data
+     */
+    fun getOrderById(orderId: Int): Flow<Resource<Order>>
+    
+    /**
+     * Delete an order by ID
+     * 
+     * @param orderId ID of the order to delete
+     * @return Flow emitting Resource with deletion result
+     */
+    fun deleteOrder(orderId: Int): Flow<Resource<Unit>>
 }
 
 /**

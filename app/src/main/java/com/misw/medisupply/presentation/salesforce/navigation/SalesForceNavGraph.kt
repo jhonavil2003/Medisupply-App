@@ -16,6 +16,7 @@ import com.misw.medisupply.presentation.salesforce.screens.home.SalesForceHomeSc
 import com.misw.medisupply.presentation.salesforce.screens.orders.OrdersScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.create.CreateOrderScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.create.CustomerListScreen
+import com.misw.medisupply.presentation.salesforce.screens.orders.detail.OrderDetailScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.list.MyOrdersScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.products.ProductSelectionScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.OrderReviewScreen
@@ -157,6 +158,25 @@ fun SalesForceNavGraph(
         // My Orders Screen - Mis pedidos
         composable(route = SalesForceRoutes.MY_ORDERS) {
             MyOrdersScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToEditOrder = { orderId ->
+                    navController.navigate("${SalesForceRoutes.ORDER_DETAIL}/$orderId")
+                }
+            )
+        }
+        
+        // Order Detail Screen - Detalle del pedido
+        composable(
+            route = "${SalesForceRoutes.ORDER_DETAIL}/{orderId}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            OrderDetailScreen(
+                orderId = orderId,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
