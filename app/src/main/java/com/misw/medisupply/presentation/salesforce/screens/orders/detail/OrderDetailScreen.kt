@@ -16,27 +16,39 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,9 +72,23 @@ fun OrderDetailScreen(
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
     
     LaunchedEffect(orderId) {
         viewModel.loadOrderDetail(orderId)
+    }
+    
+    // Handle success states
+    LaunchedEffect(state.updateSuccess) {
+        if (state.updateSuccess) {
+            onNavigateBack()
+        }
+    }
+    
+    LaunchedEffect(state.deleteSuccess) {
+        if (state.deleteSuccess) {
+            onNavigateBack()
+        }
     }
     
     Scaffold(
@@ -88,10 +114,36 @@ fun OrderDetailScreen(
             state.order != null -> {
                 OrderDetailContent(
                     order = state.order!!,
+                    state = state,
+                    onUpdateQuantity = { itemId, quantity ->
+                        viewModel.onEvent(OrderDetailEvent.UpdateItemQuantity(itemId, quantity))
+                    },
+                    onRemoveItem = { itemId ->
+                        viewModel.onEvent(OrderDetailEvent.RemoveItem(itemId))
+                    },
+                    onConfirmOrder = {
+                        viewModel.onEvent(OrderDetailEvent.ConfirmOrder)
+                    },
+                    onDeleteOrder = {
+                        showDeleteDialog = true
+                    },
                     modifier = Modifier.padding(paddingValues)
                 )
             }
         }
+    }
+    
+    // Delete confirmation dialog
+    if (showDeleteDialog) {
+        DeleteConfirmationDialog(
+            onConfirm = {
+                viewModel.onEvent(OrderDetailEvent.DeleteOrder)
+                showDeleteDialog = false
+            },
+            onDismiss = {
+                showDeleteDialog = false
+            }
+        )
     }
 }
 
@@ -116,8 +168,16 @@ private fun LoadingIndicator(
 @Composable
 private fun OrderDetailContent(
     order: Order,
+    state: OrderDetailState,
+    onUpdateQuantity: (Int, Int) -> Unit,
+    onRemoveItem: (Int) -> Unit,
+    onConfirmOrder: () -> Unit,
+    onDeleteOrder: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val currentItems = state.getCurrentItems().filter { it.quantity > 0 }
+    val newTotal = state.calculateNewTotal()
+    
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -164,15 +224,39 @@ private fun OrderDetailContent(
         
         // Products list
         items(
-            items = order.items,
+            items = currentItems,
             key = { item -> item.id ?: 0 }
         ) { item ->
-            ProductItemCard(item = item)
+            EditableProductItemCard(
+                item = item,
+                onQuantityChange = { newQuantity ->
+                    item.id?.let { onUpdateQuantity(it, newQuantity) }
+                },
+                onRemove = {
+                    item.id?.let { onRemoveItem(it) }
+                }
+            )
         }
         
         // Order summary card
         item {
-            OrderSummaryCard(order = order)
+            OrderSummaryCard(
+                order = order,
+                currentTotal = if (state.isModified()) newTotal else order.totalAmount,
+                totalItems = currentItems.size,
+                totalQuantity = currentItems.sumOf { it.quantity }
+            )
+        }
+        
+        // Action buttons
+        item {
+            ActionButtons(
+                isModified = state.isModified(),
+                isUpdating = state.isUpdating,
+                isDeleting = state.isDeleting,
+                onConfirm = onConfirmOrder,
+                onDelete = onDeleteOrder
+            )
         }
     }
 }
@@ -354,96 +438,137 @@ private fun DeliveryInfoCard(
 }
 
 /**
- * Product item card
+ * Editable product item card with quantity input and delete button
  */
 @Composable
-private fun ProductItemCard(
+private fun EditableProductItemCard(
     item: OrderItem,
+    onQuantityChange: (Int) -> Unit,
+    onRemove: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var quantityText by remember(item.quantity) { mutableStateOf(item.quantity.toString()) }
+    
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.productName,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF212121)
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = "SKU: ${item.productSku}",
-                    fontSize = 12.sp,
-                    color = Color(0xFF757575)
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            // Header with product name and delete button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Cantidad:",
-                        fontSize = 13.sp,
-                        color = Color(0xFF757575),
-                        fontWeight = FontWeight.Medium
+                        text = item.productName,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF212121)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
                     Text(
-                        text = "${item.quantity}",
-                        fontSize = 13.sp,
-                        color = Color(0xFF212121),
-                        fontWeight = FontWeight.Bold
+                        text = "SKU: ${item.productSku}",
+                        fontSize = 12.sp,
+                        color = Color(0xFF757575)
                     )
                 }
                 
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                // Delete button
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(32.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar producto",
+                        tint = Color(0xFFD32F2F),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Quantity input
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Precio unitario:",
-                        fontSize = 13.sp,
+                        text = "Cantidad:",
+                        fontSize = 12.sp,
                         color = Color(0xFF757575),
                         fontWeight = FontWeight.Medium
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    OutlinedTextField(
+                        value = quantityText,
+                        onValueChange = { newValue ->
+                            quantityText = newValue
+                            newValue.toIntOrNull()?.let { qty ->
+                                if (qty >= 0) {
+                                    onQuantityChange(qty)
+                                }
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.width(100.dp),
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // Price info
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Precio unitario:",
+                        fontSize = 12.sp,
+                        color = Color(0xFF757575),
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = item.getFormattedUnitPrice(),
                         fontSize = 13.sp,
                         color = Color(0xFF212121)
                     )
                 }
-            }
-            
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Subtotal",
-                    fontSize = 12.sp,
-                    color = Color(0xFF757575)
-                )
-                Text(
-                    text = item.getFormattedSubtotal(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // Subtotal
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "Subtotal",
+                        fontSize = 12.sp,
+                        color = Color(0xFF757575)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = item.getFormattedSubtotal(),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
@@ -455,6 +580,9 @@ private fun ProductItemCard(
 @Composable
 private fun OrderSummaryCard(
     order: Order,
+    currentTotal: Double,
+    totalItems: Int,
+    totalQuantity: Int,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -487,7 +615,7 @@ private fun OrderSummaryCard(
                     color = Color(0xFF424242)
                 )
                 Text(
-                    text = "${order.getTotalItems()} items",
+                    text = "$totalItems items",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF212121)
@@ -506,7 +634,7 @@ private fun OrderSummaryCard(
                     color = Color(0xFF424242)
                 )
                 Text(
-                    text = "${order.getTotalQuantity()} unidades",
+                    text = "$totalQuantity unidades",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF212121)
@@ -531,7 +659,7 @@ private fun OrderSummaryCard(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = order.getFormattedTotal(),
+                    text = "$ ${String.format("%,.2f", currentTotal)}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -598,4 +726,121 @@ private fun InfoRow(
             modifier = Modifier.weight(0.6f)
         )
     }
+}
+
+/**
+ * Action buttons for confirm and delete
+ */
+@Composable
+private fun ActionButtons(
+    isModified: Boolean,
+    isUpdating: Boolean,
+    isDeleting: Boolean,
+    onConfirm: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Confirm button
+        Button(
+            onClick = onConfirm,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            enabled = isModified && !isUpdating && !isDeleting,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = Color(0xFFE0E0E0)
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            if (isUpdating) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White
+                )
+            } else {
+                Text(
+                    text = if (isModified) "Confirmar cambios" else "Sin cambios",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        
+        // Delete button
+        Button(
+            onClick = onDelete,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            enabled = !isUpdating && !isDeleting,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFD32F2F),
+                disabledContainerColor = Color(0xFFE0E0E0)
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            if (isDeleting) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Eliminar pedido",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Delete confirmation dialog
+ */
+@Composable
+private fun DeleteConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "¿Eliminar pedido?",
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = "Esta acción no se puede deshacer. ¿Está seguro de que desea eliminar este pedido?"
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFD32F2F)
+                )
+            ) {
+                Text("Eliminar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
