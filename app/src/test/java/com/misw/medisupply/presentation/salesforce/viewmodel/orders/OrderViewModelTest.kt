@@ -215,7 +215,7 @@ class OrderViewModelTest {
 
         verify(createOrderUseCase).invoke(
             customerId = eq(testCustomer.id),
-            sellerId = eq("SELLER001"),
+            sellerId = eq("SELLER-001"),
             sellerName = eq("Vendedor Demo"),
             items = any(),
             paymentTerms = eq(PaymentTerms.CREDIT_30),

@@ -10,6 +10,10 @@ object CustomerManagementRoutes {
     const val ORDERS = "customer_orders"
     const val ACCOUNT = "customer_account"
     
+    // Order creation flow routes
+    const val CREATE_ORDER_PRODUCTS = "customer_create_order_products"
+    const val CREATE_ORDER_REVIEW = "customer_create_order_review"
+    
     // Future routes for detail screens
     const val PRODUCT_DETAIL = "customer_product_detail"
     const val ORDER_DETAIL = "customer_order_detail"

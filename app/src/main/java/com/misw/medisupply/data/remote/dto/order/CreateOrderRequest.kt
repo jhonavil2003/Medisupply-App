@@ -34,6 +34,9 @@ data class CreateOrderRequest(
     @SerializedName("delivery_department")
     val deliveryDepartment: String? = null,
     
+    @SerializedName("delivery_date")
+    val deliveryDate: String? = null,
+    
     @SerializedName("preferred_distribution_center")
     val preferredDistributionCenter: String? = null,
     

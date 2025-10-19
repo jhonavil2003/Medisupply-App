@@ -38,6 +38,7 @@ interface OrderRepository {
         deliveryAddress: String?,
         deliveryCity: String?,
         deliveryDepartment: String?,
+        deliveryDate: String?,
         preferredDistributionCenter: String?,
         notes: String?
     ): Flow<Resource<Order>>
