@@ -50,6 +50,7 @@ import java.util.Locale
  */
 @Composable
 fun ShopScreen(
+    onNavigateToCreateOrder: () -> Unit = {},
     viewModel: CustomerShopViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -60,7 +61,7 @@ fun ShopScreen(
             .padding(16.dp)
     ) {
         // Botón Crear
-        CreateOrderButton()
+        CreateOrderButton(onNavigateToCreateOrder)
         
         Spacer(modifier = Modifier.height(24.dp))
         
@@ -88,11 +89,9 @@ fun ShopScreen(
  * Botón para crear nuevos pedidos
  */
 @Composable
-private fun CreateOrderButton() {
+private fun CreateOrderButton(onNavigateToCreateOrder: () -> Unit) {
     Button(
-        onClick = { 
-            // TODO: Implementar navegación a crear pedido
-        },
+        onClick = onNavigateToCreateOrder,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary

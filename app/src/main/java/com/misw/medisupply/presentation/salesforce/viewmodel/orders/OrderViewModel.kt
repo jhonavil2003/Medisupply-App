@@ -42,6 +42,7 @@ class OrderViewModel @Inject constructor(
         deliveryAddress: String? = null,
         deliveryCity: String? = null,
         deliveryDepartment: String? = null,
+        deliveryDate: String? = null,
         notes: String? = null
     ) {
         // Convert cart items to order item requests
@@ -55,7 +56,7 @@ class OrderViewModel @Inject constructor(
         }
 
         // TODO: Get seller info from auth/session
-        val sellerId = "SELLER001" // Hardcoded for now
+        val sellerId = "SELLER-001" // Hardcoded for now
         val sellerName = "Vendedor Demo"
 
         createOrderUseCase(
@@ -68,6 +69,7 @@ class OrderViewModel @Inject constructor(
             deliveryAddress = deliveryAddress ?: customer.address,
             deliveryCity = deliveryCity ?: customer.city,
             deliveryDepartment = deliveryDepartment ?: customer.department,
+            deliveryDate = deliveryDate,
             preferredDistributionCenter = null,
             notes = notes
         ).onEach { resource ->

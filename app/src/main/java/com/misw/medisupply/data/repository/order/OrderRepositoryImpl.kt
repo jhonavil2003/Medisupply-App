@@ -35,6 +35,7 @@ class OrderRepositoryImpl @Inject constructor(
         deliveryAddress: String?,
         deliveryCity: String?,
         deliveryDepartment: String?,
+        deliveryDate: String?,
         preferredDistributionCenter: String?,
         notes: String?
     ): Flow<Resource<Order>> = flow {
@@ -62,6 +63,7 @@ class OrderRepositoryImpl @Inject constructor(
                 deliveryAddress = deliveryAddress,
                 deliveryCity = deliveryCity,
                 deliveryDepartment = deliveryDepartment,
+                deliveryDate = deliveryDate,
                 preferredDistributionCenter = preferredDistributionCenter,
                 notes = notes
             )
