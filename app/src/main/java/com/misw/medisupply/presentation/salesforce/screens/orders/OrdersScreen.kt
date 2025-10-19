@@ -1,6 +1,8 @@
 ﻿package com.misw.medisupply.presentation.salesforce.screens.orders
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,9 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,7 +59,9 @@ fun OrdersScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             OrdersOptionCard(
-                icon = Icons.Filled.PersonSearch,
+                icon = Icons.Filled.Person,
+                avatarBackgroundColor = Color(0xFFB4FFF1),
+                iconTint = Color(0xFF008678),
                 title = "Consulta de Clientes",
                 subtitle = "Busca tu cartera y abre el perfil de cada cliente",
                 onClick = onNavigateToCustomerList
@@ -62,6 +69,8 @@ fun OrdersScreen(
             
             OrdersOptionCard(
                 icon = Icons.Filled.ShoppingCart,
+                avatarBackgroundColor = Color(0xFFD6E3FF),
+                iconTint = Color(0xFF3C5BAA),
                 title = "Crear Pedido",
                 subtitle = "Arma el pedido con disponibilidad en tiempo real",
                 onClick = onNavigateToCreateOrder
@@ -69,6 +78,8 @@ fun OrdersScreen(
             
             OrdersOptionCard(
                 icon = Icons.Filled.Assignment,
+                avatarBackgroundColor = Color(0xFFFFE5B4),
+                iconTint = Color(0xFFE67E00),
                 title = "Mis Pedidos",
                 subtitle = "Estados, filtros, y detalle de órdenes",
                 onClick = onNavigateToMyOrders
@@ -81,6 +92,8 @@ fun OrdersScreen(
 @Composable
 private fun OrdersOptionCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    avatarBackgroundColor: Color,
+    iconTint: Color,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
@@ -104,12 +117,21 @@ private fun OrdersOptionCard(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            // Avatar circular con colores personalizados
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(avatarBackgroundColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    modifier = Modifier.size(28.dp),
+                    tint = iconTint
+                )
+            }
             
             Spacer(modifier = Modifier.size(16.dp))
             
