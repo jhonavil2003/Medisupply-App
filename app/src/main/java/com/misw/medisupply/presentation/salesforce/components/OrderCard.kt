@@ -89,7 +89,7 @@ fun OrderCard(
                 OrderStatusBadge(status = order.status)
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             // Customer info
             order.customer?.let { customer ->
@@ -111,8 +111,27 @@ fun OrderCard(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
             }
+            
+            // Customer ID (always shown as it's non-nullable)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Cliente ID:",
+                    fontSize = 13.sp,
+                    color = Color(0xFF757575),
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = order.customerId.toString(),
+                    fontSize = 13.sp,
+                    color = Color(0xFF212121)
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
             
             // Delivery city
             order.deliveryCity?.let { city ->
@@ -132,7 +151,7 @@ fun OrderCard(
                         color = Color(0xFF212121)
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
             }
             
             // Items count
@@ -153,7 +172,7 @@ fun OrderCard(
                 )
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             // Divider line
             Spacer(
@@ -163,7 +182,7 @@ fun OrderCard(
                     .background(Color(0xFFE0E0E0))
             )
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             // Footer: Total and actions
             Row(
