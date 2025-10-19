@@ -15,10 +15,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-/**
- * ViewModel for Orders Screen
- * Manages UI state and handles user actions for customer selection to create orders
- */
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
     private val getCustomersUseCase: GetCustomersUseCase
@@ -31,9 +27,6 @@ class OrdersViewModel @Inject constructor(
         loadCustomers()
     }
     
-    /**
-     * Handle user events
-     */
     fun onEvent(event: OrdersEvent) {
         when (event) {
             is OrdersEvent.LoadCustomers -> loadCustomers()
@@ -45,9 +38,6 @@ class OrdersViewModel @Inject constructor(
         }
     }
     
-    /**
-     * Load customers from repository
-     */
     private fun loadCustomers(
         customerType: String? = null,
         city: String? = null,
@@ -83,9 +73,6 @@ class OrdersViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
     
-    /**
-     * Refresh customers list
-     */
     private fun refreshCustomers() {
         _state.update { it.copy(isRefreshing = true) }
         loadCustomers(
@@ -105,32 +92,18 @@ class OrdersViewModel @Inject constructor(
         )
     }
     
-    /**
-     * Search customers locally
-     */
     private fun searchCustomers(query: String) {
         _state.update { it.copy(searchQuery = query) }
     }
     
-    /**
-     * Handle customer selection
-     * Navigate to order creation screen
-     */
-    private fun selectCustomer(customer: Customer) {
-        // TODO: Navigate to order creation screen
-        // This will be implemented when order creation flow is set up
+    fun selectCustomer(customer: Customer) {
+        _state.update { it.copy(selectedCustomer = customer) }
     }
     
-    /**
-     * Clear error message
-     */
     private fun clearError() {
         _state.update { it.copy(error = null) }
     }
     
-    /**
-     * Get all customer types for filter
-     */
     fun getCustomerTypes(): List<CustomerType> {
         return CustomerType.entries
     }
