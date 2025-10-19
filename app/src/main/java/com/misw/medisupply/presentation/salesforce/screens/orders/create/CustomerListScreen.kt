@@ -1,4 +1,4 @@
-package com.misw.medisupply.presentation.salesforce.screens.orders
+package com.misw.medisupply.presentation.salesforce.screens.orders.create
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +40,8 @@ import com.misw.medisupply.presentation.salesforce.components.CustomerItem
 import com.misw.medisupply.presentation.common.components.ErrorView
 import com.misw.medisupply.presentation.common.components.LoadingIndicator
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent
+import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
 /**
  * Customer List Screen

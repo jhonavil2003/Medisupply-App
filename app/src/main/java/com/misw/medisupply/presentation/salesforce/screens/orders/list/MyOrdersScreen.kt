@@ -1,4 +1,4 @@
-package com.misw.medisupply.presentation.salesforce.screens.orders
+package com.misw.medisupply.presentation.salesforce.screens.orders.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

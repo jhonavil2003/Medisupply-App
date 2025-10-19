@@ -11,6 +11,15 @@ object Constants {
     
     const val BASE_URL = "http://10.0.2.2:3003/"
     
+    // Sales Service (Orders)
+    const val SALES_SERVICE_URL = "http://10.0.2.2:3003/"
+    
+    // Catalog Service
+    const val CATALOG_SERVICE_URL = "http://10.0.2.2:3001/"
+    
+    // Logistics Service
+    const val LOGISTICS_SERVICE_URL = "http://10.0.2.2:3002/"
+    
     /**
      * API Timeout configurations (in seconds)
      */

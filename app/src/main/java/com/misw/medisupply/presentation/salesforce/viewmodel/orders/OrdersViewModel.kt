@@ -1,4 +1,4 @@
-package com.misw.medisupply.presentation.salesforce.screens.orders
+package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

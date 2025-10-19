@@ -51,13 +51,6 @@ fun OrdersScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Selecciona una opción",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
             Spacer(modifier = Modifier.height(8.dp))
             
             OrdersOptionCard(

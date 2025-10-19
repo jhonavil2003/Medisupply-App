@@ -1,4 +1,4 @@
-package com.misw.medisupply.presentation.salesforce.screens.orders
+package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
