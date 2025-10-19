@@ -3,26 +3,17 @@ package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 
-/**
- * UI State for Orders Screen
- * Represents all possible states of the orders screen (customer list for creating orders)
- */
 data class OrdersState(
     val isLoading: Boolean = false,
     val customers: List<Customer> = emptyList(),
     val error: String? = null,
     val selectedFilter: CustomerType? = null,
     val searchQuery: String = "",
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+    val selectedCustomer: Customer? = null
 ) {
-    /**
-     * Check if there are customers to display
-     */
     fun hasCustomers(): Boolean = customers.isNotEmpty()
     
-    /**
-     * Get filtered customers based on search query
-     */
     fun getFilteredCustomers(): List<Customer> {
         if (searchQuery.isBlank()) return customers
         
@@ -34,9 +25,6 @@ data class OrdersState(
     }
 }
 
-/**
- * Sealed class representing user events/actions on Orders Screen
- */
 sealed class OrdersEvent {
     object LoadCustomers : OrdersEvent()
     object RefreshCustomers : OrdersEvent()
