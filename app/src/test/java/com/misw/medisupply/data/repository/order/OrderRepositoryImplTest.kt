@@ -101,6 +101,7 @@ class OrderRepositoryImplTest {
             deliveryAddress = "Test Address",
             deliveryCity = "Bogotá",
             deliveryDepartment = "Cundinamarca",
+            deliveryDate = null,
             preferredDistributionCenter = "DC-BOG",
             notes = null
         ).test {
@@ -141,6 +142,7 @@ class OrderRepositoryImplTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = null
         ).test {
@@ -176,6 +178,7 @@ class OrderRepositoryImplTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = null
         ).test {
@@ -211,6 +214,7 @@ class OrderRepositoryImplTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = null
         ).test {
@@ -245,6 +249,7 @@ class OrderRepositoryImplTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = null
         ).test {
@@ -300,6 +305,7 @@ class OrderRepositoryImplTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = "Test order"
         ).test {
