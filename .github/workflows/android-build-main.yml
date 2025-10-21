@@ -1,0 +1,106 @@
+name: Android Build
+
+on:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: build-main-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test & Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        id: run-tests
+        run: |
+          echo "Running all unit tests before building APK..."
+          ./gradlew test --stacktrace
+
+      - name: Parse Test Results
+        if: always()
+        run: |
+          echo "📊 Parsing test results..."
+          
+          # Buscar SOLO archivos XML de testDebugUnitTest (no release)
+          TEST_RESULTS=$(find app/build/test-results/testDebugUnitTest -name "*.xml" 2>/dev/null || echo "")
+          
+          if [ -n "$TEST_RESULTS" ]; then
+            TOTAL_TESTS=0
+            PASSED_TESTS=0
+            FAILED_TESTS=0
+            SKIPPED_TESTS=0
+            
+            for file in $TEST_RESULTS; do
+              if [ -f "$file" ]; then
+                TESTS=$(grep -oP 'tests="\K[0-9]+' "$file" 2>/dev/null || echo "0")
+                FAILURES=$(grep -oP 'failures="\K[0-9]+' "$file" 2>/dev/null || echo "0")
+                SKIPPED=$(grep -oP 'skipped="\K[0-9]+' "$file" 2>/dev/null || echo "0")
+                
+                TOTAL_TESTS=$((TOTAL_TESTS + TESTS))
+                FAILED_TESTS=$((FAILED_TESTS + FAILURES))
+                SKIPPED_TESTS=$((SKIPPED_TESTS + SKIPPED))
+              fi
+            done
+            
+            PASSED_TESTS=$((TOTAL_TESTS - FAILED_TESTS - SKIPPED_TESTS))
+            
+            echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
+            echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
+            echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
+            echo "SKIPPED_TESTS=$SKIPPED_TESTS" >> $GITHUB_ENV
+            
+            echo ""
+            echo "📊 Test Results:"
+            echo "  • Total: $TOTAL_TESTS"
+            echo "  • Passed: $PASSED_TESTS ✅"
+            echo "  • Failed: $FAILED_TESTS ❌"
+            echo "  • Skipped: $SKIPPED_TESTS ⊘"
+          fi
+
+      - name: Build Debug APK
+        if: success()
+        run: |
+          echo "Tests passed! Building Debug APK..."
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-main
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-main
+          path: app/build/reports/tests/testDebugUnitTest/
+
+      - name: Build Summary
+        if: success()
+        run: |
+          echo "✅ Build completed successfully!"
+          echo ""
+          echo "📦 APK Information:"
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          echo ""
+          echo "🎯 APK available in Artifacts section"

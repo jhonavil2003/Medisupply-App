@@ -83,6 +83,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = "Calle 123",
             deliveryCity = "Bogotá",
             deliveryDepartment = "Cundinamarca",
+            deliveryDate = null,
             preferredDistributionCenter = "DC-001",
             notes = "Test order"
         )).thenReturn(flowOf(Resource.Success(testOrder)))
@@ -97,6 +98,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = "Calle 123",
             deliveryCity = "Bogotá",
             deliveryDepartment = "Cundinamarca",
+            deliveryDate = null,
             preferredDistributionCenter = "DC-001",
             notes = "Test order"
         ).test {
@@ -123,6 +125,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
@@ -148,6 +151,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = null
         )
@@ -166,6 +170,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(creditOrder)))
@@ -197,6 +202,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(transferOrder)))
@@ -228,6 +234,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
@@ -262,6 +269,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
@@ -287,6 +295,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = null,
             deliveryCity = null,
             deliveryDepartment = null,
+            deliveryDate = null,
             preferredDistributionCenter = null,
             notes = null
         )
@@ -304,6 +313,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = any(),
             deliveryCity = any(),
             deliveryDepartment = any(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
@@ -338,6 +348,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = any(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
@@ -369,6 +380,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Error(errorMessage)))
@@ -398,6 +410,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )).thenReturn(flowOf(Resource.Loading()))
@@ -427,6 +440,7 @@ class CreateOrderUseCaseTest {
             deliveryAddress = anyOrNull(),
             deliveryCity = anyOrNull(),
             deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = any()
         )).thenReturn(flowOf(Resource.Success(testOrder.copy(notes = notesText))))
