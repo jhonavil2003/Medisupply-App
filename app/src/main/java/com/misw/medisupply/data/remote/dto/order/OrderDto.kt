@@ -33,6 +33,9 @@ data class OrderDto(
     @SerializedName("order_date")
     val orderDate: String?,
     
+    @SerializedName("delivery_date")
+    val deliveryDate: String?,
+    
     @SerializedName("status")
     val status: String,
     
@@ -86,9 +89,25 @@ data class OrderDto(
  * Parse ISO 8601 date string
  */
 private fun String.parseIso8601() = try {
-    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).parse(this)
+    // Try parsing with microseconds (backend format)
+    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault()).parse(this)
 } catch (e: Exception) {
-    null
+    try {
+        // Try parsing with milliseconds and Z
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(this)
+    } catch (e2: Exception) {
+        try {
+            // Try parsing with Z but no milliseconds
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).parse(this)
+        } catch (e3: Exception) {
+            try {
+                // Try simple date format
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(this)
+            } catch (e4: Exception) {
+                null
+            }
+        }
+    }
 }
 
 /**
@@ -101,6 +120,7 @@ fun OrderDto.toDomain() = Order(
     sellerId = sellerId,
     sellerName = sellerName,
     orderDate = orderDate?.parseIso8601(),
+    deliveryDate = deliveryDate?.parseIso8601(),
     status = OrderStatus.fromValue(status),
     subtotal = subtotal,
     discountAmount = discountAmount,

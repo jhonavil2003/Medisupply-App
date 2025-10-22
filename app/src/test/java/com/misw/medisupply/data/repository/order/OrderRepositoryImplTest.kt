@@ -86,7 +86,8 @@ class OrderRepositoryImplTest {
             notes = null,
             createdAt = "2024-01-01T00:00:00Z",
             updatedAt = "2024-01-01T00:00:00Z",
-            customer = null
+            customer = null,
+            deliveryDate = null
         )
         whenever(apiService.createOrder(any<CreateOrderRequest>()))
             .thenReturn(Response.success(mockOrderDto))
@@ -290,7 +291,8 @@ class OrderRepositoryImplTest {
             notes = "Test order",
             createdAt = "2024-01-01T00:00:00Z",
             updatedAt = "2024-01-01T00:00:00Z",
-            customer = null
+            customer = null,
+            deliveryDate = null
         )
         whenever(apiService.createOrder(any<CreateOrderRequest>()))
             .thenReturn(Response.success(mockOrderDto))
