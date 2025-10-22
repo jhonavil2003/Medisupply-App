@@ -108,7 +108,8 @@ class OrderViewModelTest {
         createdAt = null,
         updatedAt = null,
         customer = null,
-        items = emptyList()
+        items = emptyList(),
+        deliveryDate = null
     )
 
     @Before
