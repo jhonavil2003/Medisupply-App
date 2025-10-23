@@ -14,7 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,12 +30,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
+import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CartItemCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.OrderSummaryCard
@@ -42,6 +47,7 @@ import com.misw.medisupply.presentation.salesforce.screens.orders.review.compone
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ErrorDialog
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.SuccessDialog
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrderViewModel
+import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
 /**
  * Order Review Screen
@@ -53,30 +59,47 @@ fun OrderReviewScreen(
     cartItems: Map<String, CartItem>,
     onNavigateBack: () -> Unit,
     onOrderSuccess: (String) -> Unit, // orderNumber
-    viewModel: OrderViewModel = hiltViewModel()
+    mode: Mode = Mode.CREATE,
+    orderId: String? = null,
+    orderStatus: OrderStatus? = null,
+    createViewModel: OrderViewModel = hiltViewModel(),
+    editViewModel: OrdersViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    // Use different ViewModel depending on mode
+    val createState by createViewModel.state.collectAsState()
+    val editState by editViewModel.state.collectAsState()
+    
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
+
+    // Determine which state and flags to use based on mode
+    val isLoading = if (mode == Mode.EDIT) editState.isSaving else createState.isLoading
+    val error = if (mode == Mode.EDIT) editState.error else createState.error
+    val successOrder = if (mode == Mode.EDIT) {
+        // Use the updatedOrder directly from state
+        editState.updatedOrder
+    } else {
+        createState.createdOrder
+    }
 
     // Calculate totals
     val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
     val itemCount = cartItems.values.sumOf { it.quantity }
 
-    // Handle order creation result
-    if (state.createdOrder != null && !showSuccessDialog) {
+    // Handle order success result
+    if (successOrder != null && !showSuccessDialog) {
         showSuccessDialog = true
     }
 
-    if (state.error != null && !showErrorDialog) {
+    if (error != null && !showErrorDialog) {
         showErrorDialog = true
     }
 
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Revisar Pedido",
+                title = if (mode == Mode.EDIT) "Editar Pedido" else "Revisar Pedido",
                 subtitle = "Fuerza de ventas - Medisupply",
                 onNavigateBack = onNavigateBack
             )
@@ -124,14 +147,14 @@ fun OrderReviewScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Confirm button
+                    // Confirm/Update button
                     Button(
                         onClick = { showConfirmDialog = true },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !state.isLoading
+                        enabled = !isLoading
                     ) {
-                        if (state.isLoading) {
+                        if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
                                 strokeWidth = 2.dp,
@@ -147,7 +170,7 @@ fun OrderReviewScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Confirmar y Crear Pedido",
+                                text = if (mode == Mode.EDIT) "Confirmar y Actualizar Pedido" else "Confirmar y Crear Pedido",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -159,9 +182,39 @@ fun OrderReviewScreen(
                         onClick = onNavigateBack,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !state.isLoading
+                        enabled = !isLoading
                     ) {
                         Text("Cancelar")
+                    }
+                    
+                    // Delete button (only in EDIT mode for PENDING orders)
+                    if (mode == Mode.EDIT && orderStatus == OrderStatus.PENDING) {
+                        Button(
+                            onClick = { 
+                                // TODO: Show delete confirmation dialog
+                                orderId?.let { 
+                                    // viewModel.deleteOrder(it) 
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            ),
+                            enabled = !isLoading
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Eliminar Pedido",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
 
@@ -175,35 +228,50 @@ fun OrderReviewScreen(
         ConfirmOrderDialog(
             onConfirm = {
                 showConfirmDialog = false
-                viewModel.createOrder(
-                    customer = customer,
-                    cartItems = cartItems
-                )
+                if (mode == Mode.EDIT && orderId != null) {
+                    // Call updateOrder on OrdersViewModel
+                    editViewModel.updateOrder()
+                } else {
+                    // Call createOrder on OrderViewModel
+                    createViewModel.createOrder(
+                        customer = customer,
+                        cartItems = cartItems
+                    )
+                }
             },
             onDismiss = { showConfirmDialog = false }
         )
     }
 
     // Success Dialog
-    if (showSuccessDialog && state.createdOrder != null) {
-        val orderNumber = state.createdOrder!!.orderNumber ?: "N/A"
+    if (showSuccessDialog && successOrder != null) {
+        val orderNumber = successOrder.orderNumber ?: "N/A"
         SuccessDialog(
             orderNumber = orderNumber,
+            message = if (mode == Mode.EDIT) "Pedido actualizado exitosamente" else "Pedido creado exitosamente",
             onDismiss = {
                 showSuccessDialog = false
-                viewModel.resetState()
+                if (mode == Mode.EDIT) {
+                    editViewModel.clearSuccessMessage()
+                } else {
+                    createViewModel.resetState()
+                }
                 onOrderSuccess(orderNumber)
             }
         )
     }
 
     // Error Dialog
-    if (showErrorDialog && state.error != null) {
+    if (showErrorDialog && error != null) {
         ErrorDialog(
-            errorMessage = state.error!!,
+            errorMessage = error,
             onDismiss = {
                 showErrorDialog = false
-                viewModel.clearError()
+                if (mode == Mode.EDIT) {
+                    editViewModel.clearError()
+                } else {
+                    createViewModel.clearError()
+                }
             }
         )
     }

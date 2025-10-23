@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SuccessDialog(
     orderNumber: String,
+    message: String = "Su pedido ha sido creado correctamente.",
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -40,7 +41,7 @@ fun SuccessDialog(
         },
         title = {
             Text(
-                text = "¡Pedido Creado Exitosamente!",
+                text = "¡Éxito!",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -51,7 +52,7 @@ fun SuccessDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Su pedido ha sido creado correctamente.",
+                    text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )

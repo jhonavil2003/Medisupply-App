@@ -72,6 +72,35 @@ interface OrderRepository {
      * @return Flow emitting Resource with deletion result
      */
     fun deleteOrder(orderId: Int): Flow<Resource<Unit>>
+    
+    /**
+     * Update an existing order
+     * 
+     * @param orderId ID of the order to update
+     * @param customerId ID of the customer
+     * @param items Updated list of order items
+     * @param paymentTerms Payment terms for the order
+     * @param paymentMethod Payment method (optional)
+     * @param deliveryAddress Delivery address (optional)
+     * @param deliveryCity Delivery city (optional)
+     * @param deliveryDepartment Delivery department (optional)
+     * @param preferredDistributionCenter Preferred distribution center code (optional)
+     * @param notes Additional notes (optional)
+     * @return Flow emitting Resource with updated Order
+     */
+    fun updateOrder(
+        orderId: Int,
+        customerId: Int,
+        items: List<OrderItemRequest>,
+        paymentTerms: PaymentTerms,
+        paymentMethod: PaymentMethod?,
+        deliveryAddress: String?,
+        deliveryCity: String?,
+        deliveryDepartment: String?,
+        deliveryDate: String?,
+        preferredDistributionCenter: String?,
+        notes: String?
+    ): Flow<Resource<Order>>
 }
 
 /**
