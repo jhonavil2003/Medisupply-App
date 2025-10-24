@@ -74,6 +74,14 @@ fun SalesForceNavGraph(
         // Visit List Screen - Lista de visitas
         composable(route = SalesForceRoutes.VISIT_LIST) {
             com.misw.medisupply.presentation.salesforce.screens.visits.VisitListScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToCreateVisit = { navController.navigate(SalesForceRoutes.CREATE_VISIT) }
+            )
+        }
+
+        // Create Visit Screen
+        composable(route = SalesForceRoutes.CREATE_VISIT) {
+            com.misw.medisupply.presentation.salesforce.screens.visits.CreateVisitScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

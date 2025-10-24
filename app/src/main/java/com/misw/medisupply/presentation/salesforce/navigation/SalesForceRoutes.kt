@@ -8,6 +8,7 @@ object SalesForceRoutes {
     const val HOME = "salesforce_home"
     const val VISITS = "salesforce_visits"
     const val VISIT_LIST = "salesforce_visit_list"
+    const val CREATE_VISIT = "salesforce_create_visit"
     const val ORDERS = "salesforce_orders"
     const val PERFORMANCE = "salesforce_performance"
     

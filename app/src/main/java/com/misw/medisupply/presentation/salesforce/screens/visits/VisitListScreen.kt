@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Add
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -31,7 +34,8 @@ private val mockVisits = listOf(
 @Composable
 fun VisitListScreen(
     onEditVisit: (MockVisit) -> Unit = {},
-    onNavigateBack: (() -> Unit)? = null
+    onNavigateBack: (() -> Unit)? = null,
+    onNavigateToCreateVisit: (() -> Unit)? = null
 ) {
     Scaffold(
         topBar = {
@@ -42,6 +46,14 @@ fun VisitListScreen(
                     onNavigateBack?.invoke()
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { onNavigateToCreateVisit?.invoke() }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Crear visita"
+                )
+            }
         },
         containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
@@ -112,8 +124,11 @@ private fun VisitListItem(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            Button(onClick = onEdit) {
-                Text("Editar")
+            IconButton(onClick = onEdit) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar visita"
+                )
             }
         }
     }
