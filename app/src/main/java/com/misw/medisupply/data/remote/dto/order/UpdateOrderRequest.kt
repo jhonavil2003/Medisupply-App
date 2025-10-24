@@ -40,6 +40,7 @@ data class UpdateOrderRequest(
 
 /**
  * DTO for order items in update request
+ * Note: unit_price is REQUIRED by backend when updating items
  */
 data class UpdateOrderItemRequest(
     @SerializedName("product_sku")
@@ -52,7 +53,7 @@ data class UpdateOrderItemRequest(
     val quantity: Int,
     
     @SerializedName("unit_price")
-    val unitPrice: Double? = null,
+    val unitPrice: Double, // REQUIRED: Backend validates this field is present and non-negative
     
     @SerializedName("discount_percentage")
     val discountPercentage: Double? = null,

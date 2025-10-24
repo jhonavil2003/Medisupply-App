@@ -269,13 +269,22 @@ class OrderRepositoryImpl @Inject constructor(
             
             android.util.Log.d("OrderRepositoryImpl", "updateOrder() called for orderId: $orderId")
             
+            // Validate that all items have unitPrice (required by backend)
+            val itemsWithoutPrice = items.filter { it.unitPrice == null }
+            if (itemsWithoutPrice.isNotEmpty()) {
+                val skus = itemsWithoutPrice.joinToString(", ") { it.productSku }
+                android.util.Log.e("OrderRepositoryImpl", "Items without unitPrice: $skus")
+                emit(Resource.Error("Error: Los siguientes productos no tienen precio: $skus"))
+                return@flow
+            }
+            
             // Map domain items to DTO items
             val itemsDto = items.map { item ->
                 UpdateOrderItemRequest(
                     productSku = item.productSku,
-                    productName = null, // Backend will fetch from product service
+                    productName = item.productName, // Pass product name to preserve it in the database
                     quantity = item.quantity,
-                    unitPrice = null, // Backend will fetch from product service
+                    unitPrice = item.unitPrice!!, // Safe to use !! here due to validation above
                     discountPercentage = item.discountPercentage,
                     taxPercentage = item.taxPercentage
                 )

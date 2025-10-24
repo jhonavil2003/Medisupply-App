@@ -20,10 +20,13 @@ data class OrdersState(
     val cartItems: Map<String, CartItem> = emptyMap(),
     val deliveryAddress: String? = null,
     val orderIdEditing: String? = null,
+    val orderIdEditingNumeric: Int? = null, // Numeric ID for API calls
     val orderStatus: OrderStatus? = null,
     val isSaving: Boolean = false,
     val successMessage: String? = null,
-    val updatedOrder: Order? = null // Store the updated order for success dialog
+    val updatedOrder: Order? = null, // Store the updated order for success dialog
+    val isDeleting: Boolean = false,
+    val deleteSuccessMessage: String? = null
 ) {
     fun hasCustomers(): Boolean = customers.isNotEmpty()
     
@@ -47,4 +50,6 @@ sealed class OrdersEvent {
     object ClearError : OrdersEvent()
     data class LoadOrderForEdit(val orderId: String) : OrdersEvent()
     object UpdateOrder : OrdersEvent()
+    data class DeleteOrder(val orderId: Int) : OrdersEvent()
+    object ClearDeleteSuccess : OrdersEvent()
 }

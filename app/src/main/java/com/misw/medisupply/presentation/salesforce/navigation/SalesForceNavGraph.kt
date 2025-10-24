@@ -213,7 +213,9 @@ fun SalesForceNavGraph(
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
-            val viewModel: OrdersViewModel = hiltViewModel()
+            // Use parent NavBackStackEntry to share ViewModel between edit screens
+            val parentEntry = navController.getBackStackEntry(SalesForceRoutes.ORDERS)
+            val viewModel: OrdersViewModel = hiltViewModel(parentEntry)
             val state = viewModel.state.collectAsState().value
             
             // Load order data when screen is first displayed
@@ -261,6 +263,9 @@ fun SalesForceNavGraph(
                         initialCartItems = state.cartItems,
                         onNavigateBack = { navController.popBackStack() },
                         onConfirmOrder = { cartItems ->
+                            // Update cart items in OrdersViewModel before navigating
+                            android.util.Log.d("SalesForceNavGraph", "Updating cartItems: ${cartItems.size} items")
+                            viewModel.updateCartItems(cartItems)
                             // Navigate to edit review with orderId
                             navController.navigate(OrderRoute.editReview(orderId))
                         }
@@ -277,11 +282,18 @@ fun SalesForceNavGraph(
             )
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
-            val viewModel: OrdersViewModel = hiltViewModel()
+            // Use parent NavBackStackEntry to share ViewModel between edit screens
+            val parentEntry = navController.getBackStackEntry(SalesForceRoutes.ORDERS)
+            val viewModel: OrdersViewModel = hiltViewModel(parentEntry)
             val state = viewModel.state.value
+            
+            android.util.Log.d("SalesForceNavGraph", "EDIT_ORDER_REVIEW: orderId=$orderId")
+            android.util.Log.d("SalesForceNavGraph", "selectedCustomer: ${state.selectedCustomer?.businessName}")
+            android.util.Log.d("SalesForceNavGraph", "cartItems size: ${state.cartItems.size}")
             
             // Get customer and cart items from state
             if (state.selectedCustomer != null && state.cartItems.isNotEmpty()) {
+                android.util.Log.d("SalesForceNavGraph", "Showing OrderReviewScreen in EDIT mode")
                 OrderReviewScreen(
                     customer = state.selectedCustomer!!,
                     cartItems = state.cartItems,
@@ -297,6 +309,15 @@ fun SalesForceNavGraph(
                         }
                     }
                 )
+            } else {
+                android.util.Log.e("SalesForceNavGraph", "ERROR: State not ready - customer or cartItems missing!")
+                // Show loading or error state
+                Box(
+                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    androidx.compose.material3.Text("Error: Datos no disponibles")
+                }
             }
         }
         

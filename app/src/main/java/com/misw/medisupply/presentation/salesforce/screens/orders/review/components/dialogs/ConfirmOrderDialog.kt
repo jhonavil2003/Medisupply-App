@@ -13,10 +13,11 @@ import androidx.compose.ui.text.font.FontWeight
 
 /**
  * Confirmation dialog
- * Asks user to confirm before creating the order
+ * Asks user to confirm before creating or updating the order
  */
 @Composable
 fun ConfirmOrderDialog(
+    isEditMode: Boolean = false,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -31,14 +32,17 @@ fun ConfirmOrderDialog(
         },
         title = {
             Text(
-                text = "Confirmar Pedido",
+                text = if (isEditMode) "Actualizar Pedido" else "Confirmar Pedido",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                text = "¿Está seguro que desea crear este pedido? Una vez confirmado, se procesará inmediatamente.",
+                text = if (isEditMode) 
+                    "¿Está seguro que desea actualizar este pedido? Una vez confirmada, se procesará inmediatamente." 
+                else 
+                    "¿Está seguro que desea crear este pedido? Una vez confirmado, se procesará inmediatamente.",
                 style = MaterialTheme.typography.bodyMedium
             )
         },

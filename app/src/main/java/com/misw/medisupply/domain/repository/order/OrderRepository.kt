@@ -105,10 +105,15 @@ interface OrderRepository {
 
 /**
  * Data class representing an order item request
+ * 
+ * Note: unitPrice is optional for CREATE operations (backend fetches from product service),
+ * but REQUIRED for UPDATE operations (backend validates presence and non-negative value)
  */
 data class OrderItemRequest(
     val productSku: String,
+    val productName: String? = null,
     val quantity: Int,
+    val unitPrice: Double? = null, // Optional for CREATE, REQUIRED for UPDATE
     val discountPercentage: Double = 0.0,
     val taxPercentage: Double = 19.0
 )
