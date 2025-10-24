@@ -296,7 +296,9 @@ class UpdateOrderUseCaseTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
 
@@ -346,7 +348,9 @@ class UpdateOrderUseCaseTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
 
@@ -396,7 +400,9 @@ class UpdateOrderUseCaseTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 10000,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
 
@@ -446,13 +452,17 @@ class UpdateOrderUseCaseTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             ),
             OrderItemRequest(
                 productSku = "MED-002",
                 productName = "Guantes",
                 quantity = 200,
-                unitPrice = 500.0
+                unitPrice = 500.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
 
@@ -515,7 +525,9 @@ class UpdateOrderUseCaseTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
 
