@@ -468,9 +468,8 @@ class OrdersViewModelTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0,
-                subtotal = 52500.0,
-                imageUrl = null
+                unitPrice = 350.0f,
+                stockAvailable = 200
             )
         ))
         viewModel.onEvent(OrdersEvent.LoadOrderForEdit("1"))
@@ -523,9 +522,8 @@ class OrdersViewModelTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0,
-                subtotal = 52500.0,
-                imageUrl = null
+                unitPrice = 350.0f,
+                stockAvailable = 200
             )
         ))
         viewModel.onEvent(OrdersEvent.LoadOrderForEdit("1"))
@@ -566,7 +564,7 @@ class OrdersViewModelTest {
             assertNotNull(cartItem)
             assertEquals("MED-001", cartItem?.productSku)
             assertEquals("Jeringa 10ml", cartItem?.productName)
-            assertEquals(350.0, cartItem?.unitPrice ?: 0.0, 0.001)
+            assertEquals(350.0, (cartItem?.unitPrice ?: 0.0f).toDouble(), 0.001)
             assertEquals(150, cartItem?.quantity)
             assertEquals(1, state.orderIdEditingNumeric) // Numeric ID
             cancelAndIgnoreRemainingEvents()
