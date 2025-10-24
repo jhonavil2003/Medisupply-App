@@ -206,7 +206,7 @@ class OrdersViewModelTest {
             assertFalse(state.isLoading)
             assertEquals(errorMessage, state.error)
             assertTrue(state.customers.isEmpty())
-            cancelAndIgnoreRemainingEvents()
+            awaitComplete()
         }
     }
 
@@ -535,7 +535,7 @@ class OrdersViewModelTest {
             assertFalse(state.isSaving)
             assertEquals(errorMessage, state.error)
             assertNull(state.successMessage)
-            cancelAndIgnoreRemainingEvents()
+            awaitComplete()
         }
     }
 
@@ -639,7 +639,7 @@ class OrdersViewModelTest {
             assertFalse(state.isDeleting)
             assertEquals(errorMessage, state.error)
             assertNull(state.deleteSuccessMessage)
-            cancelAndIgnoreRemainingEvents()
+            awaitComplete()
         }
     }
 
