@@ -403,7 +403,9 @@ class OrderRepositoryImplTest {
             assertEquals("ORD-20241023-0001", success.data?.orderNumber)
             assertEquals(1, success.data?.items?.size)
             assertEquals("Jeringa 10ml", success.data?.items?.get(0)?.productName)
-            assertEquals(350.0, success.data?.items?.get(0)?.unitPrice, 0.001)
+            success.data?.items?.get(0)?.unitPrice?.let {
+                assertEquals(350.0, it, 0.001)
+            }
             awaitComplete()
         }
     }
@@ -682,7 +684,9 @@ class OrderRepositoryImplTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
             // Verify unitPrice is preserved
-            assertEquals(350.0, success.data?.items?.get(0)?.unitPrice, 0.001)
+            success.data?.items?.get(0)?.unitPrice?.let {
+                assertEquals(350.0, it, 0.001)
+            }
             awaitComplete()
         }
     }

@@ -135,8 +135,8 @@ class OrdersViewModelTest {
     private fun createViewModel(): OrdersViewModel {
         return OrdersViewModel(
             getCustomersUseCase,
-            getOrdersUseCase,
             getOrderByIdUseCase,
+            getOrdersUseCase,
             updateOrderUseCase,
             deleteOrderUseCase
         )
