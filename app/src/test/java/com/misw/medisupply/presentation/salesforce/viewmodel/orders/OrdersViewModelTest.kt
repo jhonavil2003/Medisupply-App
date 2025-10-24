@@ -216,6 +216,8 @@ class OrdersViewModelTest {
         viewModel.onEvent(OrdersEvent.RefreshCustomers)
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isLoading || loading.isRefreshing)
             val state = awaitItem()
             assertFalse(state.isRefreshing)
         }
@@ -230,6 +232,8 @@ class OrdersViewModelTest {
         viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.HOSPITAL))
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isLoading)
             val state = awaitItem()
             assertEquals(CustomerType.HOSPITAL, state.selectedFilter)
         }
@@ -246,6 +250,8 @@ class OrdersViewModelTest {
         viewModel.onEvent(OrdersEvent.FilterByType(null))
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isLoading)
             val state = awaitItem()
             assertNull(state.selectedFilter)
         }
@@ -304,6 +310,8 @@ class OrdersViewModelTest {
         viewModel.selectCustomer(customerToSelect)
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isLoading)
             val state = awaitItem()
             assertEquals(customerToSelect, state.selectedCustomer)
             assertEquals("Farmacia del Pueblo", state.selectedCustomer?.businessName)
@@ -316,14 +324,13 @@ class OrdersViewModelTest {
             .thenReturn(flowOf(Resource.Loading(), Resource.Success(emptyList())))
         viewModel = createViewModel()
 
-        val types = viewModel.getCustomerTypes()
-
-        assertTrue(types.contains(CustomerType.HOSPITAL))
-        assertTrue(types.contains(CustomerType.FARMACIA))
-        assertTrue(types.contains(CustomerType.CLINICA))
-        assertTrue(types.contains(CustomerType.DISTRIBUIDOR))
-        assertTrue(types.contains(CustomerType.IPS))
-        assertTrue(types.contains(CustomerType.EPS))
+    val types = viewModel.getCustomerTypes()
+    assertTrue(types.contains(CustomerType.HOSPITAL))
+    assertTrue(types.contains(CustomerType.FARMACIA))
+    assertTrue(types.contains(CustomerType.CLINICA))
+    assertTrue(types.contains(CustomerType.DISTRIBUIDOR))
+    assertTrue(types.contains(CustomerType.IPS))
+    assertTrue(types.contains(CustomerType.EPS))
     }
 
     @Test
@@ -336,9 +343,8 @@ class OrdersViewModelTest {
         
         viewModel = createViewModel()
 
-        viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.FARMACIA))
-
-        verify(getCustomersUseCase).invoke("farmacia", null, true)
+    viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.FARMACIA))
+    verify(getCustomersUseCase).invoke("farmacia", null, true)
     }
 
     @Test
@@ -352,6 +358,8 @@ class OrdersViewModelTest {
         viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.CLINICA))
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isLoading)
             val state = awaitItem()
             assertEquals(CustomerType.CLINICA, state.selectedFilter)
         }
@@ -365,6 +373,8 @@ class OrdersViewModelTest {
         viewModel = createViewModel()
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isLoading)
             val state = awaitItem()
             assertTrue(state.customers.isEmpty())
             assertFalse(state.isLoading)
@@ -618,6 +628,8 @@ class OrdersViewModelTest {
         viewModel.deleteOrder(1)
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isDeleting)
             val state = awaitItem()
             assertFalse(state.isDeleting)
             assertEquals(errorMessage, state.error)
@@ -638,8 +650,8 @@ class OrdersViewModelTest {
         viewModel.deleteOrder(1)
 
         viewModel.state.test {
-            val state = awaitItem()
-            assertTrue(state.isDeleting)
+            val loading = awaitItem()
+            assertTrue(loading.isDeleting)
         }
     }
 
@@ -671,6 +683,8 @@ class OrdersViewModelTest {
         viewModel.deleteOrder(999)
 
         viewModel.state.test {
+            val loading = awaitItem()
+            assertTrue(loading.isDeleting)
             val state = awaitItem()
             assertFalse(state.isDeleting)
             assertTrue(state.error?.contains("encontrado") == true)

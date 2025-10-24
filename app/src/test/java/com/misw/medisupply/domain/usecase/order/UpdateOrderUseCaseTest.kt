@@ -147,12 +147,13 @@ class UpdateOrderUseCaseTest {
             preferredDistributionCenter = "DC-BOG",
             notes = null
         ).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Success)
             assertEquals(testOrder, result.data)
             assertEquals("ORD-20251023-0001", result.data?.orderNumber)
             assertEquals(OrderStatus.CONFIRMED, result.data?.status)
-            // End test
         }
     }
 
@@ -199,8 +200,11 @@ class UpdateOrderUseCaseTest {
             preferredDistributionCenter = null,
             notes = null
         ).test {
-            awaitItem()
-            // End test
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+            val result = awaitItem()
+            assertTrue(result is Resource.Success)
+            assertEquals(350.0, result.data?.items?.get(0)?.unitPrice)
         }
 
         // Then - verify unitPrice was passed
@@ -262,8 +266,11 @@ class UpdateOrderUseCaseTest {
             preferredDistributionCenter = null,
             notes = null
         ).test {
-            awaitItem()
-            // End test
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+            val result = awaitItem()
+            assertTrue(result is Resource.Error)
+            assertTrue(result.message?.contains("Pendiente") == true)
         }
 
         // Then - verify productName was passed
@@ -327,10 +334,11 @@ class UpdateOrderUseCaseTest {
             preferredDistributionCenter = null,
             notes = null
         ).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
-            // End test
         }
     }
 

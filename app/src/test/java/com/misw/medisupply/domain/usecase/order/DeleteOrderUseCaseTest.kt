@@ -39,7 +39,6 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Success)
             assertEquals(Unit, result.data)
-            // End test
         }
 
         verify(repository).deleteOrder(eq(orderId))
@@ -59,7 +58,6 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
-            // End test
         }
     }
 
@@ -77,7 +75,6 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
-            // End test
         }
     }
 
@@ -95,7 +92,6 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("servidor") == true)
-            // End test
         }
     }
 
@@ -113,7 +109,6 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("red") == true)
-            // End test
         }
     }
 
@@ -154,7 +149,6 @@ class DeleteOrderUseCaseTest {
             assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Success)
-            // End test
         }
 
         // Then
@@ -176,7 +170,6 @@ class DeleteOrderUseCaseTest {
             assertTrue(loading1 is Resource.Loading)
             val result1 = awaitItem()
             assertTrue(result1 is Resource.Success)
-            // End test
         }
 
         useCase(orderId2).test {
@@ -184,7 +177,6 @@ class DeleteOrderUseCaseTest {
             assertTrue(loading2 is Resource.Loading)
             val result2 = awaitItem()
             assertTrue(result2 is Resource.Success)
-            // End test
         }
 
         // Then
