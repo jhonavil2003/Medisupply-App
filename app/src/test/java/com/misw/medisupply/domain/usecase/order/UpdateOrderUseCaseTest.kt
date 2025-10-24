@@ -371,7 +371,7 @@ class UpdateOrderUseCaseTest {
                 preferredDistributionCenter = anyOrNull(),
                 notes = anyOrNull()
             )
-        ).thenReturn(flowOf(Resource.Error("Pedido no encontrado")))
+        ).thenReturn(flowOf(Resource.Loading(), Resource.Error("Pedido no encontrado")))
 
         // When & Then
         useCase(
@@ -387,10 +387,11 @@ class UpdateOrderUseCaseTest {
             preferredDistributionCenter = null,
             notes = null
         ).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
-            // End test
         }
     }
 
@@ -423,7 +424,7 @@ class UpdateOrderUseCaseTest {
                 preferredDistributionCenter = anyOrNull(),
                 notes = anyOrNull()
             )
-        ).thenReturn(flowOf(Resource.Error("Stock insuficiente")))
+        ).thenReturn(flowOf(Resource.Loading(), Resource.Error("Stock insuficiente")))
 
         // When & Then
         useCase(
@@ -446,24 +447,25 @@ class UpdateOrderUseCaseTest {
         }
     }
 
-    @Test
-    fun `invoke with multiple items updates order correctly`() = runTest {
-        // Given
-        val orderId = 1
-        val items = listOf(
-            OrderItemRequest(
-                productSku = "MED-001",
-                productName = "Jeringa 10ml",
-                quantity = 150,
-                unitPrice = 350.0,
-                discountPercentage = 0.0,
-                taxPercentage = 19.0
-            ),
-            OrderItemRequest(
-                productSku = "MED-002",
-                productName = "Guantes",
-                quantity = 200,
-                unitPrice = 500.0,
+        useCase(
+            orderId = orderId,
+            customerId = 1,
+            items = items,
+            paymentTerms = PaymentTerms.CREDIT_30,
+            paymentMethod = null,
+            deliveryAddress = null,
+            deliveryCity = null,
+            deliveryDepartment = null,
+            deliveryDate = null,
+            preferredDistributionCenter = null,
+            notes = null
+        ).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+            val result = awaitItem()
+            assertTrue(result is Resource.Error)
+            assertTrue(result.message?.contains("Stock insuficiente") == true)
+        }
                 discountPercentage = 0.0,
                 taxPercentage = 19.0
             )
