@@ -64,7 +64,18 @@ fun SalesForceNavGraph(
         
         // Visits Screen - Gestión de visitas
         composable(route = SalesForceRoutes.VISITS) {
-            com.misw.medisupply.presentation.salesforce.screens.visits.VisitScreen()
+            com.misw.medisupply.presentation.salesforce.screens.visits.VisitScreen(
+                onNavigateToRegisterVisit = {
+                    navController.navigate(SalesForceRoutes.VISIT_LIST)
+                }
+            )
+        }
+
+        // Visit List Screen - Lista de visitas
+        composable(route = SalesForceRoutes.VISIT_LIST) {
+            com.misw.medisupply.presentation.salesforce.screens.visits.VisitListScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         
         // Orders Screen - Gestión de pedidos (Menu)
