@@ -55,12 +55,16 @@ fun SalesForceNavGraph(
     ) {
         // Home Screen - Bienvenida
         composable(route = SalesForceRoutes.HOME) {
-            SalesForceHomeScreen()
+            SalesForceHomeScreen(
+                onNavigateToVisits = {
+                    navController.navigate(SalesForceRoutes.VISITS)
+                }
+            )
         }
         
         // Visits Screen - Gestión de visitas
         composable(route = SalesForceRoutes.VISITS) {
-            VisitsScreen()
+            com.misw.medisupply.presentation.salesforce.screens.visits.VisitScreen()
         }
         
         // Orders Screen - Gestión de pedidos (Menu)

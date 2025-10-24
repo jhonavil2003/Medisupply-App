@@ -1,3 +1,4 @@
+
 package com.misw.medisupply.presentation.salesforce.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+// import androidx.compose.ui.Modifier (eliminada para evitar conflicto)
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,7 +27,9 @@ import androidx.compose.ui.unit.dp
  * Pantalla principal para Fuerza de Ventas
  */
 @Composable
-fun SalesForceHomeScreen() {
+fun SalesForceHomeScreen(
+    onNavigateToVisits: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +81,10 @@ fun SalesForceHomeScreen() {
             Text(
                 text = "• Visitas - Gestión de visitas a clientes",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .clickable { onNavigateToVisits() }
             )
             Text(
                 text = "• Pedidos - Creación y gestión de pedidos",
