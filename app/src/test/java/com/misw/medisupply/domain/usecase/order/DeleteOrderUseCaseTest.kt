@@ -37,7 +37,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Success)
             assertEquals(Unit, result.data)
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
 
         verify(repository).deleteOrder(eq(orderId))
@@ -55,7 +55,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
     }
 
@@ -71,7 +71,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
     }
 
@@ -87,7 +87,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("servidor") == true)
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
     }
 
@@ -103,7 +103,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("red") == true)
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
     }
 
@@ -127,7 +127,7 @@ class DeleteOrderUseCaseTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
 
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
     }
 
@@ -141,7 +141,7 @@ class DeleteOrderUseCaseTest {
         // When
         useCase(orderId).test {
             awaitItem()
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
 
         // Then
@@ -160,12 +160,12 @@ class DeleteOrderUseCaseTest {
         // When
         useCase(orderId1).test {
             awaitItem()
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
 
         useCase(orderId2).test {
             awaitItem()
-            cancelAndIgnoreRemainingEvents()
+            // End test
         }
 
         // Then

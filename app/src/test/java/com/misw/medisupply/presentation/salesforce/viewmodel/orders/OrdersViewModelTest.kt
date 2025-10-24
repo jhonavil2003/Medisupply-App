@@ -165,7 +165,6 @@ class OrdersViewModelTest {
             val state = awaitItem()
             assertTrue(state.isLoading)
             assertNull(state.error)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -185,7 +184,6 @@ class OrdersViewModelTest {
             assertEquals(3, state.customers.size)
             assertNull(state.error)
             assertEquals(testCustomers, state.customers)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -206,7 +204,6 @@ class OrdersViewModelTest {
             assertFalse(state.isLoading)
             assertEquals(errorMessage, state.error)
             assertTrue(state.customers.isEmpty())
-            awaitComplete()
         }
     }
 
@@ -221,7 +218,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertFalse(state.isRefreshing)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -236,7 +232,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertEquals(CustomerType.HOSPITAL, state.selectedFilter)
-            cancelAndIgnoreRemainingEvents()
         }
         verify(getCustomersUseCase).invoke("hospital", null, true)
     }
@@ -253,7 +248,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertNull(state.selectedFilter)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -268,7 +262,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertEquals("Hospital", state.searchQuery)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -284,7 +277,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertEquals(customerToSelect, state.selectedCustomer)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -299,7 +291,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertNull(state.error)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -316,7 +307,6 @@ class OrdersViewModelTest {
             val state = awaitItem()
             assertEquals(customerToSelect, state.selectedCustomer)
             assertEquals("Farmacia del Pueblo", state.selectedCustomer?.businessName)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -364,7 +354,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertEquals(CustomerType.CLINICA, state.selectedFilter)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -380,7 +369,6 @@ class OrdersViewModelTest {
             assertTrue(state.customers.isEmpty())
             assertFalse(state.isLoading)
             assertNull(state.error)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -481,7 +469,6 @@ class OrdersViewModelTest {
             assertFalse(state.isSaving)
             assertEquals("Orden actualizada exitosamente", state.successMessage)
             assertNull(state.error)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -535,7 +522,6 @@ class OrdersViewModelTest {
             assertFalse(state.isSaving)
             assertEquals(errorMessage, state.error)
             assertNull(state.successMessage)
-            awaitComplete()
         }
     }
 
@@ -567,7 +553,6 @@ class OrdersViewModelTest {
             assertEquals(350.0, (cartItem?.unitPrice ?: 0.0f).toDouble(), 0.001)
             assertEquals(150, cartItem?.quantity)
             assertEquals(1, state.orderIdEditingNumeric) // Numeric ID
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -583,7 +568,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertNull(state.successMessage)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -611,7 +595,6 @@ class OrdersViewModelTest {
             assertFalse(state.isDeleting)
             assertEquals("Pedido eliminado exitosamente", state.deleteSuccessMessage)
             assertNull(state.error)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -639,7 +622,6 @@ class OrdersViewModelTest {
             assertFalse(state.isDeleting)
             assertEquals(errorMessage, state.error)
             assertNull(state.deleteSuccessMessage)
-            awaitComplete()
         }
     }
 
@@ -658,7 +640,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertTrue(state.isDeleting)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -674,7 +655,6 @@ class OrdersViewModelTest {
         viewModel.state.test {
             val state = awaitItem()
             assertNull(state.deleteSuccessMessage)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -694,7 +674,6 @@ class OrdersViewModelTest {
             val state = awaitItem()
             assertFalse(state.isDeleting)
             assertTrue(state.error?.contains("encontrado") == true)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 }

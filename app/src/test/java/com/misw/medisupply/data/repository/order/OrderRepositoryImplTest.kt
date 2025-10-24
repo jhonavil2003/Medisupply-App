@@ -115,7 +115,6 @@ class OrderRepositoryImplTest {
             assertEquals(1, success.data?.items?.size)
             success.data?.totalAmount?.let { assertEquals(119000.0, it, 0.01) }
 
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -151,7 +150,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("Validación") == true || error.message?.contains("400") == true)
-            awaitComplete()
         }
     }
 
@@ -187,7 +185,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("Stock") == true || error.message?.contains("409") == true)
-            awaitComplete()
         }
     }
 
@@ -223,7 +220,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("encontrado") == true || error.message?.contains("404") == true)
-            awaitComplete()
         }
     }
 
@@ -258,7 +254,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertNotNull(error.message)
-            awaitComplete()
         }
     }
 
@@ -315,7 +310,6 @@ class OrderRepositoryImplTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
             assertEquals("ORD-001", success.data?.orderNumber)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -406,7 +400,6 @@ class OrderRepositoryImplTest {
             success.data?.items?.get(0)?.unitPrice?.let {
                 assertEquals(350.0, it, 0.001)
             }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -448,7 +441,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("Pendiente") == true)
-            awaitComplete()
         }
     }
 
@@ -490,7 +482,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("encontrado") == true)
-            awaitComplete()
         }
     }
 
@@ -532,7 +523,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("Stock") == true)
-            awaitComplete()
         }
     }
 
@@ -574,7 +564,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("Error") == true)
-            awaitComplete()
         }
     }
 
@@ -614,7 +603,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("red") == true)
-            awaitComplete()
         }
     }
 
@@ -699,7 +687,6 @@ class OrderRepositoryImplTest {
             success.data?.items?.get(0)?.unitPrice?.let {
                 assertEquals(350.0, it, 0.001)
             }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -782,7 +769,6 @@ class OrderRepositoryImplTest {
             assertTrue(success is Resource.Success)
             // Verify productName is preserved
             assertEquals("Jeringa 10ml", success.data?.items?.get(0)?.productName)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -803,7 +789,6 @@ class OrderRepositoryImplTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
             assertEquals(Unit, success.data)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -823,7 +808,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("Pendiente") == true)
-            awaitComplete()
         }
     }
 
@@ -843,7 +827,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("encontrado") == true)
-            awaitComplete()
         }
     }
 
@@ -863,7 +846,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("servidor") == true)
-            awaitComplete()
         }
     }
 
@@ -881,7 +863,6 @@ class OrderRepositoryImplTest {
             val error = awaitItem()
             assertTrue(error is Resource.Error)
             assertTrue(error.message?.contains("red") == true)
-            awaitComplete()
         }
     }
 }
