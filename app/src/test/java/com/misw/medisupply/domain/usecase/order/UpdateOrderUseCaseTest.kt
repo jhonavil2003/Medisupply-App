@@ -154,7 +154,7 @@ class UpdateOrderUseCaseTest {
             assertEquals(testOrder, result.data)
             assertEquals("ORD-20251023-0001", result.data?.orderNumber)
             assertEquals(OrderStatus.CONFIRMED, result.data?.status)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -204,7 +204,7 @@ class UpdateOrderUseCaseTest {
             notes = null
         ).test {
             awaitItem()
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
 
         // Then - verify unitPrice was passed
@@ -269,7 +269,7 @@ class UpdateOrderUseCaseTest {
             notes = null
         ).test {
             awaitItem()
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
 
         // Then - verify productName was passed
@@ -336,7 +336,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -388,7 +388,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -440,7 +440,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Stock") == true)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -499,7 +499,7 @@ class UpdateOrderUseCaseTest {
         ).test {
             val result = awaitItem()
             assertTrue(result is Resource.Success)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
 
         verify(repository).updateOrder(
@@ -573,7 +573,7 @@ class UpdateOrderUseCaseTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
