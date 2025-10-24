@@ -18,6 +18,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -178,13 +179,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(flowOf(Resource.Success(testOrder)))
 
@@ -212,13 +213,13 @@ class UpdateOrderUseCaseTest {
             customerId = any(),
             items = eq(items), // Items with unitPrice
             paymentTerms = any(),
-            paymentMethod = any(),
-            deliveryAddress = any(),
-            deliveryCity = any(),
-            deliveryDepartment = any(),
-            deliveryDate = any(),
-            preferredDistributionCenter = any(),
-            notes = any()
+            paymentMethod = anyOrNull(),
+            deliveryAddress = anyOrNull(),
+            deliveryCity = anyOrNull(),
+            deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
+            preferredDistributionCenter = anyOrNull(),
+            notes = anyOrNull()
         )
     }
 
@@ -243,13 +244,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(flowOf(Resource.Success(testOrder)))
 
@@ -277,13 +278,13 @@ class UpdateOrderUseCaseTest {
             customerId = any(),
             items = eq(items), // Items with productName
             paymentTerms = any(),
-            paymentMethod = any(),
-            deliveryAddress = any(),
-            deliveryCity = any(),
-            deliveryDepartment = any(),
-            deliveryDate = any(),
-            preferredDistributionCenter = any(),
-            notes = any()
+            paymentMethod = anyOrNull(),
+            deliveryAddress = anyOrNull(),
+            deliveryCity = anyOrNull(),
+            deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
+            preferredDistributionCenter = anyOrNull(),
+            notes = anyOrNull()
         )
     }
 
@@ -308,13 +309,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(flowOf(Resource.Error("Validación fallida: Solo se pueden actualizar pedidos en estado Pendiente")))
 
@@ -360,13 +361,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(flowOf(Resource.Error("Pedido no encontrado")))
 
@@ -412,13 +413,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(flowOf(Resource.Error("Stock insuficiente")))
 
@@ -472,13 +473,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(flowOf(Resource.Success(testOrder)))
 
@@ -506,13 +507,13 @@ class UpdateOrderUseCaseTest {
             customerId = any(),
             items = eq(items),
             paymentTerms = any(),
-            paymentMethod = any(),
-            deliveryAddress = any(),
-            deliveryCity = any(),
-            deliveryDepartment = any(),
-            deliveryDate = any(),
-            preferredDistributionCenter = any(),
-            notes = any()
+            paymentMethod = anyOrNull(),
+            deliveryAddress = anyOrNull(),
+            deliveryCity = anyOrNull(),
+            deliveryDepartment = anyOrNull(),
+            deliveryDate = anyOrNull(),
+            preferredDistributionCenter = anyOrNull(),
+            notes = anyOrNull()
         )
     }
 
@@ -537,13 +538,13 @@ class UpdateOrderUseCaseTest {
                 customerId = any(),
                 items = any(),
                 paymentTerms = any(),
-                paymentMethod = any(),
-                deliveryAddress = any(),
-                deliveryCity = any(),
-                deliveryDepartment = any(),
-                deliveryDate = any(),
-                preferredDistributionCenter = any(),
-                notes = any()
+                paymentMethod = anyOrNull(),
+                deliveryAddress = anyOrNull(),
+                deliveryCity = anyOrNull(),
+                deliveryDepartment = anyOrNull(),
+                deliveryDate = anyOrNull(),
+                preferredDistributionCenter = anyOrNull(),
+                notes = anyOrNull()
             )
         ).thenReturn(
             flowOf(
