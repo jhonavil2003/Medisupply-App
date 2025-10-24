@@ -419,7 +419,9 @@ class OrderRepositoryImplTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
         val errorBody = """{"error":"Validación fallida: Solo se pueden actualizar pedidos en estado Pendiente"}"""
@@ -459,7 +461,9 @@ class OrderRepositoryImplTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
         val errorBody = """{"error":"Pedido no encontrado"}"""
@@ -499,7 +503,9 @@ class OrderRepositoryImplTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 10000,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
         val errorBody = """{"error":"Stock insuficiente para el producto MED-001"}"""
@@ -539,7 +545,9 @@ class OrderRepositoryImplTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
         val errorBody = """{"error":"Error del servidor"}"""
@@ -619,7 +627,9 @@ class OrderRepositoryImplTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml",
                 quantity = 150,
-                unitPrice = 350.0 // REQUIRED field
+                unitPrice = 350.0, // REQUIRED field
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
         val mockOrderItemDto = OrderItemDto(
@@ -702,7 +712,9 @@ class OrderRepositoryImplTest {
                 productSku = "MED-001",
                 productName = "Jeringa 10ml", // Should be sent
                 quantity = 150,
-                unitPrice = 350.0
+                unitPrice = 350.0,
+                discountPercentage = 0.0,
+                taxPercentage = 19.0
             )
         )
         val mockOrderItemDto = OrderItemDto(
