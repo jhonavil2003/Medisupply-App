@@ -121,21 +121,21 @@ class UpdateOrderUseCaseTest {
 
         whenever(
             repository.updateOrder(
-                orderId = eq(orderId),
-                customerId = eq(customerId),
-                items = eq(items),
-                paymentTerms = eq(PaymentTerms.CREDIT_30),
-                paymentMethod = eq(PaymentMethod.TRANSFER),
-                deliveryAddress = eq("Calle 123 #45-67"),
-                deliveryCity = eq("Bogotá"),
-                deliveryDepartment = eq("Cundinamarca"),
-                deliveryDate = eq(null),
-                preferredDistributionCenter = eq("DC-BOG"),
-                notes = eq(null)
-            )
-        ).thenReturn(flowOf(Resource.Success(testOrder)))
-
-        // When & Then
+            whenever(
+                repository.updateOrder(
+                    orderId = eq(orderId),
+                    customerId = eq(customerId),
+                    items = eq(items),
+                    paymentTerms = eq(PaymentTerms.CREDIT_30),
+                    paymentMethod = eq(PaymentMethod.TRANSFER),
+                    deliveryAddress = eq("Calle 123 #45-67"),
+                    deliveryCity = eq("Bogotá"),
+                    deliveryDepartment = eq("Cundinamarca"),
+                    deliveryDate = eq(null),
+                    preferredDistributionCenter = eq("DC-BOG"),
+                    notes = eq(null)
+                )
+            ).thenReturn(flowOf(Resource.Loading(), Resource.Success(testOrder)))
         useCase(
             orderId = orderId,
             customerId = customerId,
@@ -175,21 +175,21 @@ class UpdateOrderUseCaseTest {
 
         whenever(
             repository.updateOrder(
-                orderId = any(),
-                customerId = any(),
-                items = any(),
-                paymentTerms = any(),
-                paymentMethod = anyOrNull(),
-                deliveryAddress = anyOrNull(),
-                deliveryCity = anyOrNull(),
-                deliveryDepartment = anyOrNull(),
-                deliveryDate = anyOrNull(),
-                preferredDistributionCenter = anyOrNull(),
-                notes = anyOrNull()
-            )
-        ).thenReturn(flowOf(Resource.Success(testOrder)))
-
-        // When
+                whenever(
+                    repository.updateOrder(
+                        orderId = any(),
+                        customerId = any(),
+                        items = any(),
+                        paymentTerms = any(),
+                        paymentMethod = anyOrNull(),
+                        deliveryAddress = anyOrNull(),
+                        deliveryCity = anyOrNull(),
+                        deliveryDepartment = anyOrNull(),
+                        deliveryDate = anyOrNull(),
+                        preferredDistributionCenter = anyOrNull(),
+                        notes = anyOrNull()
+                    )
+                ).thenReturn(flowOf(Resource.Loading(), Resource.Success(testOrder)))
         useCase(
             orderId = orderId,
             customerId = 1,
@@ -240,21 +240,21 @@ class UpdateOrderUseCaseTest {
 
         whenever(
             repository.updateOrder(
-                orderId = any(),
-                customerId = any(),
-                items = any(),
-                paymentTerms = any(),
-                paymentMethod = anyOrNull(),
-                deliveryAddress = anyOrNull(),
-                deliveryCity = anyOrNull(),
-                deliveryDepartment = anyOrNull(),
-                deliveryDate = anyOrNull(),
-                preferredDistributionCenter = anyOrNull(),
-                notes = anyOrNull()
-            )
-        ).thenReturn(flowOf(Resource.Success(testOrder)))
-
-        // When
+                whenever(
+                    repository.updateOrder(
+                        orderId = any(),
+                        customerId = any(),
+                        items = any(),
+                        paymentTerms = any(),
+                        paymentMethod = anyOrNull(),
+                        deliveryAddress = anyOrNull(),
+                        deliveryCity = anyOrNull(),
+                        deliveryDepartment = anyOrNull(),
+                        deliveryDate = anyOrNull(),
+                        preferredDistributionCenter = anyOrNull(),
+                        notes = anyOrNull()
+                    )
+                ).thenReturn(flowOf(Resource.Loading(), Resource.Error("Validación fallida: Solo se pueden actualizar pedidos en estado Pendiente")))
         useCase(
             orderId = orderId,
             customerId = 1,

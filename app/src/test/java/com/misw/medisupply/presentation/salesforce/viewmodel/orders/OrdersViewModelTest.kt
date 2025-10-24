@@ -145,7 +145,7 @@ class OrdersViewModelTest {
     @Test
     fun `init loads customers automatically`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
 
         viewModel = createViewModel()
 
@@ -210,7 +210,7 @@ class OrdersViewModelTest {
     @Test
     fun `onEvent RefreshCustomers sets refreshing state`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
 
         viewModel.onEvent(OrdersEvent.RefreshCustomers)
@@ -224,7 +224,7 @@ class OrdersViewModelTest {
     @Test
     fun `onEvent FilterByType filters customers by hospital`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
 
         viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.HOSPITAL))
@@ -239,7 +239,7 @@ class OrdersViewModelTest {
     @Test
     fun `onEvent FilterByType with null clears filter`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
         viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.FARMACIA))
 
@@ -297,7 +297,7 @@ class OrdersViewModelTest {
     @Test
     fun `selectCustomer directly updates selected customer`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
         val customerToSelect = testCustomers[1]
 
@@ -313,7 +313,7 @@ class OrdersViewModelTest {
     @Test
     fun `getCustomerTypes returns all customer types`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(emptyList())))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(emptyList())))
         viewModel = createViewModel()
 
         val types = viewModel.getCustomerTypes()
@@ -330,9 +330,9 @@ class OrdersViewModelTest {
     fun `filtering by pharmacy type loads only pharmacy customers`() = runTest {
         val pharmacyCustomers = listOf(testCustomers[1])
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         whenever(getCustomersUseCase.invoke("farmacia", null, true))
-            .thenReturn(flowOf(Resource.Success(pharmacyCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(pharmacyCustomers)))
         
         viewModel = createViewModel()
 
@@ -344,7 +344,7 @@ class OrdersViewModelTest {
     @Test
     fun `multiple filter changes update state correctly`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
 
         viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.HOSPITAL))
@@ -360,7 +360,7 @@ class OrdersViewModelTest {
     @Test
     fun `loading empty list updates state with empty customers`() = runTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Success(emptyList())))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(emptyList())))
 
         viewModel = createViewModel()
 
@@ -664,7 +664,7 @@ class OrdersViewModelTest {
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         whenever(deleteOrderUseCase.invoke(any()))
-            .thenReturn(flowOf(Resource.Error("Pedido no encontrado")))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Error("Pedido no encontrado")))
 
         viewModel = createViewModel()
 

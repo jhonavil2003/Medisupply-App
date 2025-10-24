@@ -30,10 +30,12 @@ class DeleteOrderUseCaseTest {
         // Given
         val orderId = 1
         whenever(repository.deleteOrder(orderId))
-            .thenReturn(flowOf(Resource.Success(Unit)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(Unit)))
 
         // When & Then
         useCase(orderId).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Success)
             assertEquals(Unit, result.data)
@@ -48,10 +50,12 @@ class DeleteOrderUseCaseTest {
         // Given
         val orderId = 1
         whenever(repository.deleteOrder(orderId))
-            .thenReturn(flowOf(Resource.Error("Validación fallida: Solo se pueden eliminar pedidos en estado Pendiente")))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Error("Validación fallida: Solo se pueden eliminar pedidos en estado Pendiente")))
 
         // When & Then
         useCase(orderId).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
@@ -64,10 +68,12 @@ class DeleteOrderUseCaseTest {
         // Given
         val orderId = 999
         whenever(repository.deleteOrder(orderId))
-            .thenReturn(flowOf(Resource.Error("Pedido no encontrado")))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Error("Pedido no encontrado")))
 
         // When & Then
         useCase(orderId).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
@@ -80,10 +86,12 @@ class DeleteOrderUseCaseTest {
         // Given
         val orderId = 1
         whenever(repository.deleteOrder(orderId))
-            .thenReturn(flowOf(Resource.Error("Error del servidor al eliminar el pedido")))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Error("Error del servidor al eliminar el pedido")))
 
         // When & Then
         useCase(orderId).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("servidor") == true)
@@ -96,10 +104,12 @@ class DeleteOrderUseCaseTest {
         // Given
         val orderId = 1
         whenever(repository.deleteOrder(orderId))
-            .thenReturn(flowOf(Resource.Error("Error de red al eliminar pedido")))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Error("Error de red al eliminar pedido")))
 
         // When & Then
         useCase(orderId).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("red") == true)
@@ -136,11 +146,14 @@ class DeleteOrderUseCaseTest {
         // Given
         val orderId = 1
         whenever(repository.deleteOrder(orderId))
-            .thenReturn(flowOf(Resource.Success(Unit)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(Unit)))
 
         // When
         useCase(orderId).test {
-            awaitItem()
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+            val result = awaitItem()
+            assertTrue(result is Resource.Success)
             // End test
         }
 
@@ -155,16 +168,22 @@ class DeleteOrderUseCaseTest {
         val orderId2 = 2
 
         whenever(repository.deleteOrder(any()))
-            .thenReturn(flowOf(Resource.Success(Unit)))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(Unit)))
 
         // When
         useCase(orderId1).test {
-            awaitItem()
+            val loading1 = awaitItem()
+            assertTrue(loading1 is Resource.Loading)
+            val result1 = awaitItem()
+            assertTrue(result1 is Resource.Success)
             // End test
         }
 
         useCase(orderId2).test {
-            awaitItem()
+            val loading2 = awaitItem()
+            assertTrue(loading2 is Resource.Loading)
+            val result2 = awaitItem()
+            assertTrue(result2 is Resource.Success)
             // End test
         }
 
