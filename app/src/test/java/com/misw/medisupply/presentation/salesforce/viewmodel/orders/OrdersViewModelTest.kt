@@ -6,6 +6,7 @@ import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.customer.DocumentType
+import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderItem
 import com.misw.medisupply.domain.model.order.OrderStatus
@@ -437,15 +438,6 @@ class OrdersViewModelTest {
         whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
-        val items = listOf(
-            OrderItemRequest(
-                productSku = "MED-001",
-                productName = "Jeringa 10ml",
-                quantity = 150,
-                unitPrice = 350.0
-            )
-        )
-
         whenever(
             updateOrderUseCase.invoke(
                 orderId = any(),
@@ -468,22 +460,27 @@ class OrdersViewModelTest {
         )
 
         viewModel = createViewModel()
+        
+        // Set up state for update
+        viewModel.selectCustomer(testCustomers[0])
+        viewModel.updateCartItems(mapOf(
+            "MED-001" to CartItem(
+                productSku = "MED-001",
+                productName = "Jeringa 10ml",
+                quantity = 150,
+                unitPrice = 350.0,
+                subtotal = 52500.0,
+                imageUrl = null
+            )
+        ))
+        viewModel.onEvent(OrdersEvent.LoadOrderForEdit("1"))
 
-        viewModel.updateOrder(
-            orderId = 1,
-            customerId = 1,
-            items = items,
-            paymentTerms = PaymentTerms.CREDIT_30,
-            paymentMethod = PaymentMethod.TRANSFER,
-            deliveryAddress = "Calle 123 #45-67",
-            deliveryCity = "Bogotá",
-            deliveryDepartment = "Cundinamarca"
-        )
+        viewModel.updateOrder()
 
         viewModel.state.test {
             val state = awaitItem()
-            assertFalse(state.isUpdating)
-            assertEquals("ORD-20251023-0001", state.updateSuccessMessage)
+            assertFalse(state.isSaving)
+            assertEquals("Orden actualizada exitosamente", state.successMessage)
             assertNull(state.error)
             cancelAndIgnoreRemainingEvents()
         }
@@ -495,14 +492,6 @@ class OrdersViewModelTest {
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         val errorMessage = "Solo se pueden actualizar pedidos en estado Pendiente"
-        val items = listOf(
-            OrderItemRequest(
-                productSku = "MED-001",
-                productName = "Jeringa 10ml",
-                quantity = 150,
-                unitPrice = 350.0
-            )
-        )
 
         whenever(
             updateOrderUseCase.invoke(
@@ -526,19 +515,28 @@ class OrdersViewModelTest {
         )
 
         viewModel = createViewModel()
+        
+        // Set up state for update
+        viewModel.selectCustomer(testCustomers[0])
+        viewModel.updateCartItems(mapOf(
+            "MED-001" to CartItem(
+                productSku = "MED-001",
+                productName = "Jeringa 10ml",
+                quantity = 150,
+                unitPrice = 350.0,
+                subtotal = 52500.0,
+                imageUrl = null
+            )
+        ))
+        viewModel.onEvent(OrdersEvent.LoadOrderForEdit("1"))
 
-        viewModel.updateOrder(
-            orderId = 1,
-            customerId = 1,
-            items = items,
-            paymentTerms = PaymentTerms.CREDIT_30
-        )
+        viewModel.updateOrder()
 
         viewModel.state.test {
             val state = awaitItem()
-            assertFalse(state.isUpdating)
+            assertFalse(state.isSaving)
             assertEquals(errorMessage, state.error)
-            assertNull(state.updateSuccessMessage)
+            assertNull(state.successMessage)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -558,16 +556,18 @@ class OrdersViewModelTest {
 
         viewModel = createViewModel()
 
-        viewModel.loadOrderForEdit(1)
+        viewModel.onEvent(OrdersEvent.LoadOrderForEdit("1"))
 
         viewModel.state.test {
             val state = awaitItem()
             assertFalse(state.isLoading)
             assertEquals(1, state.cartItems.size)
-            assertEquals("MED-001", state.cartItems[0].productSku)
-            assertEquals("Jeringa 10ml", state.cartItems[0].productName)
-            assertEquals(350.0, state.cartItems[0].unitPrice, 0.001)
-            assertEquals(150, state.cartItems[0].quantity)
+            val cartItem = state.cartItems["MED-001"]
+            assertNotNull(cartItem)
+            assertEquals("MED-001", cartItem?.productSku)
+            assertEquals("Jeringa 10ml", cartItem?.productName)
+            assertEquals(350.0, cartItem?.unitPrice ?: 0.0, 0.001)
+            assertEquals(150, cartItem?.quantity)
             assertEquals(1, state.orderIdEditingNumeric) // Numeric ID
             cancelAndIgnoreRemainingEvents()
         }
@@ -580,19 +580,11 @@ class OrdersViewModelTest {
 
         viewModel = createViewModel()
 
-        // Simulate success message
-        viewModel.updateOrder(
-            orderId = 1,
-            customerId = 1,
-            items = listOf(),
-            paymentTerms = PaymentTerms.CREDIT_30
-        )
-
-        viewModel.onEvent(OrdersEvent.ClearUpdateSuccess)
+        viewModel.onEvent(OrdersEvent.ClearError)
 
         viewModel.state.test {
             val state = awaitItem()
-            assertNull(state.updateSuccessMessage)
+            assertNull(state.successMessage)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -265,9 +265,9 @@ class OrderRepositoryImplTest {
     @Test
     fun `createOrder with multiple items maps correctly`() = runTest {
         val orderItems = listOf(
-            OrderItemRequest("MED-001", 10, 0.0, 19.0),
-            OrderItemRequest("MED-002", 5, 5.0, 19.0),
-            OrderItemRequest("EQUIP-001", 2, 10.0, 16.0)
+            OrderItemRequest("MED-001", "Producto 1", 10, 100.0, 0.0, 19.0),
+            OrderItemRequest("MED-002", "Producto 2", 5, 200.0, 5.0, 19.0),
+            OrderItemRequest("EQUIP-001", "Equipo 1", 2, 500.0, 10.0, 16.0)
         )
         val mockOrderDto = OrderDto(
             id = 1,

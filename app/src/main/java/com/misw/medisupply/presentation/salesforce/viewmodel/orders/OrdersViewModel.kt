@@ -346,7 +346,7 @@ class OrdersViewModel @Inject constructor(
      * Delete an order by ID
      * Only PENDING orders can be deleted
      */
-    private fun deleteOrder(orderId: Int) {
+    internal fun deleteOrder(orderId: Int) {
         Log.d(TAG, "deleteOrder: Attempting to delete order with ID: $orderId")
         
         viewModelScope.launch {
