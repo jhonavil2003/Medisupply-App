@@ -5,6 +5,8 @@ import com.misw.medisupply.core.utils.Constants
 import com.misw.medisupply.data.remote.api.order.OrderApiService
 import com.misw.medisupply.data.remote.dto.order.CreateOrderItemRequest
 import com.misw.medisupply.data.remote.dto.order.CreateOrderRequest
+import com.misw.medisupply.data.remote.dto.order.UpdateOrderItemRequest
+import com.misw.medisupply.data.remote.dto.order.UpdateOrderRequest
 import com.misw.medisupply.data.remote.dto.order.toDomain
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.PaymentMethod
@@ -246,6 +248,98 @@ class OrderRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             // Unknown errors
             emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
+        }
+    }
+    
+    override fun updateOrder(
+        orderId: Int,
+        customerId: Int,
+        items: List<OrderItemRequest>,
+        paymentTerms: PaymentTerms,
+        paymentMethod: PaymentMethod?,
+        deliveryAddress: String?,
+        deliveryCity: String?,
+        deliveryDepartment: String?,
+        deliveryDate: String?,
+        preferredDistributionCenter: String?,
+        notes: String?
+    ): Flow<Resource<Order>> = flow {
+        try {
+            emit(Resource.Loading())
+            
+            android.util.Log.d("OrderRepositoryImpl", "updateOrder() called for orderId: $orderId")
+            
+            // Validate that all items have unitPrice (required by backend)
+            val itemsWithoutPrice = items.filter { it.unitPrice == null }
+            if (itemsWithoutPrice.isNotEmpty()) {
+                val skus = itemsWithoutPrice.joinToString(", ") { it.productSku }
+                android.util.Log.e("OrderRepositoryImpl", "Items without unitPrice: $skus")
+                emit(Resource.Error("Error: Los siguientes productos no tienen precio: $skus"))
+                return@flow
+            }
+            
+            // Map domain items to DTO items
+            val itemsDto = items.map { item ->
+                UpdateOrderItemRequest(
+                    productSku = item.productSku,
+                    productName = item.productName, // Pass product name to preserve it in the database
+                    quantity = item.quantity,
+                    unitPrice = item.unitPrice!!, // Safe to use !! here due to validation above
+                    discountPercentage = item.discountPercentage,
+                    taxPercentage = item.taxPercentage
+                )
+            }
+            
+            // Create update request DTO
+            val request = UpdateOrderRequest(
+                customerId = customerId,
+                items = itemsDto,
+                paymentTerms = paymentTerms.value,
+                paymentMethod = paymentMethod?.value,
+                deliveryAddress = deliveryAddress,
+                deliveryCity = deliveryCity,
+                deliveryDepartment = deliveryDepartment,
+                deliveryDate = deliveryDate,
+                preferredDistributionCenter = preferredDistributionCenter,
+                notes = notes
+            )
+            
+            android.util.Log.d("OrderRepositoryImpl", "Request: customerId=$customerId, items=${items.size}, paymentTerms=${paymentTerms.value}")
+            
+            // Make API call
+            val response = apiService.updateOrder(orderId, request)
+            
+            android.util.Log.d("OrderRepositoryImpl", "Response code: ${response.code()}")
+            
+            if (response.isSuccessful) {
+                response.body()?.let { orderDto ->
+                    android.util.Log.d("OrderRepositoryImpl", "Success! Order: ${orderDto.orderNumber}, Status: ${orderDto.status}")
+                    emit(Resource.Success(orderDto.toDomain()))
+                } ?: run {
+                    android.util.Log.e("OrderRepositoryImpl", "Response body is null")
+                    emit(Resource.Error("Response body is null"))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("OrderRepositoryImpl", "Error response: code=${response.code()}, body=$errorBody")
+                val errorMessage = when (response.code()) {
+                    400 -> "Validación fallida: Solo se pueden actualizar pedidos en estado Pendiente"
+                    404 -> "Pedido no encontrado"
+                    409 -> "Stock insuficiente"
+                    500 -> Constants.ErrorMessages.SERVER_ERROR
+                    else -> "Error ${response.code()}: ${response.message()}"
+                }
+                emit(Resource.Error(errorMessage))
+            }
+        } catch (e: HttpException) {
+            android.util.Log.e("OrderRepositoryImpl", "HttpException: ${e.message()}", e)
+            emit(Resource.Error("Error HTTP: ${e.message()}"))
+        } catch (e: IOException) {
+            android.util.Log.e("OrderRepositoryImpl", "IOException: ${e.message}", e)
+            emit(Resource.Error("Error de red: Verifique su conexión a internet"))
+        } catch (e: Exception) {
+            android.util.Log.e("OrderRepositoryImpl", "Exception: ${e.message}", e)
+            emit(Resource.Error("Error inesperado: ${e.message}"))
         }
     }
 }

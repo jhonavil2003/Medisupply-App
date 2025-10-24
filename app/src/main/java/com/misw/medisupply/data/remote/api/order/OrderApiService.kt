@@ -3,10 +3,12 @@ package com.misw.medisupply.data.remote.api.order
 import com.misw.medisupply.data.remote.dto.order.CreateOrderRequest
 import com.misw.medisupply.data.remote.dto.order.OrderDto
 import com.misw.medisupply.data.remote.dto.order.OrdersResponse
+import com.misw.medisupply.data.remote.dto.order.UpdateOrderRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -64,4 +66,17 @@ interface OrderApiService {
     suspend fun deleteOrder(
         @Path("id") orderId: Int
     ): Response<Unit>
+    
+    /**
+     * Update an existing order
+     * 
+     * @param orderId ID of the order to update
+     * @param updateRequest Request body containing fields to update
+     * @return Response containing updated OrderDto
+     */
+    @PATCH("orders/{id}")
+    suspend fun updateOrder(
+        @Path("id") orderId: Int,
+        @Body updateRequest: UpdateOrderRequest
+    ): Response<OrderDto>
 }

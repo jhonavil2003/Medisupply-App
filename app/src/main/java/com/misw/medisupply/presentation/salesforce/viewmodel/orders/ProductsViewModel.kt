@@ -410,6 +410,14 @@ class ProductsViewModel @Inject constructor(
     fun clearCart() {
         _state.update { it.copy(cartItems = emptyMap()) }
     }
+    
+    /**
+     * Load initial cart items (for edit mode)
+     * Populates the cart with items from an existing order
+     */
+    fun loadInitialCartItems(items: Map<String, CartItem>) {
+        _state.update { it.copy(cartItems = items) }
+    }
 
     fun getCartQuantity(productSku: String): Int {
         return _state.value.cartItems[normalizedSku(productSku)]?.quantity ?: 0

@@ -92,43 +92,22 @@ fun OrderCard(
             Spacer(modifier = Modifier.height(10.dp))
             
             // Customer info
-            order.customer?.let { customer ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Cliente:",
-                        fontSize = 13.sp,
-                        color = Color(0xFF757575),
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = customer.getDisplayName(),
-                        fontSize = 13.sp,
-                        color = Color(0xFF212121),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-            
-            // Customer ID (always shown as it's non-nullable)
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Cliente ID:",
+                    text = "Cliente:",
                     fontSize = 13.sp,
                     color = Color(0xFF757575),
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = order.customerId.toString(),
+                    text = order.customer?.getDisplayName() ?: "ID: ${order.customerId}",
                     fontSize = 13.sp,
-                    color = Color(0xFF212121)
+                    color = Color(0xFF212121),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
