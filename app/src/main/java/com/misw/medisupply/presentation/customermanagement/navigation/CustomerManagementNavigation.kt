@@ -38,7 +38,9 @@ import com.misw.medisupply.ui.theme.NavBarIconGreen
  * Integrates NavGraph and BottomNavigationBar
  */
 @Composable
-fun CustomerManagementNavigation() {
+fun CustomerManagementNavigation(
+    onNavigateToRoleSelection: () -> Unit = {}
+) {
     val navController = rememberNavController()
     
     Scaffold(
@@ -49,7 +51,8 @@ fun CustomerManagementNavigation() {
     ) { paddingValues ->
         CustomerManagementNavGraph(
             navController = navController,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            onNavigateToRoleSelection = onNavigateToRoleSelection
         )
     }
 }

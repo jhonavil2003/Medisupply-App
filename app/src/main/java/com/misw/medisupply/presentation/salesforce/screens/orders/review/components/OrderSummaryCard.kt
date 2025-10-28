@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.core.utils.FormatUtils
 
 /**
  * Order summary card with totals
@@ -43,12 +44,12 @@ fun OrderSummaryCard(
         ) {
             SummaryRow(
                 label = "Subtotal",
-                value = "${"$%,.0f".format(subtotal)}"
+                value = FormatUtils.formatCurrency(subtotal, decimals = 0)
             )
             if (tax > 0) {
                 SummaryRow(
                     label = "IVA",
-                    value = "${"$%,.0f".format(tax)}"
+                    value = FormatUtils.formatCurrency(tax, decimals = 0)
                 )
             }
             
@@ -69,7 +70,7 @@ fun OrderSummaryCard(
                     color = Color(0xFF1565C0)
                 )
                 Text(
-                    text = "${"$%,.0f".format(total)}",
+                    text = FormatUtils.formatCurrency(total, decimals = 0),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1565C0)

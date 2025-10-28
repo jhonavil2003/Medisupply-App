@@ -79,12 +79,30 @@ fun MainNavGraph(
         
         // Sales Force Flow - Complete navigation for internal staff
         composable(MainRoutes.SALES_FORCE_FLOW) {
-            SalesForceNavigation()
+            SalesForceNavigation(
+                onNavigateToRoleSelection = {
+                    navController.navigate(MainRoutes.ROLE_SELECTION) {
+                        popUpTo(MainRoutes.SALES_FORCE_FLOW) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         
         // Customer Management Flow - Complete navigation for clients
         composable(MainRoutes.CUSTOMER_MANAGEMENT_FLOW) {
-            CustomerManagementNavigation()
+            CustomerManagementNavigation(
+                onNavigateToRoleSelection = {
+                    navController.navigate(MainRoutes.ROLE_SELECTION) {
+                        popUpTo(MainRoutes.CUSTOMER_MANAGEMENT_FLOW) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
     }
 }

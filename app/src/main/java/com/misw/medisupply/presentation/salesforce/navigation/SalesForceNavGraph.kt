@@ -31,7 +31,8 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
 @Composable
 fun SalesForceNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToRoleSelection: () -> Unit = {}
 ) {
     NavHost(
         navController = navController,
@@ -40,7 +41,9 @@ fun SalesForceNavGraph(
     ) {
         // Home Screen - Bienvenida
         composable(route = SalesForceRoutes.HOME) {
-            SalesForceHomeScreen()
+            SalesForceHomeScreen(
+                onNavigateToRoleSelection = onNavigateToRoleSelection
+            )
         }
         
         // Visits Screen - Gestión de visitas
