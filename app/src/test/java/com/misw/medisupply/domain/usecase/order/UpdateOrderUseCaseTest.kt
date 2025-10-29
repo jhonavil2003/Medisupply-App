@@ -134,6 +134,8 @@ class UpdateOrderUseCaseTest {
                 notes = eq(null)
             )
         ).thenReturn(flowOf(Resource.Loading(), Resource.Success(testOrder)))
+        
+        // When & Then
         useCase(
             orderId = orderId,
             customerId = customerId,
@@ -154,6 +156,7 @@ class UpdateOrderUseCaseTest {
             assertEquals(testOrder, result.data)
             assertEquals("ORD-20251023-0001", result.data?.orderNumber)
             assertEquals(OrderStatus.CONFIRMED, result.data?.status)
+            awaitComplete()
         }
     }
 
@@ -205,6 +208,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Success)
             assertEquals(350.0, result.data?.items?.get(0)?.unitPrice)
+            awaitComplete()
         }
 
         // Then - verify unitPrice was passed
@@ -271,6 +275,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
+            awaitComplete()
         }
 
         // Then - verify productName was passed
@@ -339,6 +344,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
+            awaitComplete()
         }
     }
 
@@ -392,6 +398,7 @@ class UpdateOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
+            awaitComplete()
         }
     }
 
@@ -440,32 +447,25 @@ class UpdateOrderUseCaseTest {
             preferredDistributionCenter = null,
             notes = null
         ).test {
-            val result = awaitItem()
-            assertTrue(result is Resource.Error)
-            assertTrue(result.message?.contains("Stock") == true)
-            // End test
-        }
-    }
-
-        useCase(
-            orderId = orderId,
-            customerId = 1,
-            items = items,
-            paymentTerms = PaymentTerms.CREDIT_30,
-            paymentMethod = null,
-            deliveryAddress = null,
-            deliveryCity = null,
-            deliveryDepartment = null,
-            deliveryDate = null,
-            preferredDistributionCenter = null,
-            notes = null
-        ).test {
             val loading = awaitItem()
             assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Stock insuficiente") == true)
+            awaitComplete()
         }
+    }
+
+    @Test
+    fun `invoke passes all parameters correctly to repository`() = runTest {
+        // Given
+        val orderId = 1
+        val items = listOf(
+            OrderItemRequest(
+                productSku = "MED-001",
+                productName = "Jeringa 10ml",
+                quantity = 150,
+                unitPrice = 350.0,
                 discountPercentage = 0.0,
                 taxPercentage = 19.0
             )
@@ -503,7 +503,7 @@ class UpdateOrderUseCaseTest {
         ).test {
             val result = awaitItem()
             assertTrue(result is Resource.Success)
-            // End test
+            awaitComplete()
         }
 
         verify(repository).updateOrder(
@@ -577,7 +577,7 @@ class UpdateOrderUseCaseTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
 
-            // End test
+            awaitComplete()
         }
     }
 }
