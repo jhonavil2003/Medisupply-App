@@ -103,7 +103,7 @@ fun CustomerOrderReviewScreen(
                 // TODO: En versiones futuras, enviar la fecha al backend
                 onOrderSuccess(orderNumber)
             },
-            viewModel = viewModel
+            createViewModel = viewModel
         )
     }
 }

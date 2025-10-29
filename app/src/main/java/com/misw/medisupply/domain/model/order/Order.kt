@@ -1,5 +1,6 @@
 package com.misw.medisupply.domain.model.order
 
+import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.customer.Customer
 import java.util.Date
 
@@ -14,6 +15,7 @@ data class Order(
     val sellerId: String,
     val sellerName: String?,
     val orderDate: Date?,
+    val deliveryDate: Date?,
     val status: OrderStatus,
     val subtotal: Double,
     val discountAmount: Double,
@@ -35,28 +37,28 @@ data class Order(
      * Get formatted total amount
      */
     fun getFormattedTotal(): String {
-        return "$ ${String.format("%,.2f", totalAmount)}"
+        return FormatUtils.formatCurrency(totalAmount)
     }
     
     /**
      * Get formatted subtotal
      */
     fun getFormattedSubtotal(): String {
-        return "$ ${String.format("%,.2f", subtotal)}"
+        return FormatUtils.formatCurrency(subtotal)
     }
     
     /**
      * Get formatted discount amount
      */
     fun getFormattedDiscount(): String {
-        return "$ ${String.format("%,.2f", discountAmount)}"
+        return FormatUtils.formatCurrency(discountAmount)
     }
     
     /**
      * Get formatted tax amount
      */
     fun getFormattedTax(): String {
-        return "$ ${String.format("%,.2f", taxAmount)}"
+        return FormatUtils.formatCurrency(taxAmount)
     }
     
     /**

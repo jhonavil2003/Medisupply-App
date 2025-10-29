@@ -1,5 +1,6 @@
 package com.misw.medisupply.domain.model.order
 
+import com.misw.medisupply.core.utils.FormatUtils
 import java.util.Date
 
 /**
@@ -28,20 +29,20 @@ data class OrderItem(
      * Get formatted unit price
      */
     fun getFormattedUnitPrice(): String {
-        return "$ ${String.format("%,.2f", unitPrice)}"
+        return FormatUtils.formatCurrency(unitPrice)
     }
     
     /**
      * Get formatted total
      */
     fun getFormattedTotal(): String {
-        return "$ ${String.format("%,.2f", total)}"
+        return FormatUtils.formatCurrency(total)
     }
     
     /**
      * Get formatted subtotal
      */
     fun getFormattedSubtotal(): String {
-        return "$ ${String.format("%,.2f", subtotal)}"
+        return FormatUtils.formatCurrency(subtotal)
     }
 }

@@ -52,6 +52,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderItem
 import com.misw.medisupply.presentation.common.components.ErrorView
@@ -662,7 +663,7 @@ private fun OrderSummaryCard(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "$ ${String.format("%,.2f", currentTotal)}",
+                    text = FormatUtils.formatCurrency(currentTotal),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

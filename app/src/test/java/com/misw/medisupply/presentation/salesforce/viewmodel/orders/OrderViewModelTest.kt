@@ -108,7 +108,8 @@ class OrderViewModelTest {
         createdAt = null,
         updatedAt = null,
         customer = null,
-        items = emptyList()
+        items = emptyList(),
+        deliveryDate = null
     )
 
     @Before
@@ -134,7 +135,7 @@ class OrderViewModelTest {
     @Test
     fun `createOrder shows loading state`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Loading()))
 
         viewModel.createOrder(
@@ -155,7 +156,7 @@ class OrderViewModelTest {
     @Test
     fun `createOrder successfully creates order`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(
             Resource.Loading(),
             Resource.Success(testOrder)
@@ -180,7 +181,7 @@ class OrderViewModelTest {
     fun `createOrder with error updates error state`() = runTest {
         val errorMessage = "Error al crear la orden"
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(
             Resource.Loading(),
             Resource.Error(errorMessage)
@@ -203,7 +204,7 @@ class OrderViewModelTest {
     @Test
     fun `createOrder calls use case with correct parameters`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(
@@ -223,6 +224,7 @@ class OrderViewModelTest {
             deliveryAddress = eq(testCustomer.address),
             deliveryCity = eq(testCustomer.city),
             deliveryDepartment = eq(testCustomer.department),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )
@@ -235,7 +237,7 @@ class OrderViewModelTest {
         val customDepartment = "Custom Department"
         
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(
@@ -256,6 +258,7 @@ class OrderViewModelTest {
             deliveryAddress = eq(customAddress),
             deliveryCity = eq(customCity),
             deliveryDepartment = eq(customDepartment),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )
@@ -265,7 +268,7 @@ class OrderViewModelTest {
     fun `createOrder with notes passes notes to use case`() = runTest {
         val notes = "Urgent delivery required"
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(
@@ -284,6 +287,7 @@ class OrderViewModelTest {
             deliveryAddress = any(),
             deliveryCity = any(),
             deliveryDepartment = any(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = eq(notes)
         )
@@ -292,7 +296,7 @@ class OrderViewModelTest {
     @Test
     fun `resetState clears all state`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
         
         viewModel.createOrder(testCustomer, testCartItems)
@@ -308,7 +312,7 @@ class OrderViewModelTest {
     @Test
     fun `clearError clears error message`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Error("Test error")))
         
         viewModel.createOrder(testCustomer, testCartItems)
@@ -322,7 +326,7 @@ class OrderViewModelTest {
     @Test
     fun `createOrder converts cart items to order items correctly`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(
@@ -340,6 +344,7 @@ class OrderViewModelTest {
             deliveryAddress = any(),
             deliveryCity = any(),
             deliveryDepartment = any(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )
@@ -348,7 +353,7 @@ class OrderViewModelTest {
     @Test
     fun `createOrder with empty cart items creates order with empty items`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(
@@ -366,6 +371,7 @@ class OrderViewModelTest {
             deliveryAddress = any(),
             deliveryCity = any(),
             deliveryDepartment = any(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )
@@ -374,7 +380,7 @@ class OrderViewModelTest {
     @Test
     fun `createOrder uses default payment terms when not specified`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(
@@ -392,6 +398,7 @@ class OrderViewModelTest {
             deliveryAddress = any(),
             deliveryCity = any(),
             deliveryDepartment = any(),
+            deliveryDate = anyOrNull(),
             preferredDistributionCenter = anyOrNull(),
             notes = anyOrNull()
         )
@@ -400,7 +407,7 @@ class OrderViewModelTest {
     @Test
     fun `multiple createOrder calls update state correctly`() = runTest {
         whenever(createOrderUseCase.invoke(
-            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull()
+            any(), any(), any(), any(), any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()
         )).thenReturn(flowOf(Resource.Success(testOrder)))
 
         viewModel.createOrder(testCustomer, testCartItems)

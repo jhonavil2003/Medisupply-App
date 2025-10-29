@@ -2,7 +2,7 @@ package com.misw.medisupply.core.utils
 
 import android.util.Patterns
 import java.text.DecimalFormat
-import java.text.NumberFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,18 +53,21 @@ fun String.trimSpaces(): String {
 // ============================================================================
 
 /**
- * Format number as currency (Colombian Peso)
+ * Format number as currency (Colombian format: dot for thousands, comma for decimals)
  */
 fun Double.toCurrency(): String {
-    val formatter = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
-    return formatter.format(this)
+    return FormatUtils.formatCurrency(this)
 }
 
 /**
- * Format number with thousands separator
+ * Format number with thousands separator (Colombian format with dot)
  */
 fun Int.toFormattedString(): String {
     val formatter = DecimalFormat("#,###")
+    val symbols = DecimalFormatSymbols().apply {
+        groupingSeparator = '.'
+    }
+    formatter.decimalFormatSymbols = symbols
     return formatter.format(this)
 }
 

@@ -1,5 +1,7 @@
 package com.misw.medisupply.domain.model.order
 
+import com.misw.medisupply.core.utils.FormatUtils
+
 /**
  * Cart Item
  * Represents a product added to the shopping cart during order creation
@@ -21,7 +23,7 @@ data class CartItem(
     /**
      * Get formatted subtotal with currency
      */
-    fun getFormattedSubtotal(): String = "$${String.format("%,.0f", calculateSubtotal())}"
+    fun getFormattedSubtotal(): String = FormatUtils.formatCurrency(calculateSubtotal(), decimals = 0)
     
     /**
      * Check if quantity exceeds available stock

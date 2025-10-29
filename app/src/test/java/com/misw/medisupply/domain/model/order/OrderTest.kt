@@ -35,7 +35,8 @@ class OrderTest {
             createdAt = Date(),
             updatedAt = Date(),
             customer = null,
-            items = items
+            items = items,
+            deliveryDate = null
         )
     }
 
@@ -66,7 +67,8 @@ class OrderTest {
         
         val result = order.getFormattedTotal()
         
-        assertTrue(result.contains("15,000.50") || result.contains("15.000,50"))
+        // FormatUtils uses Colombian format: $ 15.000,50
+        assertEquals("$ 15.000,50", result)
     }
 
     @Test
@@ -75,7 +77,8 @@ class OrderTest {
         
         val result = order.getFormattedSubtotal()
         
-        assertTrue(result.contains("8,500.25") || result.contains("8.500,25"))
+        // FormatUtils uses Colombian format: $ 8.500,25
+        assertEquals("$ 8.500,25", result)
     }
 
     @Test
@@ -84,7 +87,8 @@ class OrderTest {
         
         val result = order.getFormattedDiscount()
         
-        assertTrue(result.contains("250.75") || result.contains("250,75"))
+        // FormatUtils uses Colombian format: $ 250,75
+        assertEquals("$ 250,75", result)
     }
 
     @Test
@@ -93,7 +97,8 @@ class OrderTest {
         
         val result = order.getFormattedTax()
         
-        assertTrue(result.contains("1,900.00") || result.contains("1.900,00"))
+        // FormatUtils uses Colombian format: $ 1.900,00
+        assertEquals("$ 1.900,00", result)
     }
 
     @Test
