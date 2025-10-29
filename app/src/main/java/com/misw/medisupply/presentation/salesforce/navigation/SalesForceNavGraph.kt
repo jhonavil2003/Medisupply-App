@@ -36,7 +36,6 @@ import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.screens.orders.products.ProductSelectionScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.OrderReviewScreen
 import com.misw.medisupply.presentation.salesforce.screens.performance.PerformanceScreen
-import com.misw.medisupply.presentation.salesforce.screens.visits.VisitsScreen
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
 /**
@@ -64,7 +63,7 @@ fun SalesForceNavGraph(
         
         // Visits Screen - Gestión de visitas
         composable(route = SalesForceRoutes.VISITS) {
-            com.misw.medisupply.presentation.salesforce.screens.visits.VisitScreen(
+            com.misw.medisupply.presentation.salesforce.screens.visits.screens.VisitHomeScreen(
                 onNavigateToRegisterVisit = {
                     navController.navigate(SalesForceRoutes.VISIT_LIST)
                 }
@@ -73,7 +72,7 @@ fun SalesForceNavGraph(
 
         // Visit List Screen - Lista de visitas
         composable(route = SalesForceRoutes.VISIT_LIST) {
-            com.misw.medisupply.presentation.salesforce.screens.visits.VisitListScreen(
+            com.misw.medisupply.presentation.salesforce.screens.visits.screens.VisitListScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToCreateVisit = { navController.navigate(SalesForceRoutes.CREATE_VISIT) }
             )
@@ -81,7 +80,7 @@ fun SalesForceNavGraph(
 
         // Create Visit Screen
         composable(route = SalesForceRoutes.CREATE_VISIT) {
-            com.misw.medisupply.presentation.salesforce.screens.visits.CreateVisitScreen(
+            com.misw.medisupply.presentation.salesforce.screens.visits.screens.CreateVisitScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

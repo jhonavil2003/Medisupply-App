@@ -1,0 +1,2546 @@
+{
+  "metadata": {
+    "device": {
+      "emulatorDevice": {
+        "serialNumber": "emulator-5554",
+        "isOnline": true,
+        "release": "16",
+        "apiLevel": {
+          "majorVersion": 36,
+          "minorVersion": 0
+        },
+        "featureLevel": 36,
+        "avdName": "Medium Phone v2",
+        "avdPath": "/Users/dannamilenacoral/.android/avd/Medium_Phone_v2.avd",
+        "type": "HANDHELD"
+      }
+    },
+    "filter": "",
+    "projectApplicationIds": [
+      "com.misw.medisupply",
+      "com.misw.medisupply.test"
+    ]
+  },
+  "logcatMessages": [
+    {
+      "header": {
+        "logLevel": "ERROR",
+        "pid": 680,
+        "tid": 1715,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "TaskPersister",
+        "timestamp": {
+          "seconds": 1761288014,
+          "nanos": 462752789
+        }
+      },
+      "message": "File error accessing recents directory (directory doesn\u0027t exist?)."
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1101,
+        "tid": 1325,
+        "applicationId": "com.android.phone",
+        "processName": "com.android.phone",
+        "tag": "SatelliteController",
+        "timestamp": {
+          "seconds": 1761288014,
+          "nanos": 884000873
+        }
+      },
+      "message": "iisInCarrierRoamingNbIotNtn: satellite is disabled"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 19048,
+        "tid": 19048,
+        "applicationId": "dumpsys",
+        "processName": "dumpsys",
+        "tag": "dumpsys",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 103659623
+        }
+      },
+      "message": "Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: package"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 170810373
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/base.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 172672456
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_AdsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 174064831
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_CronetDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 175359623
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteLoader_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 176685540
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesA_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 177935165
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesC_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 179095456
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_GoogleCertificates_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 180363998
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MapsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 181585123
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MeasurementDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 182826040
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_all_locale_splits.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 183986790
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000014/dl-MlkitOcrCommon.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 185028331
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/dl-TfliteDynamiteDynamite.integ_243930801100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 185773581
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000015/dl-VisionOcr.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 187716331
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/68ABBF10BD2349E9D7068D50DCB84A7E0CD70855/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 187975998
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000001/CronetDynamite.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 188170165
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 188519665
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 189409998
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000011/dl-Appsearch.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 190935206
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000010/dl-PlayCloudSearch.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 193164123
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000008/dl-Appsearch.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 194472456
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/0618B6AD03FA49D55150C91CD8CD9E46E971ECF1/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 195649165
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/049A20A054B771E851974256D3271311889FCDDF/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 196736456
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/006C71EB834AD59565FE3716108FD279039F686F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 197554665
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000c/dl-MlkitBarcodeUi.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 198894498
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/11469011EAF999D9428D22C13B5C70E9515FB51F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 199180040
+        }
+      },
+      "message": "Could not get dex checksums for location /data/app/~~6BirKRpH9aCGkNEFTf8vPw\u003d\u003d/com.android.vending-A5-yYFH3SOOB2LmgiWk4tQ\u003d\u003d/base.apk, fd\u003d-1"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 200523706
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000012/dl-TfliteDynamiteDynamite.integ_243930802100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 201535081
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000013/dl-MlkitBarcodeUi.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 203183581
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/56149ABFA6A10C537A8BCA5FBEF5BF740193F470/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1761288015,
+          "nanos": 617786748
+        }
+      },
+      "message": "Window{c035033 u0 com.misw.medisupply/com.misw.medisupply.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@3238b94, mPriority\u003d0, mIsAnimationCallback\u003dtrue, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 19022,
+        "tid": 19051,
+        "applicationId": "com.misw.medisupply",
+        "processName": "com.misw.medisupply",
+        "tag": "ProfileInstaller",
+        "timestamp": {
+          "seconds": 1761288016,
+          "nanos": 666784624
+        }
+      },
+      "message": "Installing profile for com.misw.medisupply"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1619,
+        "tid": 1942,
+        "applicationId": "com.google.android.googlequicksearchbox:interactor",
+        "processName": "com.google.android.googlequicksearchbox:interactor",
+        "tag": "bdee",
+        "timestamp": {
+          "seconds": 1761288020,
+          "nanos": 516465876
+        }
+      },
+      "message": "(REDACTED) getHotwordActive::active query: %s, watch: %s, devices connected: %s"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillSession",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 64614709
+        }
+      },
+      "message": "Primary service component name: ComponentInfo{com.google.android.gms/com.google.android.gms.autofill.service.AutofillService}, secondary service component name: ComponentInfo{com.android.credentialmanager/com.android.credentialmanager.autofill.CredentialAutofillService}"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "SecondaryProviderHandler",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 64912584
+        }
+      },
+      "message": "Creating a secondary provider handler with component name, ComponentInfo{com.android.credentialmanager/com.android.credentialmanager.autofill.CredentialAutofillService}"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PresentationStatsEventLogger",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 66065167
+        }
+      },
+      "message": "Started new PresentationStatsEvent"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AppsFilter",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 66906501
+        }
+      },
+      "message": "interaction: PackageSetting{b731671 com.misw.medisupply/10214} -\u003e PackageSetting{af83042 com.google.android.inputmethod.latin/10160} BLOCKED"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "FillRequestEventLogger",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 67025626
+        }
+      },
+      "message": "Couldn\u0027t find packageName: com.google.android.inputmethod.latin"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 4613,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "FillResponseEventLogger",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 69571959
+        }
+      },
+      "message": "Shouldn\u0027t be logging AutofillFillRequestReported again for same event"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 4613,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PresentationStatsEventLogger",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 69596542
+        }
+      },
+      "message": "Empty dataset. Autofill ignoring log"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 4613,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillSession",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 69613292
+        }
+      },
+      "message": "clearPendingIntentLocked"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 4613,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillInlineSuggestionsRequestSession",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 69957876
+        }
+      },
+      "message": "Never received an InlineSuggestionsRequest from the IME for 1073741824:i266@1998290027"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1132,
+        "tid": 1132,
+        "applicationId": "com.google.android.ext.services",
+        "processName": "com.google.android.ext.services",
+        "tag": "InlineSuggestionRenderService",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 80343542
+        }
+      },
+      "message": "handleDestroySuggestionViews called for 0:1998290027"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 905,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "BackgroundInstallControlService",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 90173584
+        }
+      },
+      "message": "Package event received: 0"
+    },
+    {
+      "header": {
+        "logLevel": "ERROR",
+        "pid": 1288,
+        "tid": 1288,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "EventHandlerImpl",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 101798584
+        }
+      },
+      "message": "Metrics context is missing from client state [CONTEXT service_id\u003d177 ]"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 118787959
+        }
+      },
+      "message": "GoogleInputMethodService.onFinishInput():2043 "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 19022,
+        "tid": 19022,
+        "applicationId": "com.misw.medisupply",
+        "processName": "com.misw.medisupply",
+        "tag": "AssistStructure",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 121251876
+        }
+      },
+      "message": "Flattened final assist data: 1028 bytes, containing 1 windows, 8 views"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1920,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillSession",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 121589959
+        }
+      },
+      "message": "createPendingIntent for request 432"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 122128459
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 0, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1920,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ContentCapturePerUserService",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 122150751
+        }
+      },
+      "message": "Notified activity assist data for activity: Token{7eb8848 ActivityRecord{126486074 u0 com.misw.medisupply/.MainActivity t78}} without a session Id"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 126044209
+        }
+      },
+      "message": "GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName\u003dcom.misw.medisupply, inputType\u003d0, inputTypeString\u003dNULL, enableLearning\u003dfalse, autoCorrection\u003dfalse, autoComplete\u003dfalse, imeOptions\u003d0, privateImeOptions\u003dnull, actionName\u003dUNSPECIFIED, actionLabel\u003dnull, initialSelStart\u003d-1, initialSelEnd\u003d-1, initialCapsMode\u003d0, label\u003dnull, fieldId\u003d0, fieldName\u003dnull, extras\u003dnull, hintText\u003dnull, hintLocales\u003d[]}}, false)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 129340834
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 1, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 1920,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PackageConfigPersister",
+        "timestamp": {
+          "seconds": 1761288021,
+          "nanos": 130533542
+        }
+      },
+      "message": "App-specific configuration not found for packageName: com.misw.medisupply and userId: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1101,
+        "tid": 1325,
+        "applicationId": "com.android.phone",
+        "processName": "com.android.phone",
+        "tag": "SatelliteController",
+        "timestamp": {
+          "seconds": 1761288024,
+          "nanos": 887917544
+        }
+      },
+      "message": "iisInCarrierRoamingNbIotNtn: satellite is disabled"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 19053,
+        "tid": 19053,
+        "applicationId": "dumpsys",
+        "processName": "dumpsys",
+        "tag": "dumpsys",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 143019003
+        }
+      },
+      "message": "Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: package"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 215430378
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/base.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 217284711
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_AdsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 218940294
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_CronetDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 220741919
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteLoader_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 222712461
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesA_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 224006836
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesC_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 225600503
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_GoogleCertificates_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 227622294
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MapsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 228955586
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MeasurementDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 230719919
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_all_locale_splits.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 231823419
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000014/dl-MlkitOcrCommon.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 233051628
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/dl-TfliteDynamiteDynamite.integ_243930801100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 233773503
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000015/dl-VisionOcr.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 235710169
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/68ABBF10BD2349E9D7068D50DCB84A7E0CD70855/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 236266919
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000001/CronetDynamite.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 236430086
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 236673711
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 237418628
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000011/dl-Appsearch.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 238836128
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000010/dl-PlayCloudSearch.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 240810086
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000008/dl-Appsearch.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 243441669
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/0618B6AD03FA49D55150C91CD8CD9E46E971ECF1/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 247165711
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/049A20A054B771E851974256D3271311889FCDDF/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillManagerServiceImpl",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 251108253
+        }
+      },
+      "message": "logViewEntered(): not logging event because history is null"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "FillRequestEventLogger",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 251761711
+        }
+      },
+      "message": "FillRequestEventLogger is not empty before starting for a new request"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AppsFilter",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 251915378
+        }
+      },
+      "message": "interaction: PackageSetting{b731671 com.misw.medisupply/10214} -\u003e PackageSetting{af83042 com.google.android.inputmethod.latin/10160} BLOCKED"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "FillRequestEventLogger",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 252072086
+        }
+      },
+      "message": "Couldn\u0027t find packageName: com.google.android.inputmethod.latin"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PresentationStatsEventLogger",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 252556253
+        }
+      },
+      "message": "Empty dataset. Autofill ignoring log"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1925,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PresentationStatsEventLogger",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 252564378
+        }
+      },
+      "message": "Started new PresentationStatsEvent"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 680,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillInlineSuggestionsRequestSession",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 253446128
+        }
+      },
+      "message": "Never received an InlineSuggestionsRequest from the IME for 1073741824:i253@2062624416"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 255140961
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/006C71EB834AD59565FE3716108FD279039F686F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 256510336
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000c/dl-MlkitBarcodeUi.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 264673461
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/11469011EAF999D9428D22C13B5C70E9515FB51F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 265505336
+        }
+      },
+      "message": "Could not get dex checksums for location /data/app/~~6BirKRpH9aCGkNEFTf8vPw\u003d\u003d/com.android.vending-A5-yYFH3SOOB2LmgiWk4tQ\u003d\u003d/base.apk, fd\u003d-1"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 267801378
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000012/dl-TfliteDynamiteDynamite.integ_243930802100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 269309961
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000013/dl-MlkitBarcodeUi.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 271548419
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/56149ABFA6A10C537A8BCA5FBEF5BF740193F470/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 19022,
+        "tid": 19022,
+        "applicationId": "com.misw.medisupply",
+        "processName": "com.misw.medisupply",
+        "tag": "AssistStructure",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 298939044
+        }
+      },
+      "message": "Flattened final assist data: 1028 bytes, containing 1 windows, 8 views"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1920,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "AutofillSession",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 299412919
+        }
+      },
+      "message": "createPendingIntent for request 434"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 1920,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ContentCapturePerUserService",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 300018419
+        }
+      },
+      "message": "Notified activity assist data for activity: Token{7eb8848 ActivityRecord{126486074 u0 com.misw.medisupply/.MainActivity t78}} without a session Id"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 680,
+        "tid": 700,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "system_server",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 341235878
+        }
+      },
+      "message": "Background concurrent mark compact GC freed 26MB AllocSpace bytes, 30(600KB) LOS objects, 43% free, 31MB/55MB, paused 1.053ms,1.651ms total 188.415ms"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 680,
+        "tid": 703,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1761288025,
+          "nanos": 346681336
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "StylusModule",
+        "timestamp": {
+          "seconds": 1761288027,
+          "nanos": 862380171
+        }
+      },
+      "message": "StylusModule.onUpdateToolType():801 Update tool type \u003d 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "StylusModule",
+        "timestamp": {
+          "seconds": 1761288028,
+          "nanos": 58076296
+        }
+      },
+      "message": "StylusModule.onUpdateToolType():801 Update tool type \u003d 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "StylusModule",
+        "timestamp": {
+          "seconds": 1761288028,
+          "nanos": 224930879
+        }
+      },
+      "message": "StylusModule.onUpdateToolType():801 Update tool type \u003d 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "StylusModule",
+        "timestamp": {
+          "seconds": 1761288028,
+          "nanos": 448750713
+        }
+      },
+      "message": "StylusModule.onUpdateToolType():801 Update tool type \u003d 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "StylusModule",
+        "timestamp": {
+          "seconds": 1761288028,
+          "nanos": 654865921
+        }
+      },
+      "message": "StylusModule.onUpdateToolType():801 Update tool type \u003d 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1441,
+        "tid": 1441,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "StylusModule",
+        "timestamp": {
+          "seconds": 1761288028,
+          "nanos": 889616421
+        }
+      },
+      "message": "StylusModule.onUpdateToolType():801 Update tool type \u003d 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1101,
+        "tid": 1325,
+        "applicationId": "com.android.phone",
+        "processName": "com.android.phone",
+        "tag": "SatelliteController",
+        "timestamp": {
+          "seconds": 1761288034,
+          "nanos": 888899757
+        }
+      },
+      "message": "iisInCarrierRoamingNbIotNtn: satellite is disabled"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 19056,
+        "tid": 19056,
+        "applicationId": "dumpsys",
+        "processName": "dumpsys",
+        "tag": "dumpsys",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 118933716
+        }
+      },
+      "message": "Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: package"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 151255674
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/base.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 152664174
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_AdsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 153830091
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_CronetDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 155256508
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteLoader_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 156657008
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesA_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 157902091
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesC_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 159289091
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_GoogleCertificates_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 160535883
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MapsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 161973174
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MeasurementDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 163283049
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_all_locale_splits.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 164397966
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000014/dl-MlkitOcrCommon.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 165503216
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/dl-TfliteDynamiteDynamite.integ_243930801100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 166452883
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000015/dl-VisionOcr.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 167867883
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/68ABBF10BD2349E9D7068D50DCB84A7E0CD70855/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 168143424
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000001/CronetDynamite.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 168446383
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 168740299
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 170077883
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000011/dl-Appsearch.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 171133383
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000010/dl-PlayCloudSearch.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 172094049
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000008/dl-Appsearch.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 173054424
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/0618B6AD03FA49D55150C91CD8CD9E46E971ECF1/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 5914,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 174120383
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/049A20A054B771E851974256D3271311889FCDDF/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 175225383
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/006C71EB834AD59565FE3716108FD279039F686F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 175908091
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000c/dl-MlkitBarcodeUi.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 176785091
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/11469011EAF999D9428D22C13B5C70E9515FB51F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 176959133
+        }
+      },
+      "message": "Could not get dex checksums for location /data/app/~~6BirKRpH9aCGkNEFTf8vPw\u003d\u003d/com.android.vending-A5-yYFH3SOOB2LmgiWk4tQ\u003d\u003d/base.apk, fd\u003d-1"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 178003716
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000012/dl-TfliteDynamiteDynamite.integ_243930802100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 178889799
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000013/dl-MlkitBarcodeUi.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288035,
+          "nanos": 180231549
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/56149ABFA6A10C537A8BCA5FBEF5BF740193F470/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 905,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "BackgroundInstallControlService",
+        "timestamp": {
+          "seconds": 1761288036,
+          "nanos": 158637508
+        }
+      },
+      "message": "Package event received: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 680,
+        "tid": 905,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "BackgroundInstallControlService",
+        "timestamp": {
+          "seconds": 1761288036,
+          "nanos": 158797591
+        }
+      },
+      "message": "Package event received: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1101,
+        "tid": 1325,
+        "applicationId": "com.android.phone",
+        "processName": "com.android.phone",
+        "tag": "SatelliteController",
+        "timestamp": {
+          "seconds": 1761288044,
+          "nanos": 905583971
+        }
+      },
+      "message": "iisInCarrierRoamingNbIotNtn: satellite is disabled"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 19059,
+        "tid": 19059,
+        "applicationId": "dumpsys",
+        "processName": "dumpsys",
+        "tag": "dumpsys",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 143967012
+        }
+      },
+      "message": "Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: package"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 183994054
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/base.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 185237679
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_AdsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 186504887
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_CronetDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed-profile\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 187861304
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteLoader_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 189282512
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesA_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 190642637
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_DynamiteModulesC_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 191904679
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_GoogleCertificates_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 193279721
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MapsDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 194515929
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_MeasurementDynamite_installtime.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 195675679
+        }
+      },
+      "message": "GetBestInfo: odex next to the dex file (/data/app/~~IxGHXRuJHlS0cdy3Gd3VNw\u003d\u003d/com.google.android.gms-sqH0xVvI6RNJopxpnaUpvg\u003d\u003d/oat/arm64/split_all_locale_splits.odex) is kOatUpToDate with filter \u0027speed\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 196589596
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000014/dl-MlkitOcrCommon.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 197752846
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/dl-TfliteDynamiteDynamite.integ_243930801100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 198938221
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000015/dl-VisionOcr.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 200607429
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/68ABBF10BD2349E9D7068D50DCB84A7E0CD70855/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 200949054
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000001/CronetDynamite.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 201281221
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 201704012
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 203104429
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000011/dl-Appsearch.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 204129137
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000010/dl-PlayCloudSearch.optional_254031100000.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 205792846
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000008/dl-Appsearch.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 207562887
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/0618B6AD03FA49D55150C91CD8CD9E46E971ECF1/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 208615471
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/049A20A054B771E851974256D3271311889FCDDF/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 209816179
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/006C71EB834AD59565FE3716108FD279039F686F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 210594929
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000c/dl-MlkitBarcodeUi.optional_250834100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 211735887
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/11469011EAF999D9428D22C13B5C70E9515FB51F/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 212041221
+        }
+      },
+      "message": "Could not get dex checksums for location /data/app/~~6BirKRpH9aCGkNEFTf8vPw\u003d\u003d/com.android.vending-A5-yYFH3SOOB2LmgiWk4tQ\u003d\u003d/base.apk, fd\u003d-1"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 213272679
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000012/dl-TfliteDynamiteDynamite.integ_243930802100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 214178721
+        }
+      },
+      "message": "GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000013/dl-MlkitBarcodeUi.optional_254031100400.apk has no usable artifacts"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 5805,
+        "tid": 18403,
+        "applicationId": "artd",
+        "processName": "artd",
+        "tag": "artd",
+        "timestamp": {
+          "seconds": 1761288045,
+          "nanos": 215754721
+        }
+      },
+      "message": "GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/56149ABFA6A10C537A8BCA5FBEF5BF740193F470/oat/arm64/the.vdex) is kOatUpToDate with filter \u0027verify\u0027 executable \u0027false\u0027"
+    }
+  ]
+}

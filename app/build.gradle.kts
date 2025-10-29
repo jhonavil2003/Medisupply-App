@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    // Compose Material Dialogs (Date/Time Picker 100% Compose)
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
 
     // Core Android
     implementation(libs.androidx.core.ktx)

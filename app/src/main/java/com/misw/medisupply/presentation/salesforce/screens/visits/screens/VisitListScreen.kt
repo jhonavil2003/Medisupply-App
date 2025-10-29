@@ -1,4 +1,4 @@
-package com.misw.medisupply.presentation.salesforce.screens.visits
+package com.misw.medisupply.presentation.salesforce.screens.visits.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,9 +11,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Add
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.salesforce.screens.visits.components.VisitCard
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -71,7 +71,7 @@ fun VisitListScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(mockVisits) { visit ->
-                    VisitListItem(visit = visit, onEdit = { onEditVisit(visit) })
+                    VisitCard(visit = visit, onEdit = { onEditVisit(visit) })
                 }
             }
         }
@@ -89,47 +89,4 @@ private fun CustomerSearchBar(modifier: Modifier = Modifier) {
         enabled = false,
         singleLine = true
     )
-}
-
-@Composable
-private fun VisitListItem(
-    visit: MockVisit,
-    onEdit: () -> Unit
-) {
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = visit.customerName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Fecha: ${visit.dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Hora: ${visit.dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            IconButton(onClick = onEdit) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Editar visita"
-                )
-            }
-        }
-    }
 }

@@ -1,4 +1,4 @@
-package com.misw.medisupply.presentation.salesforce.screens.visits
+package com.misw.medisupply.presentation.salesforce.screens.visits.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 
 @Composable
-fun VisitScreen(
+fun VisitHomeScreen(
     onNavigateToRegisterVisit: () -> Unit = {},
     onNavigateToVisitRoute: () -> Unit = {},
     onNavigateBack: (() -> Unit)? = null
