@@ -15,6 +15,7 @@ data class Order(
     val sellerId: String,
     val sellerName: String?,
     val orderDate: Date?,
+    val deliveryDate: Date?,
     val status: OrderStatus,
     val subtotal: Double,
     val discountAmount: Double,

@@ -49,6 +49,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +67,7 @@ import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.product.Product
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.ProductsState
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.ProductsViewModel
 
@@ -78,16 +80,26 @@ fun ProductSelectionScreen(
     customer: Customer,
     onNavigateBack: () -> Unit,
     onConfirmOrder: (Map<String, CartItem>) -> Unit = {},
+    mode: Mode = Mode.CREATE,
+    orderId: String? = null,
+    initialCartItems: Map<String, CartItem> = emptyMap(),
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     var searchText by remember { mutableStateOf("") }
     val pullToRefreshState = rememberPullToRefreshState()
 
+    // Load initial cart items for edit mode
+    LaunchedEffect(mode, orderId, initialCartItems) {
+        if (mode == Mode.EDIT && initialCartItems.isNotEmpty()) {
+            viewModel.loadInitialCartItems(initialCartItems)
+        }
+    }
+
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Seleccionar Productos",
+                title = if (mode == Mode.EDIT) "Editar Productos" else "Seleccionar Productos",
                 subtitle = "Fuerza de ventas - Medisupply",
                 onNavigateBack = onNavigateBack
             )
@@ -97,6 +109,7 @@ fun ProductSelectionScreen(
                 CartBottomBar(
                     itemCount = state.cartItems.values.sumOf { it.quantity },
                     totalAmount = state.cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat(),
+                    mode = mode,
                     onConfirmOrder = { 
                         onConfirmOrder(state.cartItems)
                     }
@@ -831,6 +844,7 @@ private fun CartControls(
 private fun CartBottomBar(
     itemCount: Int,
     totalAmount: Float,
+    mode: Mode,
     onConfirmOrder: () -> Unit
 ) {
     Card(
@@ -897,7 +911,7 @@ private fun CartBottomBar(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Confirmar Pedido",
+                    text = if (mode == Mode.EDIT) "Actualizar Pedido" else "Confirmar Pedido",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )

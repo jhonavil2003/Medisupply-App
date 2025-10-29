@@ -49,7 +49,9 @@ class OrderViewModel @Inject constructor(
         val orderItems = cartItems.values.map { cartItem ->
             OrderItemRequest(
                 productSku = cartItem.productSku,
+                productName = cartItem.productName,
                 quantity = cartItem.quantity,
+                unitPrice = cartItem.unitPrice.toDouble(),
                 discountPercentage = 0.0, // No discount
                 taxPercentage = 19.0 // Default IVA Colombia
             )

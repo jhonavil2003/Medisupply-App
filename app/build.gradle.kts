@@ -64,6 +64,10 @@ android {
         compose = true
         buildConfig = true  // Habilitar BuildConfig
     }
+    
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {

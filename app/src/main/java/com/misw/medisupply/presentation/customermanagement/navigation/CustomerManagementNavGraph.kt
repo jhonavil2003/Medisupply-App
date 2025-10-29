@@ -13,6 +13,7 @@ import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.presentation.customermanagement.screens.account.CustomerAccountScreen
 import com.misw.medisupply.presentation.customermanagement.screens.home.CustomerHomeScreen
 import com.misw.medisupply.presentation.customermanagement.screens.orders.CustomerOrdersScreen
+import com.misw.medisupply.presentation.customermanagement.screens.orders.OrderDetailScreen
 import com.misw.medisupply.presentation.customermanagement.screens.shop.ShopScreen
 import com.misw.medisupply.presentation.customermanagement.screens.shop.createorder.CustomerOrderReviewScreen
 import com.misw.medisupply.presentation.customermanagement.screens.shop.createorder.CustomerProductSelectionScreen
@@ -50,7 +51,28 @@ fun CustomerManagementNavGraph(
         
         // Orders Screen - Mis pedidos
         composable(route = CustomerManagementRoutes.ORDERS) {
-            CustomerOrdersScreen()
+            CustomerOrdersScreen(
+                onNavigateToOrderDetail = { orderId ->
+                    android.util.Log.d("CustomerNavGraph", "Navegando a detalle del pedido con ID: $orderId")
+                    navController.navigate("${CustomerManagementRoutes.ORDER_DETAIL}/$orderId")
+                }
+            )
+        }
+        
+        // Order Detail Screen - Detalle del pedido
+        composable(
+            route = "${CustomerManagementRoutes.ORDER_DETAIL}/{orderId}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
+            OrderDetailScreen(
+                orderId = orderId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
         
         // Create Order - Product Selection (reutiliza lógica de sales force)

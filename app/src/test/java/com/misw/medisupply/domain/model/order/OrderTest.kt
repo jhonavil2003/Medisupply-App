@@ -35,7 +35,8 @@ class OrderTest {
             createdAt = Date(),
             updatedAt = Date(),
             customer = null,
-            items = items
+            items = items,
+            deliveryDate = null
         )
     }
 

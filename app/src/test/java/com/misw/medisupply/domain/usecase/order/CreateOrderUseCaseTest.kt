@@ -62,7 +62,8 @@ class CreateOrderUseCaseTest {
         createdAt = Date(),
         updatedAt = Date(),
         customer = null,
-        items = emptyList()
+        items = emptyList(),
+        deliveryDate = null
     )
 
     @Before
