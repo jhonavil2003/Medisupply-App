@@ -1,5 +1,7 @@
 package com.misw.medisupply.core.utils
 
+import com.misw.medisupply.core.config.ApiConfig
+
 /**
  * Application-wide constants
  */
@@ -9,16 +11,28 @@ object Constants {
     // API Configuration
     // ============================================================================
     
-    const val BASE_URL = "http://10.0.2.2:3003/"
+    /**
+     * Get current API URLs from ApiConfig (based on build variant)
+     * Switch between local/AWS by changing build variant:
+     * - devDebug: Local development
+     * - prodDebug/prodRelease: AWS production
+     */
     
-    // Sales Service (Orders)
-    const val SALES_SERVICE_URL = "http://10.0.2.2:3003/"
+    // Base URL (defaults to Sales Service)
+    val BASE_URL: String
+        get() = ApiConfig.baseUrl
     
-    // Catalog Service
-    const val CATALOG_SERVICE_URL = "http://10.0.2.2:3001/"
+    // Sales Service (Orders & Customers)
+    val SALES_SERVICE_URL: String
+        get() = ApiConfig.salesServiceUrl
     
-    // Logistics Service
-    const val LOGISTICS_SERVICE_URL = "http://10.0.2.2:3002/"
+    // Catalog Service (Products)
+    val CATALOG_SERVICE_URL: String
+        get() = ApiConfig.catalogServiceUrl
+    
+    // Logistics Service (Inventory/Stock)
+    val LOGISTICS_SERVICE_URL: String
+        get() = ApiConfig.logisticsServiceUrl
     
     /**
      * API Timeout configurations (in seconds)

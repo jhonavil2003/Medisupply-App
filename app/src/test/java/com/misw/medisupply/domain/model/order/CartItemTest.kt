@@ -47,8 +47,8 @@ class CartItemTest {
         
         val formatted = cartItem.getFormattedSubtotal()
         
-        assertTrue(formatted.contains("50"))
-        assertTrue(formatted.startsWith("$"))
+        // FormatUtils uses Colombian format with decimals=0: $ 50.000
+        assertEquals("$ 50.000", formatted)
     }
 
     @Test

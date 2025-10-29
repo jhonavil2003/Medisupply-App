@@ -1,5 +1,6 @@
 package com.misw.medisupply.domain.model.customer
 
+import com.misw.medisupply.core.utils.FormatUtils
 import java.util.Date
 
 /**
@@ -30,7 +31,7 @@ data class Customer(
      * Get formatted credit limit as currency
      */
     fun getFormattedCreditLimit(): String {
-        return "$ ${String.format("%,.2f", creditLimit)}"
+        return FormatUtils.formatCurrency(creditLimit)
     }
     
     /**

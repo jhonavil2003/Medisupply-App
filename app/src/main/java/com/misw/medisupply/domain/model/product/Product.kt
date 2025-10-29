@@ -1,5 +1,7 @@
 package com.misw.medisupply.domain.model.product
 
+import com.misw.medisupply.core.utils.FormatUtils
+
 /**
  * Product domain model
  * Represents a medical product in the catalog service
@@ -46,5 +48,5 @@ data class Product(
     /**
      * Get formatted price with currency
      */
-    fun getFormattedPrice(): String = "$currency ${String.format("%.2f", unitPrice)}"
+    fun getFormattedPrice(): String = FormatUtils.formatCurrency(unitPrice)
 }

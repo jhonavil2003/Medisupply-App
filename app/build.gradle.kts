@@ -21,12 +21,36 @@ android {
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            
+            // URLs para desarrollo local (10.0.2.2 = localhost en emulador Android)
+            buildConfigField("String", "SALES_SERVICE_URL", "\"http://10.0.2.2:8000/\"")
+            buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://10.0.2.2:8001/\"")
+            buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://10.0.2.2:8002/\"")
+            buildConfigField("String", "ENVIRONMENT", "\"LOCAL\"")
+        }
+        
         release {
             isMinifyEnabled = false
+            isDebuggable = false
+            
+            // Usar firma de debug para testing (evita necesidad de keystore)
+            // Para producción real (Play Store), crea un keystore y cambia esto
+            signingConfig = signingConfigs.getByName("debug")
+            
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            
+            // URLs para AWS (producción)
+            buildConfigField("String", "SALES_SERVICE_URL", "\"http://lb-sales-service-570996197.us-east-1.elb.amazonaws.com/\"")
+            buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://lb-catalog-service-11171664.us-east-1.elb.amazonaws.com/\"")
+            buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://lb-logistics-service-1435144637.us-east-1.elb.amazonaws.com/\"")
+            buildConfigField("String", "ENVIRONMENT", "\"AWS\"")
         }
     }
     compileOptions {
@@ -38,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true  // Habilitar BuildConfig
     }
     
     testOptions {
