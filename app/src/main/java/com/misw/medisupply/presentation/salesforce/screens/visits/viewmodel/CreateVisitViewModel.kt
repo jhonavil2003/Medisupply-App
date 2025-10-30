@@ -28,10 +28,10 @@ class CreateVisitViewModel @Inject constructor(
         
         _uiState.value = _uiState.value.copy(
             customerSearchQuery = query,
-            showCustomerDropdown = query.length >= 2
+            showCustomerDropdown = query.isNotBlank()
         )
         
-        if (query.length >= 2) {
+        if (query.isNotBlank()) {
             android.util.Log.d("CreateVisitViewModel", "Starting search for query: '$query'")
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(isSearchingCustomers = true)
@@ -80,7 +80,8 @@ class CreateVisitViewModel @Inject constructor(
             selectedCustomer = customer,
             customerSearchQuery = "",
             customerSearchResults = emptyList(),
-            showCustomerDropdown = false
+            showCustomerDropdown = false,
+            isCustomerSelected = true
         )
         validateForm()
     }
@@ -90,7 +91,10 @@ class CreateVisitViewModel @Inject constructor(
             selectedCustomer = null,
             customerSearchQuery = "",
             customerSearchResults = emptyList(),
-            showCustomerDropdown = false
+            showCustomerDropdown = false,
+            isCustomerSelected = false,
+            areVisitFieldsComplete = false,
+            isVisitSaved = false
         )
         validateForm()
     }
@@ -193,10 +197,19 @@ class CreateVisitViewModel @Inject constructor(
 
     private fun validateForm() {
         val state = _uiState.value
-        val isValid = state.selectedCustomer != null &&
-                state.contactedPersons.isNotBlank()
         
-        _uiState.value = state.copy(isFormValid = isValid)
+        // Check if visit fields are complete
+        val areVisitFieldsComplete = state.selectedCustomer != null &&
+                state.contactedPersons.isNotBlank() &&
+                state.clinicalFindings.isNotBlank()
+        
+        // Form is valid when all visit fields are complete
+        val isFormValid = areVisitFieldsComplete
+        
+        _uiState.value = state.copy(
+            areVisitFieldsComplete = areVisitFieldsComplete,
+            isFormValid = isFormValid
+        )
     }
 
     fun saveVisit() {
@@ -210,7 +223,8 @@ class CreateVisitViewModel @Inject constructor(
                 
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    saveSuccess = true
+                    saveSuccess = true,
+                    isVisitSaved = true
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(

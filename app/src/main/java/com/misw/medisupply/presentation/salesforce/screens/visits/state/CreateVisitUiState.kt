@@ -30,8 +30,13 @@ data class CreateVisitUiState(
     // Files
     val attachments: List<String> = emptyList(),
     
-    // Form state
+    // Form state and flow control
     val isFormValid: Boolean = false,
     val isSaving: Boolean = false,
-    val saveSuccess: Boolean = false
+    val saveSuccess: Boolean = false,
+    
+    // Step-by-step flow control
+    val isCustomerSelected: Boolean = false,
+    val areVisitFieldsComplete: Boolean = false,
+    val isVisitSaved: Boolean = false
 )

@@ -13,13 +13,23 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneId
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,20 +58,60 @@ fun CreateVisitScreen(
         },
         containerColor = Color(0xFFF5F5F5),
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text("Guardar visita") },
-                icon = { Icon(Icons.Default.Save, contentDescription = "Guardar visita") },
-                onClick = { viewModel.saveVisit() },
-                containerColor = if (uiState.isFormValid) Color(0xFF1565C0) else Color(0xFFBDBDBD)
-            )
+            if (!uiState.isVisitSaved) { // Solo mostrar el FAB si no se ha guardado aún
+                ExtendedFloatingActionButton(
+                    text = { 
+                        Text(
+                            if (uiState.isSaving) "Guardando..." else "Guardar visita",
+                            color = Color.White
+                        )
+                    },
+                    icon = { 
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Save, 
+                                contentDescription = "Guardar visita",
+                                tint = Color.White
+                            )
+                        }
+                    },
+                    onClick = { viewModel.saveVisit() },
+                    containerColor = if (uiState.isFormValid && !uiState.isSaving) 
+                        Color(0xFF1565C0) else Color(0xFFBDBDBD)
+                )
+            }
         }
     ) { paddingValues ->
         var visitDate by remember { mutableStateOf(LocalDate.now()) }
         var visitTime by remember { mutableStateOf(LocalTime.of(9, 0)) }
         val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-        val dateDialogState = rememberMaterialDialogState()
-        val timeDialogState = rememberMaterialDialogState()
+        var showDatePicker by remember { mutableStateOf(false) }
+        var showTimePicker by remember { mutableStateOf(false) }
+        
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = visitDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        )
+        val timePickerState = rememberTimePickerState(
+            initialHour = visitTime.hour,
+            initialMinute = visitTime.minute,
+            is24Hour = true
+        )
+
+        // Manejar éxito del guardado
+        LaunchedEffect(uiState.saveSuccess) {
+            if (uiState.saveSuccess) {
+                // Cambiar al tab de ubicación automáticamente después de guardar
+                selectedTabIndex = 1
+                viewModel.clearSuccess()
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -76,17 +126,32 @@ fun CreateVisitScreen(
                 contentColor = Color(0xFF1565C0)
             ) {
                 tabTitles.forEachIndexed { index, title ->
+                    val isTabEnabled = when (index) {
+                        0 -> true // "Datos" siempre habilitado
+                        1 -> uiState.isVisitSaved // "Ubicación" solo después de guardar
+                        2 -> uiState.isVisitSaved // "Archivos" solo después de guardar
+                        else -> false
+                    }
+                    
                     Tab(
                         selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                        onClick = { 
+                            if (isTabEnabled) {
+                                selectedTabIndex = index 
+                            }
+                        },
                         text = {
                             Text(
                                 text = title,
-                                fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isTabEnabled) {
+                                    if (selectedTabIndex == index) Color(0xFF1565C0) else Color(0xFF757575)
+                                } else {
+                                    Color(0xFFBDBDBD)
+                                }
                             )
                         },
-                        selectedContentColor = Color(0xFF1565C0),
-                        unselectedContentColor = Color(0xFF757575)
+                        enabled = isTabEnabled
                     )
                 }
             }
@@ -106,8 +171,12 @@ fun CreateVisitScreen(
                         visitTime = visitTime,
                         dateFormatter = dateFormatter,
                         timeFormatter = timeFormatter,
-                        dateDialogState = dateDialogState,
-                        timeDialogState = timeDialogState,
+                        showDatePicker = showDatePicker,
+                        showTimePicker = showTimePicker,
+                        datePickerState = datePickerState,
+                        timePickerState = timePickerState,
+                        onShowDatePicker = { showDatePicker = it },
+                        onShowTimePicker = { showTimePicker = it },
                         onDateChange = { visitDate = it },
                         onTimeChange = { visitTime = it },
                         onCustomerSearchQueryChange = viewModel::searchCustomers,
@@ -126,6 +195,7 @@ fun CreateVisitScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DatosTabContent(
     uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
@@ -133,8 +203,12 @@ private fun DatosTabContent(
     visitTime: LocalTime,
     dateFormatter: DateTimeFormatter,
     timeFormatter: DateTimeFormatter,
-    dateDialogState: com.vanpra.composematerialdialogs.MaterialDialogState,
-    timeDialogState: com.vanpra.composematerialdialogs.MaterialDialogState,
+    showDatePicker: Boolean,
+    showTimePicker: Boolean,
+    datePickerState: androidx.compose.material3.DatePickerState,
+    timePickerState: TimePickerState,
+    onShowDatePicker: (Boolean) -> Unit,
+    onShowTimePicker: (Boolean) -> Unit,
     onDateChange: (LocalDate) -> Unit,
     onTimeChange: (LocalTime) -> Unit,
     onCustomerSearchQueryChange: (String) -> Unit,
@@ -156,6 +230,41 @@ private fun DatosTabContent(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
             )
+            
+            // Indicador de progreso o mensaje de éxito
+            Spacer(Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (uiState.isVisitSaved) {
+                        Color(0xFFE8F5E8) // Verde para éxito
+                    } else if (uiState.isCustomerSelected) {
+                        Color(0xFFE3F2FD) // Azul para en progreso
+                    } else {
+                        Color(0xFFFFF3E0) // Naranja para comenzar
+                    }
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (uiState.isVisitSaved) {
+                            "✅ Visita guardada exitosamente. Ahora puedes agregar ubicación y archivos."
+                        } else if (!uiState.isCustomerSelected) {
+                            "1️⃣ Selecciona un cliente para comenzar"
+                        } else if (!uiState.areVisitFieldsComplete) {
+                            "2️⃣ Completa los datos de la visita"
+                        } else {
+                            "3️⃣ Haz clic en 'Guardar visita' para continuar"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
+                    )
+                }
+            }
+            
             Spacer(Modifier.height(16.dp))
             
             // 1. PRIMERO: Selección de cliente
@@ -174,7 +283,7 @@ private fun DatosTabContent(
             Spacer(Modifier.height(16.dp))
             
             // Campos habilitados solo si hay cliente seleccionado
-            val fieldsEnabled = uiState.selectedCustomer != null
+            val fieldsEnabled = uiState.isCustomerSelected // Solo habilitar campos cuando se selecciona cliente
             
             if (!fieldsEnabled) {
                 Card(
@@ -199,7 +308,7 @@ private fun DatosTabContent(
                 leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha", tint = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { if (fieldsEnabled) dateDialogState.show() },
+                    .clickable { if (fieldsEnabled) onShowDatePicker(true) },
                 readOnly = true,
                 enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -213,19 +322,21 @@ private fun DatosTabContent(
                 )
             )
             
-            MaterialDialog(
-                dialogState = dateDialogState,
-                buttons = {
-                    positiveButton("OK")
-                    negativeButton("Cancelar")
-                }
-            ) {
-                datepicker(
-                    initialDate = visitDate,
-                    title = "Selecciona la fecha"
-                ) { date ->
-                    onDateChange(date)
-                }
+            // Date Picker Dialog
+            if (showDatePicker) {
+                CustomDatePickerDialog(
+                    onDateSelected = { dateMillis ->
+                        dateMillis?.let {
+                            val selectedDate = Instant.ofEpochMilli(it)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            onDateChange(selectedDate)
+                        }
+                        onShowDatePicker(false)
+                    },
+                    onDismiss = { onShowDatePicker(false) },
+                    datePickerState = datePickerState
+                )
             }
             
             Spacer(Modifier.height(12.dp))
@@ -238,7 +349,7 @@ private fun DatosTabContent(
                 leadingIcon = { Icon(Icons.Default.AccessTime, contentDescription = "Seleccionar hora", tint = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { if (fieldsEnabled) timeDialogState.show() },
+                    .clickable { if (fieldsEnabled) onShowTimePicker(true) },
                 readOnly = true,
                 enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -252,20 +363,17 @@ private fun DatosTabContent(
                 )
             )
             
-            MaterialDialog(
-                dialogState = timeDialogState,
-                buttons = {
-                    positiveButton("OK")
-                    negativeButton("Cancelar")
-                }
-            ) {
-                timepicker(
-                    initialTime = visitTime,
-                    title = "Selecciona la hora",
-                    is24HourClock = true
-                ) { time ->
-                    onTimeChange(time)
-                }
+            // Time Picker Dialog
+            if (showTimePicker) {
+                CustomTimePickerDialog(
+                    onTimeSelected = { hour, minute ->
+                        val selectedTime = LocalTime.of(hour, minute)
+                        onTimeChange(selectedTime)
+                        onShowTimePicker(false)
+                    },
+                    onDismiss = { onShowTimePicker(false) },
+                    timePickerState = timePickerState
+                )
             }
             
             Spacer(Modifier.height(12.dp))
@@ -506,4 +614,57 @@ private fun ArchivosTabContent() {
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomDatePickerDialog(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit,
+    datePickerState: androidx.compose.material3.DatePickerState
+) {
+    androidx.compose.material3.DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomTimePickerDialog(
+    onTimeSelected: (Int, Int) -> Unit,
+    onDismiss: () -> Unit,
+    timePickerState: TimePickerState
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onTimeSelected(timePickerState.hour, timePickerState.minute)
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        },
+        text = {
+            TimePicker(state = timePickerState)
+        }
+    )
 }

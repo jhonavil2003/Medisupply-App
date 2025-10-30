@@ -27,9 +27,10 @@ android {
             versionNameSuffix = "-DEBUG"
             
             // URLs para desarrollo local (10.0.2.2 = localhost en emulador Android)
-            buildConfigField("String", "SALES_SERVICE_URL", "\"http://10.0.2.2:8000/\"")
-            buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://10.0.2.2:8001/\"")
-            buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://10.0.2.2:8002/\"")
+            // Puertos corregidos: catalog-service:3001, logistics-service:3002, sales-service:3003
+            buildConfigField("String", "SALES_SERVICE_URL", "\"http://10.0.2.2:3003/\"")
+            buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://10.0.2.2:3001/\"")
+            buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://10.0.2.2:3002/\"")
             buildConfigField("String", "ENVIRONMENT", "\"LOCAL\"")
         }
         
@@ -71,8 +72,7 @@ android {
 }
 
 dependencies {
-    // Compose Material Dialogs (Date/Time Picker 100% Compose)
-    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+    // Using native Material3 DatePicker and TimePicker (more stable)
 
     // Core Android
     implementation(libs.androidx.core.ktx)
