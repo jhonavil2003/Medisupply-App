@@ -38,8 +38,8 @@ jobs:
         run: |
           echo "📊 Parsing test results..."
           
-          # Buscar SOLO archivos XML de testDebugUnitTest (no release)
-          TEST_RESULTS=$(find app/build/test-results/testDebugUnitTest -name "*.xml" 2>/dev/null || echo "")
+          # Buscar archivos XML de testReleaseUnitTest
+          TEST_RESULTS=$(find app/build/test-results/testReleaseUnitTest -name "*.xml" 2>/dev/null || echo "")
           
           if [ -n "$TEST_RESULTS" ]; then
             TOTAL_TESTS=0
@@ -74,18 +74,18 @@ jobs:
             echo "  • Skipped: $SKIPPED_TESTS ⊘"
           fi
 
-      - name: Build Debug APK
+      - name: Build Release APK
         if: success()
         run: |
-          echo "Tests passed! Building Debug APK..."
-          ./gradlew assembleDebug --stacktrace
+          echo "Tests passed! Building Release APK with AWS URLs..."
+          ./gradlew assembleRelease --stacktrace
 
       - name: Upload APK Artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-main
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: app-release-main
+          path: app/build/outputs/apk/release/app-release.apk
           retention-days: 30
 
       - name: Upload Test Reports
@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-reports-main
-          path: app/build/reports/tests/testDebugUnitTest/
+          path: app/build/reports/tests/testReleaseUnitTest/
 
       - name: Build Summary
         if: success()
@@ -101,6 +101,7 @@ jobs:
           echo "✅ Build completed successfully!"
           echo ""
           echo "📦 APK Information:"
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          ls -lh app/build/outputs/apk/release/app-release.apk
           echo ""
           echo "🎯 APK available in Artifacts section"
+          echo "☁️  Configured with AWS URLs"

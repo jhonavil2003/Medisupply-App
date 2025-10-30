@@ -127,7 +127,8 @@ class ProductTest {
         
         val result = product.getFormattedPrice()
         
-        assertTrue(result == "USD 250.50" || result == "USD 250,50")
+        // FormatUtils uses Colombian format: $ 250,50 (comma for decimals)
+        assertEquals("$ 250,50", result)
     }
 
     @Test
@@ -136,7 +137,8 @@ class ProductTest {
         
         val result = product.getFormattedPrice()
         
-        assertTrue(result == "COP 1000.00" || result == "COP 1000,00")
+        // FormatUtils uses Colombian format: $ 1.000,00 (dot for thousands, comma for decimals)
+        assertEquals("$ 1.000,00", result)
     }
 
     @Test
@@ -145,6 +147,7 @@ class ProductTest {
         
         val result = product.getFormattedPrice()
         
-        assertTrue(result == "USD 99.90" || result == "USD 99,90")
+        // FormatUtils uses Colombian format: $ 99,90 (comma for decimals)
+        assertEquals("$ 99,90", result)
     }
 }

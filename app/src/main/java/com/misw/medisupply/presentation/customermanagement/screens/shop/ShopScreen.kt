@@ -43,10 +43,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.presentation.common.components.ErrorView
 import com.misw.medisupply.presentation.customermanagement.viewmodel.CustomerShopViewModel
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -509,7 +509,6 @@ private fun formatDate(date: java.util.Date?): String {
  * Formatear moneda
  */
 private fun formatCurrency(amount: Double): String {
-    val format = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
-    return format.format(amount)
+    return FormatUtils.formatCurrency(amount, decimals = 0)
 }
 

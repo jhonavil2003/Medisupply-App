@@ -110,6 +110,7 @@ class CreateOrderUseCaseTest {
             assertEquals(1, result.data!!.customerId)
             assertEquals("seller123", result.data!!.sellerId)
             assertEquals(OrderStatus.PENDING, result.data!!.status)
+            awaitComplete()
         }
     }
 
@@ -138,6 +139,7 @@ class CreateOrderUseCaseTest {
             val result = awaitItem()
             
             assertTrue(result is Resource.Success)
+            awaitComplete()
         }
 
         verify(repository).createOrder(
@@ -184,6 +186,7 @@ class CreateOrderUseCaseTest {
             
             assertTrue(result is Resource.Success)
             assertEquals(PaymentTerms.CREDIT_30, (result as Resource.Success).data!!.paymentTerms)
+            awaitComplete()
         }
     }
 
@@ -215,6 +218,7 @@ class CreateOrderUseCaseTest {
             
             assertTrue(result is Resource.Success)
             assertEquals(PaymentMethod.TRANSFER, (result as Resource.Success).data!!.paymentMethod)
+            awaitComplete()
         }
     }
 
@@ -244,6 +248,7 @@ class CreateOrderUseCaseTest {
             val result = awaitItem()
             
             assertTrue(result is Resource.Success)
+            awaitComplete()
         }
     }
 
@@ -278,6 +283,7 @@ class CreateOrderUseCaseTest {
             val result = awaitItem()
             
             assertTrue(result is Resource.Success)
+            awaitComplete()
         }
 
         verify(repository).createOrder(
@@ -327,6 +333,7 @@ class CreateOrderUseCaseTest {
             assertEquals("Calle 123", (result as Resource.Success).data!!.deliveryAddress)
             assertEquals("Bogotá", result.data!!.deliveryCity)
             assertEquals("Cundinamarca", result.data!!.deliveryDepartment)
+            awaitComplete()
         }
     }
 
@@ -357,6 +364,7 @@ class CreateOrderUseCaseTest {
             
             assertTrue(result is Resource.Success)
             assertEquals("DC-001", (result as Resource.Success).data!!.preferredDistributionCenter)
+            awaitComplete()
         }
     }
 
@@ -387,6 +395,7 @@ class CreateOrderUseCaseTest {
             
             assertTrue(result is Resource.Error)
             assertEquals(errorMessage, (result as Resource.Error).message)
+            awaitComplete()
         }
     }
 
@@ -415,6 +424,7 @@ class CreateOrderUseCaseTest {
             val result = awaitItem()
             
             assertTrue(result is Resource.Loading)
+            awaitComplete()
         }
     }
 
@@ -446,6 +456,7 @@ class CreateOrderUseCaseTest {
             
             assertTrue(result is Resource.Success)
             assertEquals(notesText, (result as Resource.Success).data!!.notes)
+            awaitComplete()
         }
     }
 }

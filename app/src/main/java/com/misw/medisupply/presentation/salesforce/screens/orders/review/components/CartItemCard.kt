@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.order.CartItem
 
 /**
@@ -55,7 +56,7 @@ fun CartItemCard(cartItem: CartItem) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${"$%,.0f".format(cartItem.unitPrice)} x ${cartItem.quantity}",
+                    text = "${FormatUtils.formatCurrency(cartItem.unitPrice, decimals = 0)} x ${cartItem.quantity}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

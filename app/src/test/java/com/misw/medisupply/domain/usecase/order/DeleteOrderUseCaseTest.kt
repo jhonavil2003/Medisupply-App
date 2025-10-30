@@ -39,6 +39,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Success)
             assertEquals(Unit, result.data)
+            awaitComplete()
         }
 
         verify(repository).deleteOrder(eq(orderId))
@@ -58,6 +59,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("Pendiente") == true)
+            awaitComplete()
         }
     }
 
@@ -75,6 +77,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("encontrado") == true)
+            awaitComplete()
         }
     }
 
@@ -92,6 +95,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("servidor") == true)
+            awaitComplete()
         }
     }
 
@@ -109,6 +113,7 @@ class DeleteOrderUseCaseTest {
             val result = awaitItem()
             assertTrue(result is Resource.Error)
             assertTrue(result.message?.contains("red") == true)
+            awaitComplete()
         }
     }
 
@@ -132,7 +137,7 @@ class DeleteOrderUseCaseTest {
             val success = awaitItem()
             assertTrue(success is Resource.Success)
 
-            // End test
+            awaitComplete()
         }
     }
 
@@ -149,6 +154,7 @@ class DeleteOrderUseCaseTest {
             assertTrue(loading is Resource.Loading)
             val result = awaitItem()
             assertTrue(result is Resource.Success)
+            awaitComplete()
         }
 
         // Then
@@ -170,6 +176,7 @@ class DeleteOrderUseCaseTest {
             assertTrue(loading1 is Resource.Loading)
             val result1 = awaitItem()
             assertTrue(result1 is Resource.Success)
+            awaitComplete()
         }
 
         useCase(orderId2).test {
@@ -177,6 +184,7 @@ class DeleteOrderUseCaseTest {
             assertTrue(loading2 is Resource.Loading)
             val result2 = awaitItem()
             assertTrue(result2 is Resource.Success)
+            awaitComplete()
         }
 
         // Then

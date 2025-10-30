@@ -45,7 +45,8 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
 @Composable
 fun SalesForceNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToRoleSelection: () -> Unit = {}
 ) {
     NavHost(
         navController = navController,
@@ -58,6 +59,7 @@ fun SalesForceNavGraph(
                 onNavigateToVisits = {
                     navController.navigate(SalesForceRoutes.VISITS)
                 }
+                onNavigateToRoleSelection = onNavigateToRoleSelection
             )
         }
         
