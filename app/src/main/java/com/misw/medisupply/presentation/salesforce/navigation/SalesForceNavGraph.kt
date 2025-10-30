@@ -58,7 +58,7 @@ fun SalesForceNavGraph(
             SalesForceHomeScreen(
                 onNavigateToVisits = {
                     navController.navigate(SalesForceRoutes.VISITS)
-                }
+                },
                 onNavigateToRoleSelection = onNavigateToRoleSelection
             )
         }

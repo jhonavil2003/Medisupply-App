@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun SalesForceHomeScreen(
-    onNavigateToVisits: () -> Unit = {}
+    onNavigateToVisits: () -> Unit = {},
     onNavigateToRoleSelection: () -> Unit = {}
 ) {
     Column(

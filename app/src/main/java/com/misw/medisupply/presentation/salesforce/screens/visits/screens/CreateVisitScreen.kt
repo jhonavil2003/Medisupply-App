@@ -31,10 +31,12 @@ import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateVisitScreen(
-    onNavigateBack: (() -> Unit)? = null
+    onNavigateBack: (() -> Unit)? = null,
+    viewModel: com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.CreateVisitViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabTitles = listOf("Datos", "Ubicación", "Archivos")
+    val uiState by viewModel.uiState.collectAsState()
     
     Scaffold(
         topBar = {
@@ -49,7 +51,8 @@ fun CreateVisitScreen(
             ExtendedFloatingActionButton(
                 text = { Text("Guardar visita") },
                 icon = { Icon(Icons.Default.Save, contentDescription = "Guardar visita") },
-                onClick = { /* Guardar visita */ }
+                onClick = { viewModel.saveVisit() },
+                containerColor = if (uiState.isFormValid) Color(0xFF1565C0) else Color(0xFFBDBDBD)
             )
         }
     ) { paddingValues ->
@@ -98,6 +101,7 @@ fun CreateVisitScreen(
             ) {
                 when (selectedTabIndex) {
                     0 -> DatosTabContent(
+                        uiState = uiState,
                         visitDate = visitDate,
                         visitTime = visitTime,
                         dateFormatter = dateFormatter,
@@ -105,7 +109,13 @@ fun CreateVisitScreen(
                         dateDialogState = dateDialogState,
                         timeDialogState = timeDialogState,
                         onDateChange = { visitDate = it },
-                        onTimeChange = { visitTime = it }
+                        onTimeChange = { visitTime = it },
+                        onCustomerSearchQueryChange = viewModel::searchCustomers,
+                        onCustomerSelected = viewModel::selectCustomer,
+                        onClearCustomerSelection = viewModel::clearCustomerSelection,
+                        onContactedPersonsChange = viewModel::updateContactedPersons,
+                        onClinicalFindingsChange = viewModel::updateClinicalFindings,
+                        onAdditionalNotesChange = viewModel::updateAdditionalNotes
                     )
                     1 -> UbicacionTabContent()
                     2 -> ArchivosTabContent()
@@ -118,6 +128,7 @@ fun CreateVisitScreen(
 
 @Composable
 private fun DatosTabContent(
+    uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
     visitDate: LocalDate,
     visitTime: LocalTime,
     dateFormatter: DateTimeFormatter,
@@ -125,7 +136,13 @@ private fun DatosTabContent(
     dateDialogState: com.vanpra.composematerialdialogs.MaterialDialogState,
     timeDialogState: com.vanpra.composematerialdialogs.MaterialDialogState,
     onDateChange: (LocalDate) -> Unit,
-    onTimeChange: (LocalTime) -> Unit
+    onTimeChange: (LocalTime) -> Unit,
+    onCustomerSearchQueryChange: (String) -> Unit,
+    onCustomerSelected: (com.misw.medisupply.domain.model.customer.Customer) -> Unit,
+    onClearCustomerSelection: () -> Unit,
+    onContactedPersonsChange: (String) -> Unit,
+    onClinicalFindingsChange: (String) -> Unit,
+    onAdditionalNotesChange: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -141,22 +158,58 @@ private fun DatosTabContent(
             )
             Spacer(Modifier.height(16.dp))
             
+            // 1. PRIMERO: Selección de cliente
+            com.misw.medisupply.presentation.salesforce.screens.visits.components.CustomerSearchField(
+                selectedCustomer = uiState.selectedCustomer,
+                searchQuery = uiState.customerSearchQuery,
+                searchResults = uiState.customerSearchResults,
+                isSearching = uiState.isSearchingCustomers,
+                showDropdown = uiState.showCustomerDropdown,
+                onQueryChange = onCustomerSearchQueryChange,
+                onCustomerSelected = onCustomerSelected,
+                onClearSelection = onClearCustomerSelection,
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            Spacer(Modifier.height(16.dp))
+            
+            // Campos habilitados solo si hay cliente seleccionado
+            val fieldsEnabled = uiState.selectedCustomer != null
+            
+            if (!fieldsEnabled) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+                ) {
+                    Text(
+                        text = "Selecciona un cliente para continuar con los datos de la visita",
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF757575)
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+            
             // Date Picker
             OutlinedTextField(
                 value = visitDate.format(dateFormatter),
                 onValueChange = {},
                 label = { Text("Fecha de la visita") },
-                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha", tint = Color(0xFF1565C0)) },
+                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha", tint = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { dateDialogState.show() },
+                    .clickable { if (fieldsEnabled) dateDialogState.show() },
                 readOnly = true,
-                enabled = true,
+                enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = Color(0xFFB6C6E3),
+                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
                     focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = Color(0xFF1565C0)
+                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    disabledBorderColor = Color(0xFFE0E0E0),
+                    disabledLabelColor = Color(0xFFBDBDBD),
+                    disabledTextColor = Color(0xFFBDBDBD)
                 )
             )
             
@@ -182,17 +235,20 @@ private fun DatosTabContent(
                 value = visitTime.format(timeFormatter),
                 onValueChange = {},
                 label = { Text("Hora de la visita") },
-                leadingIcon = { Icon(Icons.Default.AccessTime, contentDescription = "Seleccionar hora", tint = Color(0xFF1565C0)) },
+                leadingIcon = { Icon(Icons.Default.AccessTime, contentDescription = "Seleccionar hora", tint = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { timeDialogState.show() },
+                    .clickable { if (fieldsEnabled) timeDialogState.show() },
                 readOnly = true,
-                enabled = true,
+                enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = Color(0xFFB6C6E3),
+                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
                     focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = Color(0xFF1565C0)
+                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    disabledBorderColor = Color(0xFFE0E0E0),
+                    disabledLabelColor = Color(0xFFBDBDBD),
+                    disabledTextColor = Color(0xFFBDBDBD)
                 )
             )
             
@@ -215,46 +271,64 @@ private fun DatosTabContent(
             Spacer(Modifier.height(12.dp))
             
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = uiState.contactedPersons,
+                onValueChange = onContactedPersonsChange,
                 label = { Text("Personas contactadas") },
+                placeholder = { Text("Ej: Dr. García, Enf. López") },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = Color(0xFFB6C6E3),
-                    focusedLabelColor = Color(0xFF1565C0)
+                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    focusedLabelColor = Color(0xFF1565C0),
+                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    disabledBorderColor = Color(0xFFE0E0E0),
+                    disabledLabelColor = Color(0xFFBDBDBD),
+                    disabledTextColor = Color(0xFFBDBDBD)
                 )
             )
             
             Spacer(Modifier.height(12.dp))
             
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = uiState.clinicalFindings,
+                onValueChange = onClinicalFindingsChange,
                 label = { Text("Hallazgos clínicos") },
+                placeholder = { Text("Describe los hallazgos relevantes...") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
+                enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = Color(0xFFB6C6E3),
-                    focusedLabelColor = Color(0xFF1565C0)
+                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    focusedLabelColor = Color(0xFF1565C0),
+                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    disabledBorderColor = Color(0xFFE0E0E0),
+                    disabledLabelColor = Color(0xFFBDBDBD),
+                    disabledTextColor = Color(0xFFBDBDBD)
                 )
             )
             
             Spacer(Modifier.height(12.dp))
             
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = uiState.additionalNotes,
+                onValueChange = onAdditionalNotesChange,
                 label = { Text("Notas adicionales") },
+                placeholder = { Text("Observaciones, comentarios...") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
                 maxLines = 4,
+                enabled = fieldsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = Color(0xFFB6C6E3),
-                    focusedLabelColor = Color(0xFF1565C0)
+                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    focusedLabelColor = Color(0xFF1565C0),
+                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    disabledBorderColor = Color(0xFFE0E0E0),
+                    disabledLabelColor = Color(0xFFBDBDBD),
+                    disabledTextColor = Color(0xFFBDBDBD)
                 )
             )
         }
