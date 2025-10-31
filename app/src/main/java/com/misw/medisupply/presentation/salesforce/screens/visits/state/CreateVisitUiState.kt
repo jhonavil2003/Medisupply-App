@@ -19,6 +19,8 @@ data class CreateVisitUiState(
     val contactedPersons: String = "",
     val clinicalFindings: String = "",
     val additionalNotes: String = "",
+    val selectedDate: LocalDate? = null,
+    val selectedTime: LocalTime? = null,
     val visitDate: LocalDate = LocalDate.now(),
     val visitTime: LocalTime = LocalTime.of(9, 0),
     
@@ -34,9 +36,18 @@ data class CreateVisitUiState(
     val isFormValid: Boolean = false,
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
+    val successMessage: String? = null,
     
     // Step-by-step flow control
     val isCustomerSelected: Boolean = false,
     val areVisitFieldsComplete: Boolean = false,
-    val isVisitSaved: Boolean = false
+    val isVisitSaved: Boolean = false,
+    
+    // Created visit information
+    val createdVisitId: Int? = null,
+    val visitId: Int? = null,
+    
+    // User interaction tracking (to require explicit interaction)
+    val hasModifiedDate: Boolean = false,
+    val hasModifiedTime: Boolean = false
 )

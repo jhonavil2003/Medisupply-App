@@ -8,23 +8,32 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import java.time.LocalDate
 import java.time.LocalTime
 
 @HiltViewModel
 class CreateVisitViewModel @Inject constructor(
-    // TODO: Inject customer repository when created
+    private val createVisitUseCase: com.misw.medisupply.domain.usecase.visit.CreateVisitUseCase,
+    private val updateVisitUseCase: com.misw.medisupply.domain.usecase.visit.UpdateVisitUseCase,
+    private val completeVisitUseCase: com.misw.medisupply.domain.usecase.visit.CompleteVisitUseCase,
+    private val getCustomersUseCase: com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase,
+    private val userSessionManager: com.misw.medisupply.core.session.UserSessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateVisitUiState())
     val uiState: StateFlow<CreateVisitUiState> = _uiState.asStateFlow()
+    
+    init {
+        // Ejecutar validación inicial para configurar correctamente isFormValid
+        validateForm()
+    }
 
     // Customer search methods
     fun searchCustomers(query: String) {
-        android.util.Log.d("CreateVisitViewModel", "searchCustomers called with query: '$query'")
+        // Log: searchCustomers called with query: $query
         
         _uiState.value = _uiState.value.copy(
             customerSearchQuery = query,
@@ -32,32 +41,48 @@ class CreateVisitViewModel @Inject constructor(
         )
         
         if (query.isNotBlank()) {
-            android.util.Log.d("CreateVisitViewModel", "Starting search for query: '$query'")
+            // Log: Starting search for query: $query
             viewModelScope.launch {
                 _uiState.value = _uiState.value.copy(isSearchingCustomers = true)
                 try {
-                    // TODO: Replace with actual repository call
-                    delay(300) // Simulate network delay
-                    
-                    // Mock data for now
-                    val mockResults = getMockCustomers().filter { 
-                        it.businessName.contains(query, ignoreCase = true) 
+                    // Get all customers from backend
+                    getCustomersUseCase().collect { resource ->
+                        when (resource) {
+                            is com.misw.medisupply.core.base.Resource.Success -> {
+                                val allCustomers = resource.data ?: emptyList()
+                                val filteredResults = allCustomers.filter { customer ->
+                                    customer.businessName.contains(query, ignoreCase = true) ||
+                                    customer.tradeName?.contains(query, ignoreCase = true) == true ||
+                                    customer.contactName?.contains(query, ignoreCase = true) == true ||
+                                    customer.documentNumber.contains(query, ignoreCase = true)
+                                }
+                                
+                                // Log: Search completed. Found ${filteredResults.size} results
+                                
+                                val shouldShowDropdown = filteredResults.isNotEmpty()
+                                // Log: Updating state - showDropdown: $shouldShowDropdown, results: ${filteredResults.size}
+                                
+                                _uiState.value = _uiState.value.copy(
+                                    customerSearchResults = filteredResults,
+                                    isSearchingCustomers = false,
+                                    showCustomerDropdown = shouldShowDropdown
+                                )
+                            }
+                            is com.misw.medisupply.core.base.Resource.Error -> {
+                                // Log: Failed to get customers: ${resource.message}
+                                _uiState.value = _uiState.value.copy(
+                                    customerSearchResults = emptyList(),
+                                    isSearchingCustomers = false,
+                                    showCustomerDropdown = false,
+                                    error = "Error al obtener clientes: ${resource.message}"
+                                )
+                            }
+                            is com.misw.medisupply.core.base.Resource.Loading -> {
+                                // Ya estamos mostrando loading con isSearchingCustomers = true
+                            }
+                        }
                     }
-                    
-                    android.util.Log.d("CreateVisitViewModel", "Search completed. Found ${mockResults.size} results")
-                    
-                    val shouldShowDropdown = mockResults.isNotEmpty()
-                    android.util.Log.d("CreateVisitViewModel", "Updating state - showDropdown: $shouldShowDropdown, results: ${mockResults.size}")
-                    
-                    _uiState.value = _uiState.value.copy(
-                        customerSearchResults = mockResults,
-                        isSearchingCustomers = false,
-                        showCustomerDropdown = shouldShowDropdown
-                    )
-                    
-                    android.util.Log.d("CreateVisitViewModel", "State updated - current showCustomerDropdown: ${_uiState.value.showCustomerDropdown}")
                 } catch (e: Exception) {
-                    android.util.Log.e("CreateVisitViewModel", "Search error: ${e.message}")
                     _uiState.value = _uiState.value.copy(
                         customerSearchResults = emptyList(),
                         isSearchingCustomers = false,
@@ -67,7 +92,7 @@ class CreateVisitViewModel @Inject constructor(
                 }
             }
         } else {
-            android.util.Log.d("CreateVisitViewModel", "Query too short, clearing results")
+            // Log: Query too short, clearing results
             _uiState.value = _uiState.value.copy(
                 customerSearchResults = emptyList(),
                 showCustomerDropdown = false
@@ -94,117 +119,86 @@ class CreateVisitViewModel @Inject constructor(
             showCustomerDropdown = false,
             isCustomerSelected = false,
             areVisitFieldsComplete = false,
-            isVisitSaved = false
+            isVisitSaved = false,
+            hasModifiedDate = false,
+            hasModifiedTime = false
         )
         validateForm()
     }
     
-    // Mock data - replace with actual repository call
-    private fun getMockCustomers(): List<Customer> {
-        return listOf(
-            Customer(
-                id = 1,
-                documentType = com.misw.medisupply.domain.model.customer.DocumentType.NIT,
-                documentNumber = "900123456-7",
-                businessName = "Farmacia San Juan",
-                tradeName = "Farmacia San Juan",
-                customerType = com.misw.medisupply.domain.model.customer.CustomerType.FARMACIA,
-                contactName = "María García",
-                contactEmail = "maria@farmacia.com",
-                contactPhone = "3001234567",
-                address = "Calle 123 #45-67, Bogotá",
-                city = "Bogotá",
-                department = "Cundinamarca",
-                country = "Colombia",
-                creditLimit = 5000000.0,
-                creditDays = 30,
-                isActive = true,
-                createdAt = null,
-                updatedAt = null
-            ),
-            Customer(
-                id = 2,
-                documentType = com.misw.medisupply.domain.model.customer.DocumentType.NIT,
-                documentNumber = "800234567-8",
-                businessName = "Clínica El Rosario",
-                tradeName = "Clínica El Rosario",
-                customerType = com.misw.medisupply.domain.model.customer.CustomerType.CLINICA,
-                contactName = "Dr. Carlos López",
-                contactEmail = "carlos@clinica.com",
-                contactPhone = "3007654321",
-                address = "Carrera 45 #23-89, Medellín",
-                city = "Medellín",
-                department = "Antioquia",
-                country = "Colombia",
-                creditLimit = 10000000.0,
-                creditDays = 45,
-                isActive = true,
-                createdAt = null,
-                updatedAt = null
-            ),
-            Customer(
-                id = 3,
-                documentType = com.misw.medisupply.domain.model.customer.DocumentType.NIT,
-                documentNumber = "700345678-9",
-                businessName = "Hospital General",
-                tradeName = "Hospital General del Valle",
-                customerType = com.misw.medisupply.domain.model.customer.CustomerType.HOSPITAL,
-                contactName = "Ana Rodríguez",
-                contactEmail = "ana@hospital.com",
-                contactPhone = "3009876543",
-                address = "Avenida 80 #12-34, Cali",
-                city = "Cali",
-                department = "Valle del Cauca",
-                country = "Colombia",
-                creditLimit = 15000000.0,
-                creditDays = 60,
-                isActive = true,
-                createdAt = null,
-                updatedAt = null
-            )
-        )
-    }
+
 
     fun updateContactedPersons(contactedPersons: String) {
         _uiState.value = _uiState.value.copy(contactedPersons = contactedPersons)
         validateForm()
+        
+        // Auto-actualizar si ya existe una visita guardada
+        if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            autoSaveVisitChanges()
+        }
     }
 
     fun updateClinicalFindings(clinicalFindings: String) {
         _uiState.value = _uiState.value.copy(clinicalFindings = clinicalFindings)
         validateForm()
+        
+        // Auto-actualizar si ya existe una visita guardada
+        if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            autoSaveVisitChanges()
+        }
     }
 
     fun updateAdditionalNotes(additionalNotes: String) {
         _uiState.value = _uiState.value.copy(additionalNotes = additionalNotes)
         validateForm()
+        
+        // Auto-actualizar si ya existe una visita guardada
+        if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            autoSaveVisitChanges()
+        }
     }
 
     fun updateVisitDate(visitDate: LocalDate) {
-        _uiState.value = _uiState.value.copy(visitDate = visitDate)
+        _uiState.value = _uiState.value.copy(
+            visitDate = visitDate,
+            hasModifiedDate = true
+        )
         validateForm()
     }
 
     fun updateVisitTime(visitTime: LocalTime) {
-        _uiState.value = _uiState.value.copy(visitTime = visitTime)
+        _uiState.value = _uiState.value.copy(
+            visitTime = visitTime,
+            hasModifiedTime = true
+        )
         validateForm()
     }
 
     fun updateAddress(address: String) {
         _uiState.value = _uiState.value.copy(address = address)
         validateForm()
+        
+        // Auto-actualizar si ya existe una visita guardada
+        if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            autoSaveVisitChanges()
+        }
     }
 
     private fun validateForm() {
         val state = _uiState.value
         
-        // Check if visit fields are complete
+        // Requiere: Cliente + Fecha confirmada + Hora confirmada (interacción explícita del usuario)
+        val areEssentialFieldsComplete = state.selectedCustomer != null && 
+                                        state.hasModifiedDate && 
+                                        state.hasModifiedTime
+        
+        // Check if ALL visit fields are complete (para el indicador de progreso)
         val areVisitFieldsComplete = state.selectedCustomer != null &&
                 state.contactedPersons.isNotBlank() &&
                 state.clinicalFindings.isNotBlank()
         
-        // Form is valid when all visit fields are complete
-        val isFormValid = areVisitFieldsComplete
+        // Form is valid when essential fields are complete (Cliente + Fecha + Hora)
+        val isFormValid = areEssentialFieldsComplete
         
         _uiState.value = state.copy(
             areVisitFieldsComplete = areVisitFieldsComplete,
@@ -215,31 +209,191 @@ class CreateVisitViewModel @Inject constructor(
     fun saveVisit() {
         if (!_uiState.value.isFormValid) return
         
+        val state = _uiState.value
+        val customer = state.selectedCustomer ?: return
+        
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, error = null)
             try {
-                // TODO: Save visit using repository
-                delay(1000) // Simulate network call
+                // Obtener vendedor de la sesión
+                val salesperson = try {
+                    userSessionManager.requireSalesperson()
+                } catch (e: IllegalStateException) {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        error = "Error: Usuario no autenticado"
+                    )
+                    return@launch
+                }
+                
+                val visit = com.misw.medisupply.domain.model.visit.Visit(
+                    customerId = customer.id,
+                    salespersonId = salesperson.id,
+                    visitDate = state.visitDate,
+                    visitTime = state.visitTime,
+                    contactedPersons = state.contactedPersons.takeIf { it.isNotBlank() },
+                    clinicalFindings = state.clinicalFindings.takeIf { it.isNotBlank() },
+                    additionalNotes = state.additionalNotes.takeIf { it.isNotBlank() },
+                    address = state.address.takeIf { it.isNotBlank() },
+                    latitude = state.latitude,
+                    longitude = state.longitude
+                )
+                
+                val result = createVisitUseCase(visit)
+                
+                if (result.isSuccess) {
+                    val createdVisit = result.getOrNull()
+                    // Log: Visit created successfully: ${createdVisit?.id}
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        saveSuccess = true,
+                        isVisitSaved = true,
+                        createdVisitId = createdVisit?.id
+                    )
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "Error desconocido"
+                    // Log: Failed to create visit: $error
+                    val enhancedError = if (error.contains("Vendedor no encontrado") || error.contains("404")) {
+                        "Vendedor no encontrado (ID: ${salesperson.id}). Verifique la configuración del usuario."
+                    } else {
+                        "Error al guardar la visita: $error"
+                    }
+                    
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        error = enhancedError
+                    )
+                }
+            } catch (e: Exception) {
+                // Log: Exception saving visit: ${e.message}
+                val enhancedError = if (e.message?.contains("Vendedor no encontrado") == true || e.message?.contains("404") == true) {
+                    try {
+                        val salesperson = userSessionManager.requireSalesperson()
+                        "Vendedor no encontrado en el sistema (ID: ${salesperson.id}, Nombre: ${salesperson.fullName}). Contacte al administrador."
+                    } catch (sessionException: IllegalStateException) {
+                        "Error de autenticación: ${sessionException.message}"
+                    }
+                } else {
+                    e.message ?: "Error al guardar la visita"
+                }
                 
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    saveSuccess = true,
-                    isVisitSaved = true
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isSaving = false,
-                    error = e.message ?: "Error al guardar la visita"
+                    error = enhancedError
                 )
             }
         }
     }
 
     fun clearSuccess() {
-        _uiState.value = _uiState.value.copy(saveSuccess = false)
+        _uiState.value = _uiState.value.copy(saveSuccess = false, successMessage = null)
     }
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+    
+    private fun autoSaveVisitChanges() {
+        val state = _uiState.value
+        val visitId = state.createdVisitId ?: return
+        val customer = state.selectedCustomer ?: return
+        
+        // Evitar guardado múltiple simultáneo
+        if (state.isSaving) return
+        
+        viewModelScope.launch {
+            try {
+                val salesperson = userSessionManager.requireSalesperson()
+                
+                val updatedVisit = com.misw.medisupply.domain.model.visit.Visit(
+                    id = visitId,
+                    customerId = customer.id,
+                    salespersonId = salesperson.id,
+                    visitDate = state.visitDate,
+                    visitTime = state.visitTime,
+                    contactedPersons = state.contactedPersons.takeIf { it.isNotBlank() },
+                    clinicalFindings = state.clinicalFindings.takeIf { it.isNotBlank() },
+                    additionalNotes = state.additionalNotes.takeIf { it.isNotBlank() },
+                    address = state.address.takeIf { it.isNotBlank() },
+                    latitude = state.latitude,
+                    longitude = state.longitude
+                )
+                
+                _uiState.value = _uiState.value.copy(isSaving = true)
+                val result = updateVisitUseCase(visitId, updatedVisit)
+                
+                if (result.isSuccess) {
+                    // Mostrar feedback sutil de guardado automático
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        saveSuccess = true
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        error = "Error al actualizar: ${result.exceptionOrNull()?.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSaving = false,
+                    error = "Error al actualizar: ${e.message}"
+                )
+            }
+        }
+    }
+    
+    /**
+     * Switch to different salesperson for testing
+     * TODO: Remove this method when real authentication is implemented
+     */
+    fun switchSalesperson(salespersonId: Int) {
+        userSessionManager.switchToSalesperson(salespersonId)
+    }
+    
+    /**
+     * Get current salesperson info for debugging
+     */
+    fun getCurrentSalespersonInfo(): String {
+        return try {
+            val salesperson = userSessionManager.requireSalesperson()
+            "Vendedor actual: ${salesperson.fullName} (ID: ${salesperson.id})"
+        } catch (e: IllegalStateException) {
+            "Sin vendedor configurado"
+        }
+    }
+    
+    /**
+     * Complete the current visit by changing its status to COMPLETADA
+     */
+    fun completeVisit() {
+        val state = _uiState.value
+        val visitId = state.visitId ?: return
+        
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isSaving = true)
+                
+                val result = completeVisitUseCase(visitId)
+                
+                if (result.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        saveSuccess = true,
+                        successMessage = "Visita completada exitosamente"
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        error = "Error al completar visita: ${result.exceptionOrNull()?.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSaving = false,
+                    error = "Error al completar visita: ${e.message}"
+                )
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState
+import com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.CreateVisitViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,12 +51,34 @@ fun CreateVisitScreen(
     val tabTitles = listOf("Datos", "Ubicación", "Archivos")
     val uiState by viewModel.uiState.collectAsState()
     
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             MedisupplyAppBar(
                 title = "Crear visita",
                 subtitle = "Visitas - Medisupply",
                 onNavigateBack = onNavigateBack
+            )
+        },
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = if (data.visuals.message.startsWith("✅")) {
+                            Color(0xFF4CAF50) // Verde para éxito
+                        } else {
+                            MaterialTheme.colorScheme.errorContainer // Rojo para error
+                        },
+                        contentColor = if (data.visuals.message.startsWith("✅")) {
+                            Color.White
+                        } else {
+                            MaterialTheme.colorScheme.onErrorContainer
+                        }
+                    )
+                }
             )
         },
         containerColor = Color(0xFFF5F5F5),
@@ -88,28 +113,58 @@ fun CreateVisitScreen(
             }
         }
     ) { paddingValues ->
-        var visitDate by remember { mutableStateOf(LocalDate.now()) }
-        var visitTime by remember { mutableStateOf(LocalTime.of(9, 0)) }
         val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
         var showDatePicker by remember { mutableStateOf(false) }
         var showTimePicker by remember { mutableStateOf(false) }
         
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = visitDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            initialSelectedDateMillis = uiState.visitDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
         )
         val timePickerState = rememberTimePickerState(
-            initialHour = visitTime.hour,
-            initialMinute = visitTime.minute,
+            initialHour = uiState.visitTime.hour,
+            initialMinute = uiState.visitTime.minute,
             is24Hour = true
         )
+
+        // Sincronizar datePickerState cuando cambie la fecha del ViewModel
+        LaunchedEffect(uiState.visitDate) {
+            datePickerState.selectedDateMillis = uiState.visitDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+        }
 
         // Manejar éxito del guardado
         LaunchedEffect(uiState.saveSuccess) {
             if (uiState.saveSuccess) {
+                // Mostrar mensaje de éxito
+                snackbarHostState.showSnackbar(
+                    message = "✅ ¡Visita guardada exitosamente! Ahora puedes completar ubicación y archivos.",
+                    duration = SnackbarDuration.Long
+                )
                 // Cambiar al tab de ubicación automáticamente después de guardar
                 selectedTabIndex = 1
                 viewModel.clearSuccess()
+            }
+        }
+        
+        // Manejar mensajes de éxito personalizados
+        uiState.successMessage?.let { successMessage ->
+            LaunchedEffect(successMessage) {
+                snackbarHostState.showSnackbar(
+                    message = "✅ $successMessage",
+                    duration = SnackbarDuration.Long
+                )
+                viewModel.clearSuccess()
+            }
+        }
+
+        // Mostrar SnackBar para errores
+        uiState.error?.let { error ->
+            LaunchedEffect(error) {
+                snackbarHostState.showSnackbar(
+                    message = "❌ $error",
+                    duration = SnackbarDuration.Long
+                )
+                viewModel.clearError()
             }
         }
 
@@ -167,8 +222,6 @@ fun CreateVisitScreen(
                 when (selectedTabIndex) {
                     0 -> DatosTabContent(
                         uiState = uiState,
-                        visitDate = visitDate,
-                        visitTime = visitTime,
                         dateFormatter = dateFormatter,
                         timeFormatter = timeFormatter,
                         showDatePicker = showDatePicker,
@@ -177,8 +230,8 @@ fun CreateVisitScreen(
                         timePickerState = timePickerState,
                         onShowDatePicker = { showDatePicker = it },
                         onShowTimePicker = { showTimePicker = it },
-                        onDateChange = { visitDate = it },
-                        onTimeChange = { visitTime = it },
+                        onDateChange = viewModel::updateVisitDate,
+                        onTimeChange = viewModel::updateVisitTime,
                         onCustomerSearchQueryChange = viewModel::searchCustomers,
                         onCustomerSelected = viewModel::selectCustomer,
                         onClearCustomerSelection = viewModel::clearCustomerSelection,
@@ -186,8 +239,14 @@ fun CreateVisitScreen(
                         onClinicalFindingsChange = viewModel::updateClinicalFindings,
                         onAdditionalNotesChange = viewModel::updateAdditionalNotes
                     )
-                    1 -> UbicacionTabContent()
-                    2 -> ArchivosTabContent()
+                    1 -> UbicacionTabContent(
+                        uiState = uiState,
+                        onAddressChange = viewModel::updateAddress
+                    )
+                    2 -> ArchivosTabContent(
+                        uiState = uiState,
+                        viewModel = viewModel
+                    )
                 }
                 Spacer(Modifier.height(80.dp)) // Espacio para el FAB
             }
@@ -199,8 +258,6 @@ fun CreateVisitScreen(
 @Composable
 private fun DatosTabContent(
     uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
-    visitDate: LocalDate,
-    visitTime: LocalTime,
     dateFormatter: DateTimeFormatter,
     timeFormatter: DateTimeFormatter,
     showDatePicker: Boolean,
@@ -249,19 +306,46 @@ private fun DatosTabContent(
                     modifier = Modifier.padding(12.dp),
                     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = if (uiState.isVisitSaved) {
-                            "✅ Visita guardada exitosamente. Ahora puedes agregar ubicación y archivos."
-                        } else if (!uiState.isCustomerSelected) {
-                            "1️⃣ Selecciona un cliente para comenzar"
-                        } else if (!uiState.areVisitFieldsComplete) {
-                            "2️⃣ Completa los datos de la visita"
-                        } else {
-                            "3️⃣ Haz clic en 'Guardar visita' para continuar"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
-                    )
+                    Column {
+                        Text(
+                            text = if (uiState.isVisitSaved) {
+                                val visitId = uiState.createdVisitId?.let { " (ID: $it)" } ?: ""
+                                "✅ Visita guardada exitosamente$visitId. Ve a las pestañas 'Ubicación' y 'Archivos' para completar información adicional."
+                            } else if (!uiState.isCustomerSelected) {
+                                "1️⃣ Selecciona un cliente para comenzar"
+                            } else if (uiState.isFormValid) {
+                                "3️⃣ ¡Listo para guardar! Cliente, fecha y hora confirmados."
+                            } else if (uiState.isCustomerSelected && !uiState.hasModifiedDate) {
+                                "2️⃣ Confirma la fecha de la visita (toca el campo de fecha)"
+                            } else if (uiState.isCustomerSelected && !uiState.hasModifiedTime) {
+                                "2️⃣ Confirma la hora de la visita (toca el campo de hora)"
+                            } else {
+                                "2️⃣ Confirma la fecha y hora de la visita"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
+                        )
+                        
+                        // Mostrar indicador de auto-guardado cuando está editando
+                        if (uiState.isVisitSaved && uiState.isSaving) {
+                            Spacer(Modifier.height(4.dp))
+                            Row(
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(12.dp),
+                                    color = Color(0xFF1565C0),
+                                    strokeWidth = 1.5.dp
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    text = "Guardando cambios...",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF1565C0)
+                                )
+                            }
+                        }
+                    }
                 }
             }
             
@@ -284,6 +368,8 @@ private fun DatosTabContent(
             
             // Campos habilitados solo si hay cliente seleccionado
             val fieldsEnabled = uiState.isCustomerSelected // Solo habilitar campos cuando se selecciona cliente
+            val dateTimeEnabled = fieldsEnabled && !uiState.isVisitSaved // Fecha/hora solo editable antes de guardar
+            val detailsEnabled = fieldsEnabled // Detalles siempre editables si hay cliente
             
             if (!fieldsEnabled) {
                 Card(
@@ -300,35 +386,64 @@ private fun DatosTabContent(
                 Spacer(Modifier.height(16.dp))
             }
             
-            // Date Picker
-            OutlinedTextField(
-                value = visitDate.format(dateFormatter),
-                onValueChange = {},
-                label = { Text("Fecha de la visita") },
-                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha", tint = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)) },
+            // Mostrar información adicional si la visita ya está guardada
+            if (uiState.isVisitSaved) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
+                ) {
+                    Text(
+                        text = "💾 Los cambios en personas contactadas, hallazgos y notas se guardan automáticamente.",
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF2E7D32)
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+            
+            // Date Picker - Envuelto en Box clickeable
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { if (fieldsEnabled) onShowDatePicker(true) },
-                readOnly = true,
-                enabled = fieldsEnabled,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
-                    focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
-                    disabledBorderColor = Color(0xFFE0E0E0),
-                    disabledLabelColor = Color(0xFFBDBDBD),
-                    disabledTextColor = Color(0xFFBDBDBD)
+                    .clickable(enabled = dateTimeEnabled) { 
+                        if (dateTimeEnabled) onShowDatePicker(true) 
+                    }
+            ) {
+                OutlinedTextField(
+                    value = uiState.visitDate.format(dateFormatter),
+                    onValueChange = {},
+                    label = { Text("Fecha de la visita") },
+                    leadingIcon = { 
+                        Icon(
+                            Icons.Default.CalendarToday, 
+                            contentDescription = "Seleccionar fecha", 
+                            tint = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)
+                        ) 
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    enabled = false, // Deshabilitado para evitar focus, el click lo maneja el Box
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF1565C0),
+                        unfocusedBorderColor = if (dateTimeEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                        focusedLabelColor = Color(0xFF1565C0),
+                        unfocusedLabelColor = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                        disabledBorderColor = if (dateTimeEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                        disabledLabelColor = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                        disabledTextColor = if (dateTimeEnabled) Color(0xFF000000) else Color(0xFFBDBDBD)
+                    )
                 )
-            )
+            }
             
             // Date Picker Dialog
             if (showDatePicker) {
                 CustomDatePickerDialog(
                     onDateSelected = { dateMillis ->
                         dateMillis?.let {
+                            // Usar UTC para evitar problemas de zona horaria
                             val selectedDate = Instant.ofEpochMilli(it)
-                                .atZone(ZoneId.systemDefault())
+                                .atZone(ZoneId.of("UTC"))
                                 .toLocalDate()
                             onDateChange(selectedDate)
                         }
@@ -341,27 +456,39 @@ private fun DatosTabContent(
             
             Spacer(Modifier.height(12.dp))
             
-            // Time Picker
-            OutlinedTextField(
-                value = visitTime.format(timeFormatter),
-                onValueChange = {},
-                label = { Text("Hora de la visita") },
-                leadingIcon = { Icon(Icons.Default.AccessTime, contentDescription = "Seleccionar hora", tint = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)) },
+            // Time Picker - Envuelto en Box clickeable
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { if (fieldsEnabled) onShowTimePicker(true) },
-                readOnly = true,
-                enabled = fieldsEnabled,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
-                    focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
-                    disabledBorderColor = Color(0xFFE0E0E0),
-                    disabledLabelColor = Color(0xFFBDBDBD),
-                    disabledTextColor = Color(0xFFBDBDBD)
+                    .clickable(enabled = dateTimeEnabled) { 
+                        if (dateTimeEnabled) onShowTimePicker(true) 
+                    }
+            ) {
+                OutlinedTextField(
+                    value = uiState.visitTime.format(timeFormatter),
+                    onValueChange = {},
+                    label = { Text("Hora de la visita") },
+                    leadingIcon = { 
+                        Icon(
+                            Icons.Default.AccessTime, 
+                            contentDescription = "Seleccionar hora", 
+                            tint = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)
+                        ) 
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    enabled = false, // Deshabilitado para evitar focus, el click lo maneja el Box
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF1565C0),
+                        unfocusedBorderColor = if (dateTimeEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                        focusedLabelColor = Color(0xFF1565C0),
+                        unfocusedLabelColor = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                        disabledBorderColor = if (dateTimeEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                        disabledLabelColor = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                        disabledTextColor = if (dateTimeEnabled) Color(0xFF000000) else Color(0xFFBDBDBD)
+                    )
                 )
-            )
+            }
             
             // Time Picker Dialog
             if (showTimePicker) {
@@ -384,12 +511,12 @@ private fun DatosTabContent(
                 label = { Text("Personas contactadas") },
                 placeholder = { Text("Ej: Dr. García, Enf. López") },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = fieldsEnabled,
+                enabled = detailsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    unfocusedBorderColor = if (detailsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
                     focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    unfocusedLabelColor = if (detailsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
                     disabledBorderColor = Color(0xFFE0E0E0),
                     disabledLabelColor = Color(0xFFBDBDBD),
                     disabledTextColor = Color(0xFFBDBDBD)
@@ -406,12 +533,12 @@ private fun DatosTabContent(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
-                enabled = fieldsEnabled,
+                enabled = detailsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    unfocusedBorderColor = if (detailsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
                     focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    unfocusedLabelColor = if (detailsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
                     disabledBorderColor = Color(0xFFE0E0E0),
                     disabledLabelColor = Color(0xFFBDBDBD),
                     disabledTextColor = Color(0xFFBDBDBD)
@@ -428,12 +555,12 @@ private fun DatosTabContent(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
                 maxLines = 4,
-                enabled = fieldsEnabled,
+                enabled = detailsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = if (fieldsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    unfocusedBorderColor = if (detailsEnabled) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
                     focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = if (fieldsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    unfocusedLabelColor = if (detailsEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD),
                     disabledBorderColor = Color(0xFFE0E0E0),
                     disabledLabelColor = Color(0xFFBDBDBD),
                     disabledTextColor = Color(0xFFBDBDBD)
@@ -444,7 +571,10 @@ private fun DatosTabContent(
 }
 
 @Composable
-private fun UbicacionTabContent() {
+private fun UbicacionTabContent(
+    uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
+    onAddressChange: (String) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -457,18 +587,66 @@ private fun UbicacionTabContent() {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
             )
+            
+            // Mensaje informativo
+            Spacer(Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (uiState.isVisitSaved) Color(0xFFE8F5E8) else Color(0xFFE3F2FD)
+                )
+            ) {
+                Column(Modifier.padding(12.dp)) {
+                    Text(
+                        text = if (uiState.isVisitSaved) {
+                            "� La dirección se guarda automáticamente en tu visita (ID: ${uiState.createdVisitId})."
+                        } else {
+                            "📍 Primero debes guardar la visita en el tab 'Datos' para poder agregar ubicación."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
+                    )
+                    
+                    // Indicador de guardado
+                    if (uiState.isSaving && uiState.isVisitSaved) {
+                        Spacer(Modifier.height(4.dp))
+                        Row(
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                color = Color(0xFF2E7D32),
+                                strokeWidth = 1.5.dp
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "Guardando ubicación...",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF2E7D32)
+                            )
+                        }
+                    }
+                }
+            }
+            
             Spacer(Modifier.height(16.dp))
             
             OutlinedTextField(
-                value = "Cra 7 #123-45, Bogotá",
-                onValueChange = {},
-                label = { Text("Buscar dirección") },
+                value = uiState.address,
+                onValueChange = onAddressChange,
+                label = { Text("Dirección de la visita") },
+                placeholder = { Text("Ej: Cra 7 #123-45, Bogotá") },
                 leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF1565C0)) },
-                enabled = false,
+                enabled = uiState.isVisitSaved, // Solo habilitado después de guardar la visita
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = Color(0xFFB6C6E3),
-                    disabledLabelColor = Color(0xFF1565C0)
+                    focusedBorderColor = Color(0xFF1565C0),
+                    unfocusedBorderColor = if (uiState.isVisitSaved) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
+                    focusedLabelColor = Color(0xFF1565C0),
+                    unfocusedLabelColor = if (uiState.isVisitSaved) Color(0xFF1565C0) else Color(0xFFBDBDBD),
+                    disabledBorderColor = Color(0xFFE0E0E0),
+                    disabledLabelColor = Color(0xFFBDBDBD),
+                    disabledTextColor = Color(0xFFBDBDBD)
                 )
             )
             
@@ -533,7 +711,10 @@ private fun UbicacionTabContent() {
 }
 
 @Composable
-private fun ArchivosTabContent() {
+private fun ArchivosTabContent(
+    uiState: CreateVisitUiState,
+    viewModel: CreateVisitViewModel
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -546,6 +727,21 @@ private fun ArchivosTabContent() {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
             )
+            
+            // Mensaje informativo
+            Spacer(Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
+            ) {
+                Text(
+                    text = "📎 Adjunta fotos, documentos y otros archivos relacionados con tu visita. Todo se guardará asociado a tu visita creada.",
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF2E7D32)
+                )
+            }
+            
             Spacer(Modifier.height(16.dp))
             
             // Área de archivos con mejor diseño
@@ -612,6 +808,55 @@ private fun ArchivosTabContent() {
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth()
             )
+            
+            // Botón "Completar Visita" - Solo visible cuando la visita está guardada
+            if (uiState.isVisitSaved) {
+                Spacer(Modifier.height(24.dp))
+                
+                Button(
+                    onClick = { viewModel.completeVisit() },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !uiState.isSaving,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32), // Verde para completar
+                        disabledContainerColor = Color(0xFFBDBDBD)
+                    )
+                ) {
+                    if (uiState.isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Completando...",
+                            color = Color.White
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Check, 
+                            contentDescription = "Completar visita",
+                            tint = Color.White
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Completar Visita",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                
+                Spacer(Modifier.height(8.dp))
+                
+                Text(
+                    text = "Al completar la visita, esta cambiará a estado COMPLETADA y no podrá ser editada.",
+                    color = Color(0xFF757575),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
