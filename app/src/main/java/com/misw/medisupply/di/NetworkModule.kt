@@ -7,6 +7,7 @@ import com.misw.medisupply.data.remote.api.order.OrderApiService
 
 import com.misw.medisupply.data.remote.api.product.ProductApiService
 import com.misw.medisupply.data.remote.api.stock.StockApiService
+import com.misw.medisupply.data.remote.websocket.InventoryWebSocketClient
 import com.misw.medisupply.core.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -208,5 +209,13 @@ object NetworkModule {
         return retrofit.create(OrderApiService::class.java)
     }
     
+    /**
+     * Provides InventoryWebSocketClient for real-time stock updates
+     */
+    @Provides
+    @Singleton
+    fun provideInventoryWebSocketClient(): InventoryWebSocketClient {
+        return InventoryWebSocketClient()
+    }
 
 }

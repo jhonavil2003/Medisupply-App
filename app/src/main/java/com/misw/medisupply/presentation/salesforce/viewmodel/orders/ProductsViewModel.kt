@@ -3,9 +3,13 @@ package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.data.remote.websocket.InventoryWebSocketClient
+import com.misw.medisupply.data.remote.websocket.WebSocketEvent
+import com.misw.medisupply.data.remote.websocket.WebSocketState
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.product.Pagination
 import com.misw.medisupply.domain.model.product.Product
+import com.misw.medisupply.domain.model.stock.DistributionCenter
 import com.misw.medisupply.domain.model.stock.StockLevel
 import com.misw.medisupply.domain.usecase.product.GetProductsUseCase
 import com.misw.medisupply.domain.usecase.stock.GetMultipleProductsStockUseCase
@@ -31,15 +35,20 @@ private const val PRODUCTS_CACHE_DURATION_MS = 3_600_000L // 1 hour
  * ViewModel for Products Screen
  * Manages product catalog state, filtering and search with intelligent caching
  * Stock is always loaded fresh (no cache)
+ * Now includes real-time stock updates via WebSocket
  */
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
-    private val getMultipleProductsStockUseCase: GetMultipleProductsStockUseCase
+    private val getMultipleProductsStockUseCase: GetMultipleProductsStockUseCase,
+    private val webSocketClient: InventoryWebSocketClient
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductsState())
     val state: StateFlow<ProductsState> = _state.asStateFlow()
+    
+    // WebSocket connection state
+    val connectionState: StateFlow<WebSocketState> = webSocketClient.connectionState
     
     private var lastProductsLoadTime: Long = 0
     
@@ -48,7 +57,194 @@ class ProductsViewModel @Inject constructor(
 
     init {
         loadProducts()
+        initializeWebSocket()
     }
+    
+    // ============================================================================
+    // WebSocket Real-Time Updates
+    // ============================================================================
+    
+    /**
+     * Initializes WebSocket connection and event listeners
+     */
+    private fun initializeWebSocket() {
+        // Connect to WebSocket server
+        webSocketClient.connect()
+        
+        // Listen to connection state changes
+        viewModelScope.launch {
+            webSocketClient.connectionState.collect { state ->
+                when (state) {
+                    WebSocketState.CONNECTED -> {
+                        println("🟢 WebSocket conectado")
+                        // Subscribe to visible products when connected
+                        subscribeToVisibleProducts()
+                    }
+                    WebSocketState.DISCONNECTED -> {
+                        println("🔴 WebSocket desconectado")
+                    }
+                    WebSocketState.ERROR -> {
+                        println("❌ WebSocket error")
+                    }
+                    WebSocketState.CONNECTING -> {
+                        println("🟡 WebSocket conectando...")
+                    }
+                    WebSocketState.RECONNECTING -> {
+                        println("🔄 WebSocket reconectando...")
+                    }
+                }
+            }
+        }
+        
+        // Listen to stock update events
+        viewModelScope.launch {
+            webSocketClient.stockEvents.collect { event ->
+                when (event) {
+                    is WebSocketEvent.StockUpdated -> {
+                        handleStockUpdate(event)
+                    }
+                    is WebSocketEvent.Connected -> {
+                        println("✅ WebSocket: ${event.message}")
+                    }
+                    is WebSocketEvent.Subscribed -> {
+                        println("📡 Suscrito a ${event.productSkus.size} productos")
+                    }
+                    is WebSocketEvent.Error -> {
+                        println("⚠️ WebSocket Error: ${event.message}")
+                    }
+                    is WebSocketEvent.Disconnected -> {
+                        println("🔌 Desconectado: ${event.reason}")
+                    }
+                    null -> {
+                        // No event yet
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Handles real-time stock update from WebSocket
+     */
+    private fun handleStockUpdate(event: WebSocketEvent.StockUpdated) {
+        val normalizedSku = normalizedSku(event.productSku)
+        
+        println("📦 Actualización de stock recibida:")
+        println("   SKU: ${event.productSku} (normalizado: $normalizedSku)")
+        println("   Tipo: ${event.changeType}")
+        println("   Disponible: ${event.stockData.totalAvailable}")
+        println("   Cambio: ${event.stockData.quantityChange}")
+        
+        // Update stock in the map
+        _state.update { currentState ->
+            val updatedStockMap = currentState.productStockMap.toMutableMap()
+            
+            // Convert WebSocket stock data to StockLevel domain model
+            val updatedStock = StockLevel(
+                productSku = event.stockData.productSku,
+                totalAvailable = event.stockData.totalAvailable,
+                totalReserved = event.stockData.totalReserved,
+                totalInTransit = event.stockData.totalInTransit,
+                distributionCenters = event.stockData.distributionCenters.map { dc ->
+                    DistributionCenter(
+                        id = dc.distributionCenterId,
+                        code = dc.distributionCenterCode,
+                        name = dc.distributionCenterName ?: "N/A",
+                        city = dc.city ?: "N/A",
+                        quantityAvailable = dc.quantityAvailable,
+                        quantityReserved = null,
+                        quantityInTransit = null,
+                        isLowStock = dc.isLowStock,
+                        isOutOfStock = dc.isOutOfStock
+                    )
+                }
+            )
+            
+            updatedStockMap[normalizedSku] = updatedStock
+            
+            println("✅ Stock actualizado en el mapa")
+            
+            currentState.copy(productStockMap = updatedStockMap)
+        }
+        
+        // Check if any cart items are affected
+        checkCartItemsStock(event)
+    }
+    
+    /**
+     * Verifies if cart items are affected by stock changes
+     */
+    private fun checkCartItemsStock(event: WebSocketEvent.StockUpdated) {
+        val normalizedSku = normalizedSku(event.productSku)
+        val cartItem = _state.value.cartItems[normalizedSku]
+        
+        if (cartItem != null) {
+            val newStockAvailable = event.stockData.totalAvailable
+            
+            println("⚠️ Producto en carrito afectado:")
+            println("   Nombre: ${cartItem.productName}")
+            println("   Cantidad en carrito: ${cartItem.quantity}")
+            println("   Stock disponible: $newStockAvailable")
+            
+            // Update cart item with new stock info
+            _state.update { currentState ->
+                val updatedCart = currentState.cartItems.toMutableMap()
+                
+                if (newStockAvailable < cartItem.quantity) {
+                    // Adjust quantity to available stock
+                    if (newStockAvailable > 0) {
+                        updatedCart[normalizedSku] = cartItem.copy(
+                            quantity = newStockAvailable,
+                            stockAvailable = newStockAvailable
+                        )
+                        println("   ⚠️ Cantidad ajustada a $newStockAvailable")
+                    } else {
+                        // Remove from cart if no stock
+                        updatedCart.remove(normalizedSku)
+                        println("   ❌ Removido del carrito (sin stock)")
+                    }
+                } else {
+                    // Just update stock info
+                    updatedCart[normalizedSku] = cartItem.copy(stockAvailable = newStockAvailable)
+                    println("   ✅ Stock actualizado en carrito")
+                }
+                
+                currentState.copy(cartItems = updatedCart)
+            }
+        }
+    }
+    
+    /**
+     * Subscribe to visible products for real-time updates
+     */
+    private fun subscribeToVisibleProducts() {
+        val productSkus = _state.value.products.map { it.sku }
+        
+        if (productSkus.isNotEmpty() && webSocketClient.isConnected()) {
+            webSocketClient.subscribeToProducts(productSkus)
+            println("📡 Suscrito a ${productSkus.size} productos visibles")
+        }
+    }
+    
+    /**
+     * Called when products are loaded to subscribe to them
+     */
+    private fun onProductsLoaded(products: List<Product>) {
+        if (webSocketClient.isConnected()) {
+            val productSkus = products.map { it.sku }
+            webSocketClient.subscribeToProducts(productSkus)
+        }
+    }
+    
+    override fun onCleared() {
+        super.onCleared()
+        webSocketClient.disconnect()
+        println("🔌 WebSocket desconectado (ViewModel cleared)")
+    }
+    
+    // ============================================================================
+    // Product Loading (Original Methods)
+    // ============================================================================
     
     private fun normalizedSku(sku: String): String = sku.uppercase().trim()
     
@@ -121,6 +317,8 @@ class ProductsViewModel @Inject constructor(
                     }
                     // Load stock for current products (always fresh)
                     loadStockForProducts(products)
+                    // Subscribe to products for real-time updates
+                    onProductsLoaded(products)
                 }
                 is Resource.Error -> {
                     _state.update {
