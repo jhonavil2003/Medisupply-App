@@ -21,7 +21,7 @@ interface VisitApiService {
     suspend fun updateVisit(
         @Path("id") visitId: Int,
         @Body request: UpdateVisitRequest
-    ): Response<CreateVisitResponse>
+    ): Response<CreateVisitApiResponse>
     
     @POST("visits/{id}/complete")
     suspend fun completeVisit(

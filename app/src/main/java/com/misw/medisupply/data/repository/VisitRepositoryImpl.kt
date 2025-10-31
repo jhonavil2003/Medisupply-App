@@ -85,21 +85,22 @@ class VisitRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
+                    val visitData = responseBody.visit
                     val updatedVisit = Visit(
-                        id = responseBody.id,
-                        customerId = responseBody.customerId,
-                        salespersonId = responseBody.salespersonId,
-                        visitDate = java.time.LocalDate.parse(responseBody.visitDate),
-                        visitTime = java.time.LocalTime.parse(responseBody.visitTime),
-                        contactedPersons = responseBody.contactedPersons,
-                        clinicalFindings = responseBody.clinicalFindings,
-                        additionalNotes = responseBody.additionalNotes,
-                        address = responseBody.address,
-                        latitude = responseBody.latitude,
-                        longitude = responseBody.longitude,
-                        createdAt = responseBody.createdAt,
-                        updatedAt = responseBody.updatedAt,
-                        status = responseBody.status?.let { VisitStatus.valueOf(it) } ?: VisitStatus.PROGRAMADA
+                        id = visitData.id,
+                        customerId = visitData.customerId,
+                        salespersonId = visitData.salespersonId,
+                        visitDate = java.time.LocalDate.parse(visitData.visitDate),
+                        visitTime = java.time.LocalTime.parse(visitData.visitTime),
+                        contactedPersons = visitData.contactedPersons,
+                        clinicalFindings = visitData.clinicalFindings,
+                        additionalNotes = visitData.additionalNotes,
+                        address = visitData.address,
+                        latitude = visitData.latitude,
+                        longitude = visitData.longitude,
+                        createdAt = visitData.createdAt,
+                        updatedAt = visitData.updatedAt,
+                        status = visitData.status?.let { VisitStatus.valueOf(it) } ?: VisitStatus.PROGRAMADA
                     )
                     Result.success(updatedVisit)
                 } else {

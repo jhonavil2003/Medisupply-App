@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import java.time.LocalDate
 import java.time.LocalTime
@@ -25,6 +27,10 @@ class CreateVisitViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(CreateVisitUiState())
     val uiState: StateFlow<CreateVisitUiState> = _uiState.asStateFlow()
+    
+    // Job para el debounce del auto-save
+    private var autoSaveJob: Job? = null
+    private val autoSaveDelayMs = 1500L // 1.5 segundos de delay
     
     init {
         // Ejecutar validación inicial para configurar correctamente isFormValid
@@ -132,9 +138,9 @@ class CreateVisitViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(contactedPersons = contactedPersons)
         validateForm()
         
-        // Auto-actualizar si ya existe una visita guardada
+        // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
-            autoSaveVisitChanges()
+            scheduleAutoSave()
         }
     }
 
@@ -142,9 +148,9 @@ class CreateVisitViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(clinicalFindings = clinicalFindings)
         validateForm()
         
-        // Auto-actualizar si ya existe una visita guardada
+        // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
-            autoSaveVisitChanges()
+            scheduleAutoSave()
         }
     }
 
@@ -152,9 +158,9 @@ class CreateVisitViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(additionalNotes = additionalNotes)
         validateForm()
         
-        // Auto-actualizar si ya existe una visita guardada
+        // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
-            autoSaveVisitChanges()
+            scheduleAutoSave()
         }
     }
 
@@ -178,9 +184,9 @@ class CreateVisitViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(address = address)
         validateForm()
         
-        // Auto-actualizar si ya existe una visita guardada
+        // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
-            autoSaveVisitChanges()
+            scheduleAutoSave()
         }
     }
 
@@ -293,13 +299,26 @@ class CreateVisitViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(error = null)
     }
     
+    /**
+     * Programa el auto-guardado con debounce para evitar múltiples peticiones
+     */
+    private fun scheduleAutoSave() {
+        // Cancelar el job anterior si existe
+        autoSaveJob?.cancel()
+        
+        autoSaveJob = viewModelScope.launch {
+            delay(autoSaveDelayMs)
+            autoSaveVisitChanges()
+        }
+    }
+    
     private fun autoSaveVisitChanges() {
         val state = _uiState.value
         val visitId = state.createdVisitId ?: return
         val customer = state.selectedCustomer ?: return
         
         // Evitar guardado múltiple simultáneo
-        if (state.isSaving) return
+        if (state.isAutoSaving || state.isSaving) return
         
         viewModelScope.launch {
             try {
@@ -319,25 +338,31 @@ class CreateVisitViewModel @Inject constructor(
                     longitude = state.longitude
                 )
                 
-                _uiState.value = _uiState.value.copy(isSaving = true)
+                _uiState.value = _uiState.value.copy(isAutoSaving = true)
                 val result = updateVisitUseCase(visitId, updatedVisit)
                 
                 if (result.isSuccess) {
-                    // Mostrar feedback sutil de guardado automático
+                    // Feedback sutil de auto-guardado exitoso
                     _uiState.value = _uiState.value.copy(
-                        isSaving = false,
+                        isAutoSaving = false,
                         saveSuccess = true
                     )
+                    
+                    // Limpiar el éxito después de un breve período
+                    viewModelScope.launch {
+                        delay(1000) // Mostrar éxito por 1 segundo
+                        _uiState.value = _uiState.value.copy(saveSuccess = false)
+                    }
                 } else {
                     _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        error = "Error al actualizar: ${result.exceptionOrNull()?.message}"
+                        isAutoSaving = false,
+                        error = "Error al auto-guardar: ${result.exceptionOrNull()?.message}"
                     )
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
-                    isSaving = false,
-                    error = "Error al actualizar: ${e.message}"
+                    isAutoSaving = false,
+                    error = "Error al auto-guardar: ${e.message}"
                 )
             }
         }
