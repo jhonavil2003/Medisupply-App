@@ -2,6 +2,7 @@ package com.misw.medisupply.data.network.api
 
 import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
 import com.misw.medisupply.data.network.dto.visit.CreateVisitResponse
+import com.misw.medisupply.data.network.dto.visit.CreateVisitApiResponse
 import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -14,7 +15,7 @@ interface VisitApiService {
     @POST("visits")
     suspend fun createVisit(
         @Body request: CreateVisitRequest
-    ): Response<CreateVisitResponse>
+    ): Response<CreateVisitApiResponse>
     
     @PUT("visits/{id}")
     suspend fun updateVisit(
@@ -25,5 +26,5 @@ interface VisitApiService {
     @POST("visits/{id}/complete")
     suspend fun completeVisit(
         @Path("id") visitId: Int
-    ): Response<CreateVisitResponse>
+    ): Response<CreateVisitApiResponse>
 }
