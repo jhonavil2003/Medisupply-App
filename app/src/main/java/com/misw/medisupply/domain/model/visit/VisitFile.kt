@@ -1,15 +1,23 @@
 package com.misw.medisupply.domain.model.visit
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * Representa un archivo adjunto a una visita
  */
 data class VisitFile(
     val id: Int = 0,
+    @SerializedName("visit_id")
     val visitId: Int,
+    @SerializedName("file_name")
     val fileName: String = "",
+    @SerializedName("file_path")
     val filePath: String = "",
+    @SerializedName("file_size")
     val fileSize: Long = 0L,
+    @SerializedName("mime_type")
     val mimeType: String = "application/octet-stream",
+    @SerializedName("upload_date")
     val uploadDate: String = ""
 )
 
