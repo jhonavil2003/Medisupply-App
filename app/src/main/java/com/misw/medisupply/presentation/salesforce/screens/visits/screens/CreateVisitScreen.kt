@@ -309,8 +309,7 @@ private fun DatosTabContent(
                     Column {
                         Text(
                             text = if (uiState.isVisitSaved) {
-                                val visitId = uiState.createdVisitId?.let { " (ID: $it)" } ?: ""
-                                "✅ Visita guardada exitosamente$visitId. Ve a las pestañas 'Ubicación' y 'Archivos' para completar información adicional."
+                                "✅ Visita guardada exitosamente. Ve a las pestañas 'Ubicación' y 'Archivos' para completar información adicional."
                             } else if (!uiState.isCustomerSelected) {
                                 "1️⃣ Selecciona un cliente para comenzar"
                             } else if (uiState.isFormValid) {
@@ -351,18 +350,20 @@ private fun DatosTabContent(
             
             Spacer(Modifier.height(16.dp))
             
-            // 1. PRIMERO: Selección de cliente
-            com.misw.medisupply.presentation.salesforce.screens.visits.components.CustomerSearchField(
-                selectedCustomer = uiState.selectedCustomer,
-                searchQuery = uiState.customerSearchQuery,
-                searchResults = uiState.customerSearchResults,
-                isSearching = uiState.isSearchingCustomers,
-                showDropdown = uiState.showCustomerDropdown,
-                onQueryChange = onCustomerSearchQueryChange,
-                onCustomerSelected = onCustomerSelected,
-                onClearSelection = onClearCustomerSelection,
-                modifier = Modifier.fillMaxWidth()
-            )
+            // 1. PRIMERO: Selección de cliente - Ocultar cuando la visita ya está guardada
+            if (!uiState.isVisitSaved) {
+                com.misw.medisupply.presentation.salesforce.screens.visits.components.CustomerSearchField(
+                    selectedCustomer = uiState.selectedCustomer,
+                    searchQuery = uiState.customerSearchQuery,
+                    searchResults = uiState.customerSearchResults,
+                    isSearching = uiState.isSearchingCustomers,
+                    showDropdown = uiState.showCustomerDropdown,
+                    onQueryChange = onCustomerSearchQueryChange,
+                    onCustomerSelected = onCustomerSelected,
+                    onClearSelection = onClearCustomerSelection,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             
             Spacer(Modifier.height(16.dp))
             
@@ -599,7 +600,7 @@ private fun UbicacionTabContent(
                 Column(Modifier.padding(12.dp)) {
                     Text(
                         text = if (uiState.isVisitSaved) {
-                            "� La dirección se guarda automáticamente en tu visita (ID: ${uiState.createdVisitId})."
+                            "💾 La dirección se guarda automáticamente en tu visita."
                         } else {
                             "📍 Primero debes guardar la visita en el tab 'Datos' para poder agregar ubicación."
                         },
