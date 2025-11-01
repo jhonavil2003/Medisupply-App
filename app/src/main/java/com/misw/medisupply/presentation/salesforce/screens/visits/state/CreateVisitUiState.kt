@@ -31,6 +31,12 @@ data class CreateVisitUiState(
     
     // Files
     val attachments: List<String> = emptyList(),
+    val visitFiles: List<com.misw.medisupply.domain.model.visit.VisitFile> = emptyList(),
+    val isLoadingFiles: Boolean = false,
+    val isUploadingFile: Boolean = false,
+    val isDeletingFile: Boolean = false,
+    val fileError: String? = null,
+    val uploadProgress: Float = 0f,
     
     // Form state and flow control
     val isFormValid: Boolean = false,

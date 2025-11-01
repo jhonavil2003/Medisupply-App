@@ -22,7 +22,10 @@ class CreateVisitViewModel @Inject constructor(
     private val updateVisitUseCase: com.misw.medisupply.domain.usecase.visit.UpdateVisitUseCase,
     private val completeVisitUseCase: com.misw.medisupply.domain.usecase.visit.CompleteVisitUseCase,
     private val getCustomersUseCase: com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase,
-    private val userSessionManager: com.misw.medisupply.core.session.UserSessionManager
+    private val userSessionManager: com.misw.medisupply.core.session.UserSessionManager,
+    private val uploadFileUseCase: com.misw.medisupply.domain.usecase.visit.UploadFileUseCase,
+    private val getVisitFilesUseCase: com.misw.medisupply.domain.usecase.visit.GetVisitFilesUseCase,
+    private val deleteFileUseCase: com.misw.medisupply.domain.usecase.visit.DeleteFileUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateVisitUiState())
@@ -256,6 +259,10 @@ class CreateVisitViewModel @Inject constructor(
                         isVisitSaved = true,
                         createdVisitId = createdVisit?.id
                     )
+                    // Cargar archivos existentes (si los hay)
+                    if (createdVisit?.id != null) {
+                        loadVisitFiles()
+                    }
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "Error desconocido"
                     // Log: Failed to create visit: $error
@@ -420,5 +427,115 @@ class CreateVisitViewModel @Inject constructor(
                 )
             }
         }
+    }
+    
+    // ================================
+    // MÉTODOS PARA ARCHIVOS
+    // ================================
+    
+    /**
+     * Cargar archivos de la visita
+     */
+    fun loadVisitFiles() {
+        val visitId = _uiState.value.createdVisitId ?: return
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingFiles = true, fileError = null)
+            
+            getVisitFilesUseCase(visitId).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(isLoadingFiles = true)
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoadingFiles = false,
+                            visitFiles = resource.data ?: emptyList(),
+                            fileError = null
+                        )
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoadingFiles = false,
+                            fileError = resource.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Subir archivo a la visita
+     */
+    fun uploadFile(file: java.io.File, originalFileName: String? = null) {
+        val visitId = _uiState.value.createdVisitId ?: return
+        val displayName = originalFileName ?: file.name
+        
+        android.util.Log.d("CreateVisitViewModel", "Subiendo archivo: $displayName (temp: ${file.name}), tamaño: ${file.length()} bytes, visitId: $visitId")
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isUploadingFile = true, fileError = null)
+            
+            uploadFileUseCase(visitId, file, originalFileName).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(isUploadingFile = true)
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isUploadingFile = false,
+                            fileError = null
+                        )
+                        // Recargar la lista de archivos después de subir
+                        loadVisitFiles()
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isUploadingFile = false,
+                            fileError = resource.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Eliminar archivo de la visita
+     */
+    fun deleteFile(fileId: Int) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isDeletingFile = true, fileError = null)
+            
+            deleteFileUseCase(fileId).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(isDeletingFile = true)
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isDeletingFile = false,
+                            fileError = null
+                        )
+                        // Recargar la lista de archivos después de eliminar
+                        loadVisitFiles()
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isDeletingFile = false,
+                            fileError = resource.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Limpiar errores de archivos
+     */
+    fun clearFileError() {
+        _uiState.value = _uiState.value.copy(fileError = null)
     }
 }
