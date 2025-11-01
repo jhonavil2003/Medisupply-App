@@ -55,6 +55,9 @@ import com.misw.medisupply.presentation.salesforce.screens.orders.review.compone
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.OrderSummaryCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.SectionTitle
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ConfirmOrderDialog
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ErrorDialog
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.SuccessDialog
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import java.text.SimpleDateFormat
@@ -157,12 +160,31 @@ private fun CustomerDeliveryDateSection(
     val initialDateMillis = remember(selectedDate) {
         try {
             val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-            formatter.timeZone = java.util.TimeZone.getDefault()
             val date = formatter.parse(selectedDate)
-            // Add timezone offset to ensure correct date display
-            date?.time?.plus(java.util.TimeZone.getDefault().getOffset(date.time))
+            
+            // Convert to UTC milliseconds for DatePicker
+            date?.let { parsedDate ->
+                val calendar = java.util.Calendar.getInstance()
+                calendar.time = parsedDate
+                
+                val utcCalendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                utcCalendar.set(
+                    calendar.get(java.util.Calendar.YEAR),
+                    calendar.get(java.util.Calendar.MONTH),
+                    calendar.get(java.util.Calendar.DAY_OF_MONTH),
+                    12, 0, 0 // Set to noon to avoid timezone edge cases
+                )
+                utcCalendar.set(java.util.Calendar.MILLISECOND, 0)
+                utcCalendar.timeInMillis
+            }
         } catch (e: Exception) {
-            System.currentTimeMillis()
+            // Default to today at noon UTC
+            val utcCalendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
+            utcCalendar.set(java.util.Calendar.HOUR_OF_DAY, 12)
+            utcCalendar.set(java.util.Calendar.MINUTE, 0)
+            utcCalendar.set(java.util.Calendar.SECOND, 0)
+            utcCalendar.set(java.util.Calendar.MILLISECOND, 0)
+            utcCalendar.timeInMillis
         }
     }
     
@@ -248,12 +270,20 @@ private fun CustomerDeliveryDateSection(
         CustomDatePickerDialog(
             onDateSelected = { dateMillis ->
                 dateMillis?.let { millis ->
-                    // Fix timezone issue: Create date using Calendar to avoid UTC conversion
-                    val calendar = java.util.Calendar.getInstance()
+                    // Use UTC to avoid timezone conversion issues
+                    val calendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
                     calendar.timeInMillis = millis
+                    
+                    // Format using local timezone but with UTC input
+                    val localCalendar = java.util.Calendar.getInstance()
+                    localCalendar.set(
+                        calendar.get(java.util.Calendar.YEAR),
+                        calendar.get(java.util.Calendar.MONTH),
+                        calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                    )
+                    
                     val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-                    formatter.timeZone = java.util.TimeZone.getDefault()
-                    onDateSelected(formatter.format(calendar.time))
+                    onDateSelected(formatter.format(localCalendar.time))
                 }
                 showDatePicker = false
             },
@@ -301,6 +331,11 @@ private fun OrderReviewContent(
     viewModel: OrderViewModel
 ) {
     val state by viewModel.state.collectAsState()
+    
+    // Dialog states
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
     // Calculate totals
     val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
@@ -308,10 +343,15 @@ private fun OrderReviewContent(
 
     // Handle order success result
     LaunchedEffect(state.createdOrder) {
-        state.createdOrder?.let { order ->
-            order.orderNumber?.let { orderNumber ->
-                onOrderSuccess(orderNumber)
-            }
+        if (state.createdOrder != null && !showSuccessDialog) {
+            showSuccessDialog = true
+        }
+    }
+
+    // Handle error result
+    LaunchedEffect(state.error) {
+        if (state.error != null && !showErrorDialog) {
+            showErrorDialog = true
         }
     }
 
@@ -354,10 +394,7 @@ private fun OrderReviewContent(
             
             Button(
                 onClick = {
-                    viewModel.createOrder(
-                        customer = customer,
-                        cartItems = cartItems
-                    )
+                    showConfirmDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -388,6 +425,46 @@ private fun OrderReviewContent(
             
             Spacer(modifier = Modifier.height(80.dp))
         }
+    }
+    
+    // Dialogs
+    if (showConfirmDialog) {
+        ConfirmOrderDialog(
+            isEditMode = false,
+            onConfirm = {
+                showConfirmDialog = false
+                viewModel.createOrder(
+                    customer = customer,
+                    cartItems = cartItems
+                )
+            },
+            onDismiss = { showConfirmDialog = false }
+        )
+    }
+    
+    if (showSuccessDialog) {
+        state.createdOrder?.let { order ->
+            SuccessDialog(
+                orderNumber = order.orderNumber ?: "N/A",
+                message = "Su pedido ha sido creado correctamente.",
+                onDismiss = { 
+                    showSuccessDialog = false
+                    order.orderNumber?.let { orderNumber ->
+                        onOrderSuccess(orderNumber)
+                    }
+                }
+            )
+        }
+    }
+    
+    if (showErrorDialog) {
+        ErrorDialog(
+            errorMessage = state.error ?: "Error desconocido",
+            onDismiss = { 
+                showErrorDialog = false 
+                viewModel.clearError()
+            }
+        )
     }
 }
 
