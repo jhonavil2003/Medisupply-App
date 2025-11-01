@@ -4,10 +4,7 @@ import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
 import com.misw.medisupply.data.network.dto.visit.CreateVisitResponse
 import com.misw.medisupply.data.network.dto.visit.CreateVisitApiResponse
 import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
-import com.misw.medisupply.domain.model.visit.VisitFile
-import com.misw.medisupply.domain.model.visit.UploadFileResponse
-import com.misw.medisupply.domain.model.visit.DeleteFileResponse
-import com.misw.medisupply.domain.model.visit.FilesWithMetadataResponse
+import com.misw.medisupply.domain.model.visit.*
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -25,19 +22,19 @@ interface VisitApiService {
     
     @POST("visits")
     suspend fun createVisit(
-        @Body request: CreateVisitRequest
-    ): Response<CreateVisitApiResponse>
+        @Body visit: Visit
+    ): Response<Visit>
     
     @PUT("visits/{id}")
     suspend fun updateVisit(
         @Path("id") visitId: Int,
-        @Body request: UpdateVisitRequest
-    ): Response<CreateVisitApiResponse>
+        @Body visit: Visit
+    ): Response<Visit>
     
     @POST("visits/{id}/complete")
     suspend fun completeVisit(
         @Path("id") visitId: Int
-    ): Response<CreateVisitApiResponse>
+    ): Response<Visit>
     
     // ================================
     // ENDPOINTS PARA ARCHIVOS

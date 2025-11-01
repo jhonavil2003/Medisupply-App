@@ -1,18 +1,13 @@
 package com.misw.medisupply.data.repository
 
 import com.misw.medisupply.data.network.api.VisitApiService
-import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
-import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
-import com.misw.medisupply.domain.model.visit.Visit
-import com.misw.medisupply.domain.model.visit.VisitFile
-import com.misw.medisupply.domain.model.visit.VisitStatus
+import com.misw.medisupply.domain.model.visit.*
 import com.misw.medisupply.domain.repository.VisitRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import java.io.File
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,45 +18,14 @@ class VisitRepositoryImpl @Inject constructor(
 
     override suspend fun createVisit(visit: Visit): Result<Visit> {
         return try {
-            val request = CreateVisitRequest(
-                customerId = visit.customerId,
-                salespersonId = visit.salespersonId,
-                visitDate = visit.visitDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                visitTime = visit.visitTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                contactedPersons = visit.contactedPersons?.takeIf { it.isNotBlank() },
-                clinicalFindings = visit.clinicalFindings?.takeIf { it.isNotBlank() },
-                additionalNotes = visit.additionalNotes?.takeIf { it.isNotBlank() },
-                address = visit.address?.takeIf { it.isNotBlank() },
-                latitude = visit.latitude,
-                longitude = visit.longitude,
-                status = visit.status.name
-            )
-
-            val response = visitApiService.createVisit(request)
+            val response = visitApiService.createVisit(visit)
             
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    val visitData = responseBody.visit
-                    val createdVisit = Visit(
-                        id = visitData.id,
-                        customerId = visitData.customerId,
-                        salespersonId = visitData.salespersonId,
-                        visitDate = java.time.LocalDate.parse(visitData.visitDate),
-                        visitTime = java.time.LocalTime.parse(visitData.visitTime),
-                        contactedPersons = visitData.contactedPersons,
-                        clinicalFindings = visitData.clinicalFindings,
-                        additionalNotes = visitData.additionalNotes,
-                        address = visitData.address,
-                        latitude = visitData.latitude,
-                        longitude = visitData.longitude,
-                        createdAt = visitData.createdAt,
-                        updatedAt = visitData.updatedAt,
-                        status = visitData.status?.let { VisitStatus.valueOf(it) } ?: VisitStatus.PROGRAMADA
-                    )
-                    Result.success(createdVisit)
+                    Result.success(responseBody)
                 } else {
-                    Result.failure(Exception("Response body is null"))
+                    Result.failure(Exception("Respuesta del servidor vacía"))
                 }
             } else {
                 Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
@@ -73,44 +37,14 @@ class VisitRepositoryImpl @Inject constructor(
 
     override suspend fun updateVisit(visitId: Int, visit: Visit): Result<Visit> {
         return try {
-            val request = UpdateVisitRequest(
-                customerId = visit.customerId,
-                salespersonId = visit.salespersonId,
-                visitDate = visit.visitDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                visitTime = visit.visitTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                contactedPersons = visit.contactedPersons?.takeIf { it.isNotBlank() },
-                clinicalFindings = visit.clinicalFindings?.takeIf { it.isNotBlank() },
-                additionalNotes = visit.additionalNotes?.takeIf { it.isNotBlank() },
-                address = visit.address?.takeIf { it.isNotBlank() },
-                latitude = visit.latitude,
-                longitude = visit.longitude
-            )
-
-            val response = visitApiService.updateVisit(visitId, request)
+            val response = visitApiService.updateVisit(visitId, visit)
             
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    val visitData = responseBody.visit
-                    val updatedVisit = Visit(
-                        id = visitData.id,
-                        customerId = visitData.customerId,
-                        salespersonId = visitData.salespersonId,
-                        visitDate = java.time.LocalDate.parse(visitData.visitDate),
-                        visitTime = java.time.LocalTime.parse(visitData.visitTime),
-                        contactedPersons = visitData.contactedPersons,
-                        clinicalFindings = visitData.clinicalFindings,
-                        additionalNotes = visitData.additionalNotes,
-                        address = visitData.address,
-                        latitude = visitData.latitude,
-                        longitude = visitData.longitude,
-                        createdAt = visitData.createdAt,
-                        updatedAt = visitData.updatedAt,
-                        status = visitData.status?.let { VisitStatus.valueOf(it) } ?: VisitStatus.PROGRAMADA
-                    )
-                    Result.success(updatedVisit)
+                    Result.success(responseBody)
                 } else {
-                    Result.failure(Exception("Response body is null"))
+                    Result.failure(Exception("Respuesta del servidor vacía"))
                 }
             } else {
                 Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
@@ -127,26 +61,9 @@ class VisitRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    val visitData = responseBody.visit
-                    val completedVisit = Visit(
-                        id = visitData.id,
-                        customerId = visitData.customerId,
-                        salespersonId = visitData.salespersonId,
-                        visitDate = java.time.LocalDate.parse(visitData.visitDate),
-                        visitTime = java.time.LocalTime.parse(visitData.visitTime),
-                        contactedPersons = visitData.contactedPersons,
-                        clinicalFindings = visitData.clinicalFindings,
-                        additionalNotes = visitData.additionalNotes,
-                        address = visitData.address,
-                        latitude = visitData.latitude,
-                        longitude = visitData.longitude,
-                        createdAt = visitData.createdAt,
-                        updatedAt = visitData.updatedAt,
-                        status = visitData.status?.let { VisitStatus.valueOf(it) } ?: VisitStatus.COMPLETADA
-                    )
-                    Result.success(completedVisit)
+                    Result.success(responseBody)
                 } else {
-                    Result.failure(Exception("Response body is null"))
+                    Result.failure(Exception("Respuesta del servidor vacía"))
                 }
             } else {
                 Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
@@ -156,35 +73,15 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
-    // ================================
-    // IMPLEMENTACIÓN PARA ARCHIVOS
-    // ================================
+
 
     override suspend fun uploadFile(visitId: Int, file: File, originalFileName: String?): Result<VisitFile> {
         return try {
             // Determinar el tipo MIME usando el nombre original si está disponible
             val fileNameToUse = originalFileName ?: file.name
             val extension = fileNameToUse.substringAfterLast('.', "").lowercase()
-            val mimeType = when (extension) {
-                "pdf" -> "application/pdf"
-                "doc" -> "application/msword"
-                "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                "txt" -> "text/plain"
-                "rtf" -> "application/rtf"
-                "jpg", "jpeg" -> "image/jpeg"
-                "png" -> "image/png"
-                "gif" -> "image/gif"
-                "bmp" -> "image/bmp"
-                "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                "xls" -> "application/vnd.ms-excel"
-                "csv" -> "text/csv"
-                "zip" -> "application/zip"
-                "rar" -> "application/vnd.rar"
-                else -> "application/octet-stream"
-            }
+            val mimeType = getMimeType(extension)
             
-            android.util.Log.d("VisitRepository", "Preparando upload: archivo=$fileNameToUse (temp: ${file.name}), tamaño=${file.length()}, mimeType=$mimeType")
-
             // Crear RequestBody para el archivo
             val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
             val multipartBody = MultipartBody.Part.createFormData("file", fileNameToUse, requestFile)
@@ -193,19 +90,14 @@ class VisitRepositoryImpl @Inject constructor(
             
             if (response.isSuccessful) {
                 val responseBody = response.body()
-                android.util.Log.d("VisitRepository", "Upload response: ${response.code()}, body=$responseBody")
                 if (responseBody != null && responseBody.success && responseBody.file != null) {
-                    android.util.Log.d("VisitRepository", "Upload exitoso: ${responseBody.file.fileName}")
                     Result.success(responseBody.file)
                 } else {
                     val errorMsg = responseBody?.message ?: "Error uploading file"
-                    android.util.Log.e("VisitRepository", "Upload fallido: $errorMsg")
                     Result.failure(Exception(errorMsg))
                 }
             } else {
-                val errorMsg = "Error ${response.code()}: ${response.message()}"
-                android.util.Log.e("VisitRepository", "HTTP Error: $errorMsg")
-                Result.failure(Exception(errorMsg))
+                Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -236,7 +128,7 @@ class VisitRepositoryImpl @Inject constructor(
                 if (responseBody != null) {
                     Result.success(responseBody)
                 } else {
-                    Result.failure(Exception("Response body is null"))
+                    Result.failure(Exception("Respuesta del servidor vacía"))
                 }
             } else {
                 Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
@@ -262,6 +154,28 @@ class VisitRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    private fun getMimeType(extension: String): String {
+        return when (extension) {
+            "pdf" -> "application/pdf"
+            "doc" -> "application/msword"
+            "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "txt" -> "text/plain"
+            "rtf" -> "application/rtf"
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "bmp" -> "image/bmp"
+            "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            "xls" -> "application/vnd.ms-excel"
+            "csv" -> "text/csv"
+            "xml" -> "application/xml"
+            "zip" -> "application/zip"
+            "ppt" -> "application/vnd.ms-powerpoint"
+            "pptx" -> "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            else -> "application/octet-stream"
         }
     }
 }

@@ -6,6 +6,7 @@ import com.misw.medisupply.data.remote.api.customer.CustomerApiService
 import com.misw.medisupply.data.remote.api.order.OrderApiService
 import com.misw.medisupply.data.remote.api.product.ProductApiService
 import com.misw.medisupply.data.remote.api.stock.StockApiService
+import com.misw.medisupply.data.network.api.VisitApiService
 import com.misw.medisupply.core.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -207,5 +208,13 @@ object NetworkModule {
         return retrofit.create(OrderApiService::class.java)
     }
     
+    /**
+     * Provides VisitApiService
+     */
+    @Provides
+    @Singleton
+    fun provideVisitApiService(@SalesRetrofit retrofit: Retrofit): VisitApiService {
+        return retrofit.create(VisitApiService::class.java)
+    }
 
 }
