@@ -21,15 +21,16 @@ import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -61,69 +62,44 @@ fun ShopScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Botón Crear
-        CreateOrderButton(onNavigateToCreateOrder)
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Historial de compras
-        HistorySection(
-            orders = uiState.orders,
-            isLoading = uiState.isLoading,
-            error = uiState.error,
-            onRetry = { viewModel.retryLoadOrders() },
-            ordersToShow = uiState.ordersToShow,
-            availablePageSizes = uiState.availablePageSizes,
-            onChangePageSize = { newSize -> viewModel.changeOrdersToShow(newSize) },
-            getPageSizeDisplayText = { size -> viewModel.getPageSizeDisplayText(size) }
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Productos rechazados (mock data como en la imagen)
-        RejectedProductsSection()
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Condiciones pactadas
-        AgreementConditionsSection()
-    }
-}
-
-/**
- * Botón para crear nuevos pedidos
- */
-@Composable
-private fun CreateOrderButton(onNavigateToCreateOrder: () -> Unit) {
-    Button(
-        onClick = onNavigateToCreateOrder,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNavigateToCreateOrder) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Crear pedido"
+                )
+            }
+        },
+        containerColor = Color(0xFFF5F5F5)
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary
+            // Historial de compras
+            HistorySection(
+                orders = uiState.orders,
+                isLoading = uiState.isLoading,
+                error = uiState.error,
+                onRetry = { viewModel.retryLoadOrders() },
+                ordersToShow = uiState.ordersToShow,
+                availablePageSizes = uiState.availablePageSizes,
+                onChangePageSize = { newSize -> viewModel.changeOrdersToShow(newSize) },
+                getPageSizeDisplayText = { size -> viewModel.getPageSizeDisplayText(size) }
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Crear",
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Productos rechazados (mock data como en la imagen)
+            RejectedProductsSection()
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Condiciones pactadas
+            AgreementConditionsSection()
         }
     }
 }
