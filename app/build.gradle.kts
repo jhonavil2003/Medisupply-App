@@ -27,9 +27,10 @@ android {
             versionNameSuffix = "-DEBUG"
             
             // URLs para desarrollo local (10.0.2.2 = localhost en emulador Android)
-            buildConfigField("String", "SALES_SERVICE_URL", "\"http://10.0.2.2:8000/\"")
-            buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://10.0.2.2:8001/\"")
-            buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://10.0.2.2:8002/\"")
+            buildConfigField("String", "SALES_SERVICE_URL", "\"http://10.0.2.2:3003/\"")
+            buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://10.0.2.2:3001/\"")
+            buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://10.0.2.2:3002/\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"http://10.0.2.2:3002\"")
             buildConfigField("String", "ENVIRONMENT", "\"LOCAL\"")
         }
         
@@ -50,6 +51,7 @@ android {
             buildConfigField("String", "SALES_SERVICE_URL", "\"http://lb-sales-service-570996197.us-east-1.elb.amazonaws.com/\"")
             buildConfigField("String", "CATALOG_SERVICE_URL", "\"http://lb-catalog-service-11171664.us-east-1.elb.amazonaws.com/\"")
             buildConfigField("String", "LOGISTICS_SERVICE_URL", "\"http://lb-logistics-service-1435144637.us-east-1.elb.amazonaws.com/\"")
+            buildConfigField("String", "WEBSOCKET_URL", "\"http://lb-logistics-service-1435144637.us-east-1.elb.amazonaws.com\"")
             buildConfigField("String", "ENVIRONMENT", "\"AWS\"")
         }
     }
@@ -71,6 +73,7 @@ android {
 }
 
 dependencies {
+    // Using native Material3 DatePicker and TimePicker (more stable)
 
     // Core Android
     implementation(libs.androidx.core.ktx)
@@ -105,6 +108,9 @@ dependencies {
     
     // Gson for JSON parsing
     implementation("com.google.code.gson:gson:2.11.0")
+    
+    // Socket.IO Client for WebSockets
+    implementation("io.socket:socket.io-client:2.1.0")
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")

@@ -1,13 +1,17 @@
 package com.misw.medisupply.presentation.customermanagement.screens.shop.createorder
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -19,11 +23,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,8 +43,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.order.CartItem
+import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.OrderReviewScreen
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrderViewModel
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CartItemCard
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.OrderSummaryCard
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.SectionTitle
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ConfirmOrderDialog
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ErrorDialog
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.SuccessDialog
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Alignment
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -81,30 +104,41 @@ fun CustomerOrderReviewScreen(
         updatedAt = null
     )
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Sección específica para clientes: Selección de fecha de entrega
-        CustomerDeliveryDateSection(
-            selectedDate = selectedDeliveryDate,
-            onDateSelected = { selectedDeliveryDate = it }
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Por ahora usar el ViewModel original y loggear la fecha
-        // En futuras versiones se podría crear un ViewModel específico para clientes
-        OrderReviewScreen(
-            customer = staticCustomer,
-            cartItems = cartItems,
-            onNavigateBack = onNavigateBack,
-            onOrderSuccess = { orderNumber ->
-                println("DEBUG: Orden $orderNumber creada con fecha de entrega preferida: $selectedDeliveryDate")
-                // TODO: En versiones futuras, enviar la fecha al backend
-                onOrderSuccess(orderNumber)
-            },
-            createViewModel = viewModel
-        )
+    Scaffold(
+        topBar = {
+            MedisupplyAppBar(
+                title = "Revisar pedido",
+                subtitle = "Compras - Medisupply",
+                onNavigateBack = onNavigateBack
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            // Sección específica para clientes: Selección de fecha de entrega
+            CustomerDeliveryDateSection(
+                selectedDate = selectedDeliveryDate,
+                onDateSelected = { selectedDeliveryDate = it }
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // SOLUCIÓN TEMPORAL: Extraer el contenido de OrderReviewScreen sin su Scaffold
+            // Para evitar el AppBar duplicado, creamos el contenido directamente aquí
+            OrderReviewContent(
+                customer = staticCustomer,
+                cartItems = cartItems,
+                onOrderSuccess = { orderNumber ->
+                    println("DEBUG: Orden $orderNumber creada con fecha de entrega preferida: $selectedDeliveryDate")
+                    // TODO: En versiones futuras, enviar la fecha al backend
+                    onOrderSuccess(orderNumber)
+                },
+                viewModel = viewModel
+            )
+        }
     }
 }
 
@@ -112,6 +146,7 @@ fun CustomerOrderReviewScreen(
 
 /**
  * Sección específica para clientes para seleccionar fecha de entrega
+ * Usa el mismo estilo visual que CreateVisitScreen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,10 +159,32 @@ private fun CustomerDeliveryDateSection(
     // Initialize DatePicker with current selected date
     val initialDateMillis = remember(selectedDate) {
         try {
-            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            formatter.parse(selectedDate)?.time
+            val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+            val date = formatter.parse(selectedDate)
+            
+            // Convert to UTC milliseconds for DatePicker
+            date?.let { parsedDate ->
+                val calendar = java.util.Calendar.getInstance()
+                calendar.time = parsedDate
+                
+                val utcCalendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                utcCalendar.set(
+                    calendar.get(java.util.Calendar.YEAR),
+                    calendar.get(java.util.Calendar.MONTH),
+                    calendar.get(java.util.Calendar.DAY_OF_MONTH),
+                    12, 0, 0 // Set to noon to avoid timezone edge cases
+                )
+                utcCalendar.set(java.util.Calendar.MILLISECOND, 0)
+                utcCalendar.timeInMillis
+            }
         } catch (e: Exception) {
-            System.currentTimeMillis()
+            // Default to today at noon UTC
+            val utcCalendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
+            utcCalendar.set(java.util.Calendar.HOUR_OF_DAY, 12)
+            utcCalendar.set(java.util.Calendar.MINUTE, 0)
+            utcCalendar.set(java.util.Calendar.SECOND, 0)
+            utcCalendar.set(java.util.Calendar.MILLISECOND, 0)
+            utcCalendar.timeInMillis
         }
     }
     
@@ -139,11 +196,8 @@ private fun CustomerDeliveryDateSection(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -152,11 +206,29 @@ private fun CustomerDeliveryDateSection(
                 text = "Fecha de Entrega Preferida",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = androidx.compose.ui.graphics.Color(0xFF1565C0)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
+            // Mensaje informativo con el mismo estilo que CreateVisitScreen
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = androidx.compose.ui.graphics.Color(0xFFE3F2FD)
+                )
+            ) {
+                Text(
+                    text = "📦 Selecciona tu fecha de entrega preferida. La confirmación está sujeta a disponibilidad y políticas de distribución.",
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = androidx.compose.ui.graphics.Color(0xFF1565C0)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Date Picker con el mismo estilo que CreateVisitScreen
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -168,69 +240,231 @@ private fun CustomerDeliveryDateSection(
                 OutlinedTextField(
                     value = selectedDate,
                     onValueChange = { },
-                    label = { Text("Selecciona fecha de entrega") },
+                    label = { Text("Fecha de entrega") },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendario"
+                            contentDescription = "Seleccionar fecha",
+                            tint = androidx.compose.ui.graphics.Color(0xFF1565C0)
                         )
                     },
                     readOnly = true,
                     enabled = false, // Disable to prevent internal interactions
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledIndicatorColor = MaterialTheme.colorScheme.outline
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = androidx.compose.ui.graphics.Color(0xFF1565C0),
+                        unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFFB6C6E3),
+                        focusedLabelColor = androidx.compose.ui.graphics.Color(0xFF1565C0),
+                        unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF1565C0),
+                        disabledBorderColor = androidx.compose.ui.graphics.Color(0xFFB6C6E3),
+                        disabledLabelColor = androidx.compose.ui.graphics.Color(0xFF1565C0),
+                        disabledTextColor = androidx.compose.ui.graphics.Color(0xFF000000)
                     )
                 )
             }
+        }
+    }
+    
+    // DatePicker Dialog con el mismo estilo que CreateVisitScreen
+    if (showDatePicker) {
+        CustomDatePickerDialog(
+            onDateSelected = { dateMillis ->
+                dateMillis?.let { millis ->
+                    // Use UTC to avoid timezone conversion issues
+                    val calendar = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))
+                    calendar.timeInMillis = millis
+                    
+                    // Format using local timezone but with UTC input
+                    val localCalendar = java.util.Calendar.getInstance()
+                    localCalendar.set(
+                        calendar.get(java.util.Calendar.YEAR),
+                        calendar.get(java.util.Calendar.MONTH),
+                        calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                    )
+                    
+                    val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                    onDateSelected(formatter.format(localCalendar.time))
+                }
+                showDatePicker = false
+            },
+            onDismiss = { showDatePicker = false },
+            datePickerState = datePickerState
+        )
+    }
+}
+
+/**
+ * Custom Date Picker Dialog - Copiado de CreateVisitScreen para mantener consistencia
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomDatePickerDialog(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit,
+    datePickerState: androidx.compose.material3.DatePickerState
+) {
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+/**
+ * Contenido de OrderReview sin el Scaffold para evitar AppBar duplicado
+ */
+@Composable
+private fun OrderReviewContent(
+    customer: Customer,
+    cartItems: Map<String, CartItem>,
+    onOrderSuccess: (String) -> Unit,
+    viewModel: OrderViewModel
+) {
+    val state by viewModel.state.collectAsState()
+    
+    // Dialog states
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+
+    // Calculate totals
+    val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
+    val itemCount = cartItems.values.sumOf { it.quantity }
+
+    // Handle order success result
+    LaunchedEffect(state.createdOrder) {
+        if (state.createdOrder != null && !showSuccessDialog) {
+            showSuccessDialog = true
+        }
+    }
+
+    // Handle error result
+    LaunchedEffect(state.error) {
+        if (state.error != null && !showErrorDialog) {
+            showErrorDialog = true
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Customer Information Section
+        item {
+            SectionTitle(text = "Información del Cliente")
+            CustomerSummaryCard(customer = customer)
+        }
+
+        // Order Items Section
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            SectionTitle(text = "Productos ($itemCount ${if (itemCount == 1) "item" else "items"})")
+        }
+
+        items(cartItems.values.toList()) { cartItem ->
+            CartItemCard(cartItem = cartItem)
+        }
+
+        // Order Summary Section
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            SectionTitle(text = "Resumen del Pedido")
+            OrderSummaryCard(
+                subtotal = subtotal,
+                tax = 0f,
+                total = subtotal
+            )
+        }
+
+        // Create Order Button
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
             
-            Spacer(modifier = Modifier.height(4.dp))
+            Button(
+                onClick = {
+                    showConfirmDialog = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                enabled = !state.isLoading
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Creando pedido...")
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Confirmar y Crear Pedido",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
             
-            Text(
-                text = "La fecha de entrega está sujeta a disponibilidad y políticas de distribución",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+    
+    // Dialogs
+    if (showConfirmDialog) {
+        ConfirmOrderDialog(
+            isEditMode = false,
+            onConfirm = {
+                showConfirmDialog = false
+                viewModel.createOrder(
+                    customer = customer,
+                    cartItems = cartItems
+                )
+            },
+            onDismiss = { showConfirmDialog = false }
+        )
+    }
+    
+    if (showSuccessDialog) {
+        state.createdOrder?.let { order ->
+            SuccessDialog(
+                orderNumber = order.orderNumber ?: "N/A",
+                message = "Su pedido ha sido creado correctamente.",
+                onDismiss = { 
+                    showSuccessDialog = false
+                    order.orderNumber?.let { orderNumber ->
+                        onOrderSuccess(orderNumber)
+                    }
+                }
             )
         }
     }
     
-    // DatePicker Dialog
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            onDateSelected(formatter.format(Date(millis)))
-                        }
-                        showDatePicker = false
-                    }
-                ) {
-                    Text("Aceptar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancelar")
-                }
+    if (showErrorDialog) {
+        ErrorDialog(
+            errorMessage = state.error ?: "Error desconocido",
+            onDismiss = { 
+                showErrorDialog = false 
+                viewModel.clearError()
             }
-        ) {
-            DatePicker(
-                state = datePickerState,
-                title = {
-                    Text(
-                        text = "Seleccionar fecha de entrega",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            )
-        }
+        )
     }
 }
 
@@ -238,9 +472,9 @@ private fun CustomerDeliveryDateSection(
  * Genera fecha de entrega por defecto (3 días hábiles desde hoy)
  */
 private fun getDefaultDeliveryDate(): String {
-    val calendar = Calendar.getInstance()
-    calendar.add(Calendar.DAY_OF_MONTH, 3) // 3 días por defecto
+    val calendar = java.util.Calendar.getInstance()
+    calendar.add(java.util.Calendar.DAY_OF_MONTH, 3) // 3 días por defecto
     
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
     return formatter.format(calendar.time)
 }
