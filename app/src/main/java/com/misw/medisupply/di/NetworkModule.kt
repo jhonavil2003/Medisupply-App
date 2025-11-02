@@ -6,6 +6,7 @@ import com.misw.medisupply.data.remote.api.customer.CustomerApiService
 import com.misw.medisupply.data.remote.api.order.OrderApiService
 import com.misw.medisupply.data.remote.api.product.ProductApiService
 import com.misw.medisupply.data.remote.api.stock.StockApiService
+import com.misw.medisupply.data.remote.websocket.InventoryWebSocketClient
 import com.misw.medisupply.data.network.api.VisitApiService
 import com.misw.medisupply.core.utils.Constants
 import dagger.Module
@@ -209,6 +210,15 @@ object NetworkModule {
     }
     
     /**
+     * Provides InventoryWebSocketClient for real-time stock updates
+     */
+    @Provides
+    @Singleton
+    fun provideInventoryWebSocketClient(): InventoryWebSocketClient {
+        return InventoryWebSocketClient()
+    }
+    
+    /**
      * Provides VisitApiService
      */
     @Provides
@@ -216,5 +226,4 @@ object NetworkModule {
     fun provideVisitApiService(@SalesRetrofit retrofit: Retrofit): VisitApiService {
         return retrofit.create(VisitApiService::class.java)
     }
-
 }
