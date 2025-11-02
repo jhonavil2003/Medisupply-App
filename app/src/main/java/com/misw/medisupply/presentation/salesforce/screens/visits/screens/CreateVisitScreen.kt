@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
@@ -350,8 +351,9 @@ private fun DatosTabContent(
             
             Spacer(Modifier.height(16.dp))
             
-            // 1. PRIMERO: Selección de cliente - Ocultar cuando la visita ya está guardada
+            // 1. PRIMERO: Selección de cliente
             if (!uiState.isVisitSaved) {
+                // Campo de búsqueda y selección (antes de guardar)
                 com.misw.medisupply.presentation.salesforce.screens.visits.components.CustomerSearchField(
                     selectedCustomer = uiState.selectedCustomer,
                     searchQuery = uiState.customerSearchQuery,
@@ -363,6 +365,72 @@ private fun DatosTabContent(
                     onClearSelection = onClearCustomerSelection,
                     modifier = Modifier.fillMaxWidth()
                 )
+            } else {
+                // Información del cliente guardado (después de guardar)
+                uiState.selectedCustomer?.let { customer ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFF0F7FF)
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Cliente",
+                                    tint = Color(0xFF1565C0),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = "Cliente de la visita:",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = Color(0xFF1565C0)
+                                )
+                            }
+                            
+                            Spacer(Modifier.height(8.dp))
+                            
+                            Text(
+                                text = customer.businessName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1565C0)
+                            )
+                            
+                            if (!customer.contactName.isNullOrEmpty()) {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Contacto: ${customer.contactName}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF757575)
+                                )
+                            }
+                            
+                            if (!customer.contactPhone.isNullOrEmpty()) {
+                                Text(
+                                    text = "Teléfono: ${customer.contactPhone}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF757575)
+                                )
+                            }
+                            
+                            if (!customer.address.isNullOrEmpty()) {
+                                Text(
+                                    text = "Dirección: ${customer.address}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF757575)
+                                )
+                            }
+                        }
+                    }
+                }
             }
             
             Spacer(Modifier.height(16.dp))

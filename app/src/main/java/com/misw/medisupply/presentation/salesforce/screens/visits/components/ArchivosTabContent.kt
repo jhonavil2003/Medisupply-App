@@ -41,12 +41,17 @@ fun ArchivosTabContent(
         }
     }
     
-    Card(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
+        // Card de archivos adjuntos
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(Modifier.padding(16.dp)) {
             Text(
                 "Archivos adjuntos", 
                 style = MaterialTheme.typography.titleMedium, 
@@ -148,33 +153,75 @@ fun ArchivosTabContent(
                     isDeleting = uiState.isDeletingFile
                 )
             }
-            
-            // Botón "Completar Visita" - Solo visible cuando la visita está guardada
-            if (uiState.isVisitSaved) {
-                Spacer(Modifier.height(24.dp))
-                
-                Button(
-                    onClick = { viewModel.completeVisit() },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !uiState.isSaving,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
+            }
+        }
+        
+        // Card separado para completar visita - Solo visible cuando la visita está guardada
+        if (uiState.isVisitSaved) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        "Finalizar visita", 
+                        style = MaterialTheme.typography.titleMedium, 
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4CAF50)
                     )
-                ) {
-                    if (uiState.isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
+                    
+                    // Mensaje de advertencia verde
+                    Spacer(Modifier.height(8.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = Color(0xFF4CAF50),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "⚠️ Al completar la visita, no podrás realizar más cambios. Asegúrate de haber completado toda la información necesaria.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF2E7D32)
+                            )
+                        }
+                    }
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    // Botón para completar visita
+                    Button(
+                        onClick = { viewModel.completeVisit() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isSaving,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50)
                         )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text("Completar Visita")
+                    ) {
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Completar Visita")
+                        }
                     }
                 }
             }
