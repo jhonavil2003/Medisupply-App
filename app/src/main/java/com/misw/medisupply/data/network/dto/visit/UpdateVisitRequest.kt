@@ -13,7 +13,7 @@ data class UpdateVisitRequest(
     val visitDate: String? = null, // YYYY-MM-DD
     
     @SerializedName("visit_time")
-    val visitTime: String? = null, // HH:MM
+    val visitTime: String? = null, // HH:MM:SS
     
     @SerializedName("contacted_persons")
     val contactedPersons: String? = null,

@@ -138,32 +138,44 @@ class CreateVisitViewModel @Inject constructor(
 
 
     fun updateContactedPersons(contactedPersons: String) {
+        android.util.Log.d("CreateVisitViewModel", "updateContactedPersons() called with: '$contactedPersons'")
         _uiState.value = _uiState.value.copy(contactedPersons = contactedPersons)
         validateForm()
         
         // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            android.util.Log.d("CreateVisitViewModel", "Triggering auto-save for contactedPersons")
             scheduleAutoSave()
+        } else {
+            android.util.Log.d("CreateVisitViewModel", "Not auto-saving contactedPersons - isVisitSaved: ${_uiState.value.isVisitSaved}, createdVisitId: ${_uiState.value.createdVisitId}")
         }
     }
 
     fun updateClinicalFindings(clinicalFindings: String) {
+        android.util.Log.d("CreateVisitViewModel", "updateClinicalFindings() called with: '$clinicalFindings'")
         _uiState.value = _uiState.value.copy(clinicalFindings = clinicalFindings)
         validateForm()
         
         // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            android.util.Log.d("CreateVisitViewModel", "Triggering auto-save for clinicalFindings")
             scheduleAutoSave()
+        } else {
+            android.util.Log.d("CreateVisitViewModel", "Not auto-saving clinicalFindings - isVisitSaved: ${_uiState.value.isVisitSaved}, createdVisitId: ${_uiState.value.createdVisitId}")
         }
     }
 
     fun updateAdditionalNotes(additionalNotes: String) {
+        android.util.Log.d("CreateVisitViewModel", "updateAdditionalNotes() called with: '$additionalNotes'")
         _uiState.value = _uiState.value.copy(additionalNotes = additionalNotes)
         validateForm()
         
         // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            android.util.Log.d("CreateVisitViewModel", "Triggering auto-save for additionalNotes")
             scheduleAutoSave()
+        } else {
+            android.util.Log.d("CreateVisitViewModel", "Not auto-saving additionalNotes - isVisitSaved: ${_uiState.value.isVisitSaved}, createdVisitId: ${_uiState.value.createdVisitId}")
         }
     }
 
@@ -184,12 +196,16 @@ class CreateVisitViewModel @Inject constructor(
     }
 
     fun updateAddress(address: String) {
+        android.util.Log.d("CreateVisitViewModel", "updateAddress() called with: '$address'")
         _uiState.value = _uiState.value.copy(address = address)
         validateForm()
         
         // Auto-actualizar con debounce si ya existe una visita guardada
         if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            android.util.Log.d("CreateVisitViewModel", "Triggering auto-save for address")
             scheduleAutoSave()
+        } else {
+            android.util.Log.d("CreateVisitViewModel", "Not auto-saving address - isVisitSaved: ${_uiState.value.isVisitSaved}, createdVisitId: ${_uiState.value.createdVisitId}")
         }
     }
 
@@ -310,11 +326,15 @@ class CreateVisitViewModel @Inject constructor(
      * Programa el auto-guardado con debounce para evitar múltiples peticiones
      */
     private fun scheduleAutoSave() {
+        android.util.Log.d("CreateVisitViewModel", "scheduleAutoSave() called - canceling previous job and scheduling new one")
+        
         // Cancelar el job anterior si existe
         autoSaveJob?.cancel()
         
         autoSaveJob = viewModelScope.launch {
+            android.util.Log.d("CreateVisitViewModel", "Auto-save job started - waiting ${autoSaveDelayMs}ms...")
             delay(autoSaveDelayMs)
+            android.util.Log.d("CreateVisitViewModel", "Auto-save delay completed - executing auto-save")
             autoSaveVisitChanges()
         }
     }
@@ -324,12 +344,18 @@ class CreateVisitViewModel @Inject constructor(
         val visitId = state.createdVisitId ?: return
         val customer = state.selectedCustomer ?: return
         
+        android.util.Log.d("CreateVisitViewModel", "autoSaveVisitChanges() called for visitId: $visitId")
+        
         // Evitar guardado múltiple simultáneo
-        if (state.isAutoSaving || state.isSaving) return
+        if (state.isAutoSaving || state.isSaving) {
+            android.util.Log.d("CreateVisitViewModel", "Skipping auto-save - already saving (isAutoSaving: ${state.isAutoSaving}, isSaving: ${state.isSaving})")
+            return
+        }
         
         viewModelScope.launch {
             try {
                 val salesperson = userSessionManager.requireSalesperson()
+                android.util.Log.d("CreateVisitViewModel", "Auto-save for salesperson: ${salesperson.id} (${salesperson.fullName})")
                 
                 val updatedVisit = com.misw.medisupply.domain.model.visit.Visit(
                     id = visitId,
@@ -345,10 +371,13 @@ class CreateVisitViewModel @Inject constructor(
                     longitude = state.longitude
                 )
                 
+                android.util.Log.d("CreateVisitViewModel", "Auto-saving visit with data: contactedPersons='${state.contactedPersons}', clinicalFindings='${state.clinicalFindings}', address='${state.address}', time=${state.visitTime}")
+                
                 _uiState.value = _uiState.value.copy(isAutoSaving = true)
                 val result = updateVisitUseCase(visitId, updatedVisit)
                 
                 if (result.isSuccess) {
+                    android.util.Log.d("CreateVisitViewModel", "Auto-save successful!")
                     // Feedback sutil de auto-guardado exitoso
                     _uiState.value = _uiState.value.copy(
                         isAutoSaving = false,
@@ -361,12 +390,15 @@ class CreateVisitViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(saveSuccess = false)
                     }
                 } else {
+                    val error = result.exceptionOrNull()?.message ?: "Error desconocido"
+                    android.util.Log.e("CreateVisitViewModel", "Auto-save failed: $error")
                     _uiState.value = _uiState.value.copy(
                         isAutoSaving = false,
-                        error = "Error al auto-guardar: ${result.exceptionOrNull()?.message}"
+                        error = "Error al auto-guardar: $error"
                     )
                 }
             } catch (e: Exception) {
+                android.util.Log.e("CreateVisitViewModel", "Auto-save exception: ${e.message}", e)
                 _uiState.value = _uiState.value.copy(
                     isAutoSaving = false,
                     error = "Error al auto-guardar: ${e.message}"

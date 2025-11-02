@@ -22,19 +22,19 @@ interface VisitApiService {
     
     @POST("visits")
     suspend fun createVisit(
-        @Body visit: Visit
-    ): Response<Visit>
+        @Body request: CreateVisitRequest
+    ): Response<CreateVisitApiResponse>
     
     @PUT("visits/{id}")
     suspend fun updateVisit(
         @Path("id") visitId: Int,
-        @Body visit: Visit
-    ): Response<Visit>
+        @Body request: UpdateVisitRequest
+    ): Response<CreateVisitApiResponse>
     
     @POST("visits/{id}/complete")
     suspend fun completeVisit(
         @Path("id") visitId: Int
-    ): Response<Visit>
+    ): Response<CreateVisitApiResponse>
     
     // ================================
     // ENDPOINTS PARA ARCHIVOS

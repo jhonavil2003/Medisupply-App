@@ -1,6 +1,8 @@
 package com.misw.medisupply.data.repository
 
 import com.misw.medisupply.data.network.api.VisitApiService
+import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
+import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
 import com.misw.medisupply.domain.model.visit.*
 import com.misw.medisupply.domain.repository.VisitRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -8,6 +10,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import java.io.File
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,12 +21,45 @@ class VisitRepositoryImpl @Inject constructor(
 
     override suspend fun createVisit(visit: Visit): Result<Visit> {
         return try {
-            val response = visitApiService.createVisit(visit)
+            // Convertir Visit domain model a CreateVisitRequest DTO
+            val request = CreateVisitRequest(
+                customerId = visit.customerId,
+                salespersonId = visit.salespersonId,
+                visitDate = visit.visitDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                visitTime = visit.visitTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                contactedPersons = visit.contactedPersons,
+                clinicalFindings = visit.clinicalFindings,
+                additionalNotes = visit.additionalNotes,
+                address = visit.address,
+                latitude = visit.latitude,
+                longitude = visit.longitude,
+                status = visit.status.name
+            )
+            
+            val response = visitApiService.createVisit(request)
             
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    Result.success(responseBody)
+                    // Convertir CreateVisitResponse a Visit domain model
+                    val visitResponse = responseBody.visit
+                    val createdVisit = Visit(
+                        id = visitResponse.id,
+                        customerId = visitResponse.customerId,
+                        salespersonId = visitResponse.salespersonId,
+                        visitDate = java.time.LocalDate.parse(visitResponse.visitDate),
+                        visitTime = java.time.LocalTime.parse(visitResponse.visitTime),
+                        contactedPersons = visitResponse.contactedPersons,
+                        clinicalFindings = visitResponse.clinicalFindings,
+                        additionalNotes = visitResponse.additionalNotes,
+                        address = visitResponse.address,
+                        latitude = visitResponse.latitude,
+                        longitude = visitResponse.longitude,
+                        status = VisitStatus.valueOf(visitResponse.status ?: "PROGRAMADA"),
+                        createdAt = visitResponse.createdAt,
+                        updatedAt = visitResponse.updatedAt
+                    )
+                    Result.success(createdVisit)
                 } else {
                     Result.failure(Exception("Respuesta del servidor vacía"))
                 }
@@ -37,12 +73,46 @@ class VisitRepositoryImpl @Inject constructor(
 
     override suspend fun updateVisit(visitId: Int, visit: Visit): Result<Visit> {
         return try {
-            val response = visitApiService.updateVisit(visitId, visit)
+            // Convertir Visit domain model a UpdateVisitRequest DTO
+            val request = UpdateVisitRequest(
+                customerId = visit.customerId,
+                salespersonId = visit.salespersonId,
+                visitDate = visit.visitDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                visitTime = visit.visitTime.format(DateTimeFormatter.ofPattern("HH:mm")), // Sin segundos para UPDATE
+                contactedPersons = visit.contactedPersons,
+                clinicalFindings = visit.clinicalFindings,
+                additionalNotes = visit.additionalNotes,
+                address = visit.address,
+                latitude = visit.latitude,
+                longitude = visit.longitude
+            )
+            
+            android.util.Log.d("VisitRepositoryImpl", "Updating visit $visitId with request: $request")
+            
+            val response = visitApiService.updateVisit(visitId, request)
             
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    Result.success(responseBody)
+                    // Convertir CreateVisitResponse a Visit domain model
+                    val visitData = responseBody.visit
+                    val updatedVisit = Visit(
+                        id = visitData.id,
+                        customerId = visitData.customerId,
+                        salespersonId = visitData.salespersonId,
+                        visitDate = java.time.LocalDate.parse(visitData.visitDate),
+                        visitTime = java.time.LocalTime.parse(visitData.visitTime),
+                        contactedPersons = visitData.contactedPersons,
+                        clinicalFindings = visitData.clinicalFindings,
+                        additionalNotes = visitData.additionalNotes,
+                        address = visitData.address,
+                        latitude = visitData.latitude,
+                        longitude = visitData.longitude,
+                        status = VisitStatus.valueOf(visitData.status ?: "PROGRAMADA"),
+                        createdAt = visitData.createdAt,
+                        updatedAt = visitData.updatedAt
+                    )
+                    Result.success(updatedVisit)
                 } else {
                     Result.failure(Exception("Respuesta del servidor vacía"))
                 }
@@ -61,7 +131,25 @@ class VisitRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    Result.success(responseBody)
+                    // Convertir CreateVisitResponse a Visit domain model
+                    val visitData = responseBody.visit
+                    val completedVisit = Visit(
+                        id = visitData.id,
+                        customerId = visitData.customerId,
+                        salespersonId = visitData.salespersonId,
+                        visitDate = java.time.LocalDate.parse(visitData.visitDate),
+                        visitTime = java.time.LocalTime.parse(visitData.visitTime),
+                        contactedPersons = visitData.contactedPersons,
+                        clinicalFindings = visitData.clinicalFindings,
+                        additionalNotes = visitData.additionalNotes,
+                        address = visitData.address,
+                        latitude = visitData.latitude,
+                        longitude = visitData.longitude,
+                        status = VisitStatus.valueOf(visitData.status ?: "COMPLETADA"),
+                        createdAt = visitData.createdAt,
+                        updatedAt = visitData.updatedAt
+                    )
+                    Result.success(completedVisit)
                 } else {
                     Result.failure(Exception("Respuesta del servidor vacía"))
                 }
