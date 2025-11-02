@@ -73,6 +73,7 @@ android {
 }
 
 dependencies {
+    // Using native Material3 DatePicker and TimePicker (more stable)
 
     // Core Android
     implementation(libs.androidx.core.ktx)

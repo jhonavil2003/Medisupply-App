@@ -16,6 +16,10 @@ data class OrdersState(
     val isRefreshing: Boolean = false,
     val selectedCustomer: Customer? = null,
     
+    // Customer search fields
+    val customerSearchResults: List<Customer> = emptyList(),
+    val isLoadingCustomers: Boolean = false,
+    
     // Fields for edit mode
     val cartItems: Map<String, CartItem> = emptyMap(),
     val deliveryAddress: String? = null,

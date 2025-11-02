@@ -114,7 +114,59 @@ class OrdersViewModel @Inject constructor(
     }
     
     private fun searchCustomers(query: String) {
+        android.util.Log.d(TAG, "🔍 searchCustomers called with query: '$query'")
         _state.update { it.copy(searchQuery = query) }
+        
+        if (query.isBlank()) {
+            android.util.Log.d(TAG, "Query vacío, limpiando resultados")
+            _state.update { it.copy(customerSearchResults = emptyList()) }
+            return
+        }
+        
+        android.util.Log.d(TAG, "🚀 Iniciando búsqueda de clientes con query: '$query'")
+        
+        viewModelScope.launch {
+            _state.update { it.copy(isLoadingCustomers = true) }
+            
+            getCustomersUseCase().onEach { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        android.util.Log.d(TAG, "🔄 Cargando clientes...")
+                        _state.update { it.copy(isLoadingCustomers = true) }
+                    }
+                    is Resource.Success -> {
+                        android.util.Log.d(TAG, "✅ Clientes cargados: ${resource.data?.size ?: 0}")
+                        val allCustomers = resource.data ?: emptyList()
+                        
+                        // Filtrar clientes por query
+                        val filteredCustomers = allCustomers.filter { customer ->
+                            customer.businessName.contains(query, ignoreCase = true) ||
+                            customer.contactName?.contains(query, ignoreCase = true) == true ||
+                            customer.documentNumber.contains(query, ignoreCase = true)
+                        }
+                        
+                        android.util.Log.d(TAG, "🎯 Clientes filtrados: ${filteredCustomers.size}")
+                        _state.update { 
+                            it.copy(
+                                isLoadingCustomers = false,
+                                customerSearchResults = filteredCustomers,
+                                error = null
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        android.util.Log.e(TAG, "❌ Error buscando clientes: ${resource.message}")
+                        _state.update { 
+                            it.copy(
+                                isLoadingCustomers = false,
+                                customerSearchResults = emptyList(),
+                                error = "Error al buscar clientes: ${resource.message}"
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
     }
     
     fun selectCustomer(customer: Customer) {
