@@ -100,26 +100,45 @@ class OrderRepositoryImpl @Inject constructor(
     override fun getOrders(
         sellerId: String?,
         customerId: Int?,
-        status: String?
-    ): Flow<Resource<List<Order>>> = flow {
+        status: String?,
+        page: Int,
+        perPage: Int
+    ): Flow<Resource<com.misw.medisupply.domain.model.common.PaginatedResult<Order>>> = flow {
         try {
             // Emit loading state
             emit(Resource.Loading())
             
-            // Make API call
+            // Validate pagination parameters
+            val validPage = page.coerceAtLeast(1)
+            val validPerPage = perPage.coerceIn(1, 100)
+            
+            // Make API call with pagination
             val response = apiService.getOrders(
                 sellerId = sellerId,
                 customerId = customerId,
-                status = status
+                status = status,
+                page = validPage,
+                perPage = validPerPage,
+                includeDetails = false  // Don't include items in list view
             )
             
             // Handle response
             if (response.isSuccessful) {
                 val ordersResponse = response.body()
                 if (ordersResponse != null) {
-                    // Convert DTOs to domain models
-                    val orders = ordersResponse.orders.map { it.toDomain() }
-                    emit(Resource.Success(orders))
+                    // Convert DTOs to domain models, handle null orders list
+                    val orders = ordersResponse.orders?.map { it.toDomain() } ?: emptyList()
+                    
+                    // Create paginated result
+                    val paginatedResult = com.misw.medisupply.domain.model.common.PaginatedResult(
+                        items = orders,
+                        total = ordersResponse.total,
+                        page = ordersResponse.page,
+                        perPage = ordersResponse.perPage,
+                        totalPages = ordersResponse.totalPages
+                    )
+                    
+                    emit(Resource.Success(paginatedResult))
                 } else {
                     emit(Resource.Error(Constants.ErrorMessages.NO_DATA))
                 }

@@ -44,18 +44,22 @@ interface OrderRepository {
     ): Flow<Resource<Order>>
     
     /**
-     * Get list of orders with optional filters
+     * Get list of orders with optional filters and pagination
      * 
      * @param sellerId Filter by seller ID
      * @param customerId Filter by customer ID
      * @param status Filter by order status
-     * @return Flow emitting Resource with list of orders
+     * @param page Page number (default: 1, minimum: 1)
+     * @param perPage Number of results per page (default: 20, minimum: 1, maximum: 100)
+     * @return Flow emitting Resource with paginated list of orders
      */
     fun getOrders(
         sellerId: String? = null,
         customerId: Int? = null,
-        status: String? = null
-    ): Flow<Resource<List<Order>>>
+        status: String? = null,
+        page: Int = 1,
+        perPage: Int = 20
+    ): Flow<Resource<com.misw.medisupply.domain.model.common.PaginatedResult<Order>>>
     
     /**
      * Get a single order by ID
