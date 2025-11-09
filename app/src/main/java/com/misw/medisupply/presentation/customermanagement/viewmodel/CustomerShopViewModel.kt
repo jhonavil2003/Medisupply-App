@@ -36,7 +36,11 @@ class CustomerShopViewModel @Inject constructor(
      */
     private fun loadCustomerOrders() {
         viewModelScope.launch {
-            orderRepository.getOrders(customerId = customerId).collect { resource ->
+            orderRepository.getOrders(
+                customerId = customerId,
+                page = 1,
+                perPage = 100  // Load all orders for customer (customers typically have few orders)
+            ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
                         _uiState.value = _uiState.value.copy(
@@ -45,9 +49,11 @@ class CustomerShopViewModel @Inject constructor(
                         )
                     }
                     is Resource.Success -> {
+                        // Extract items from PaginatedResult
+                        val orders = resource.data?.items ?: emptyList()
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            orders = resource.data ?: emptyList(),
+                            orders = orders,
                             error = null
                         )
                     }

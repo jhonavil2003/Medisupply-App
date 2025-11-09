@@ -4,15 +4,23 @@ import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 
 /**
- * UI State for My Orders Screen
+ * UI State for My Orders Screen with pagination support
  */
 data class MyOrdersState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isLoadingMore: Boolean = false,
     val orders: List<Order> = emptyList(),
     val selectedStatus: OrderStatus? = null,
     val error: String? = null,
-    val selectedOrder: Order? = null
+    val selectedOrder: Order? = null,
+    
+    // Pagination state
+    val currentPage: Int = 1,
+    val totalPages: Int = 1,
+    val totalOrders: Int = 0,
+    val perPage: Int = 20,
+    val hasMore: Boolean = false
 ) {
     /**
      * Check if there are any orders
@@ -20,27 +28,28 @@ data class MyOrdersState(
     fun hasOrders(): Boolean = orders.isNotEmpty()
     
     /**
-     * Get filtered orders based on selected status
+     * Get orders to display (no local filtering - filter is applied on backend)
      */
     fun getFilteredOrders(): List<Order> {
-        return if (selectedStatus != null) {
-            orders.filter { it.status == selectedStatus }
-        } else {
-            orders
-        }
+        return orders
     }
     
     /**
-     * Get count of orders by status
+     * Get count of orders by status (from current page only)
      */
     fun getOrderCountByStatus(status: OrderStatus): Int {
         return orders.count { it.status == status }
     }
     
     /**
-     * Get total count of orders
+     * Get total count of loaded orders
      */
     fun getTotalOrderCount(): Int = orders.size
+    
+    /**
+     * Check if we can load more orders
+     */
+    fun canLoadMore(): Boolean = hasMore && !isLoading && !isLoadingMore && !isRefreshing
 }
 
 /**
@@ -48,12 +57,22 @@ data class MyOrdersState(
  */
 sealed class MyOrdersEvent {
     /**
-     * Load orders from repository
+     * Load orders from repository (first page)
      */
     object LoadOrders : MyOrdersEvent()
     
     /**
-     * Refresh orders (pull to refresh)
+     * Load next page of orders
+     */
+    object LoadNextPage : MyOrdersEvent()
+    
+    /**
+     * Load previous page of orders
+     */
+    object LoadPreviousPage : MyOrdersEvent()
+    
+    /**
+     * Refresh orders (pull to refresh - resets to page 1)
      */
     object RefreshOrders : MyOrdersEvent()
     

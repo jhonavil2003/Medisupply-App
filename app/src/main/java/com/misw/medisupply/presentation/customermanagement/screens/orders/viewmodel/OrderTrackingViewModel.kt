@@ -55,7 +55,9 @@ class OrderTrackingViewModel @Inject constructor(
         viewModelScope.launch {
             orderRepository.getOrders(
                 customerId = CUSTOMER_ID,
-                status = currentState.selectedStatus?.takeIf { it != "todos" }
+                status = currentState.selectedStatus?.takeIf { it != "todos" },
+                page = 1,
+                perPage = 100  // Load all orders for customer tracking (customers don't have many orders)
             ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
@@ -66,8 +68,9 @@ class OrderTrackingViewModel @Inject constructor(
                         )
                     }
                     is Resource.Success -> {
-                        Log.d(TAG, "Estado: Success - ${resource.data?.size ?: 0} pedidos")
-                        val allOrders = resource.data ?: emptyList()
+                        // Extract items from PaginatedResult
+                        val allOrders = resource.data?.items ?: emptyList()
+                        Log.d(TAG, "Estado: Success - ${allOrders.size} pedidos")
                         Log.d(TAG, "Pedidos recibidos: ${allOrders.map { "ID:${it.id}, Number:${it.orderNumber}" }}")
                         
                         // Log delivery dates for debugging

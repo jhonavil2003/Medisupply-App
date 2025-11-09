@@ -31,18 +31,24 @@ interface OrderApiService {
     ): Response<OrderDto>
     
     /**
-     * Get list of orders with optional filters
+     * Get list of orders with optional filters and pagination
      * 
      * @param sellerId Filter by seller ID
      * @param customerId Filter by customer ID
      * @param status Filter by order status
-     * @return Response containing OrdersResponse with list of orders and total count
+     * @param page Page number (default: 1)
+     * @param perPage Number of results per page (default: 20, max: 100)
+     * @param includeDetails Include order items in response (default: false)
+     * @return Response containing OrdersResponse with list of orders and pagination metadata
      */
     @GET("orders")
     suspend fun getOrders(
         @Query("seller_id") sellerId: String? = null,
         @Query("customer_id") customerId: Int? = null,
-        @Query("status") status: String? = null
+        @Query("status") status: String? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 20,
+        @Query("include_details") includeDetails: Boolean = false
     ): Response<OrdersResponse>
     
     /**

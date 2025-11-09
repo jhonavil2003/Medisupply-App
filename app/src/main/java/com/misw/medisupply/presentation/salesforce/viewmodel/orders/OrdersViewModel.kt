@@ -345,7 +345,9 @@ class OrdersViewModel @Inject constructor(
             getOrdersUseCase(
                 sellerId = sellerId,
                 customerId = null,
-                status = null
+                status = null,
+                page = 1,
+                perPage = 100  // Load more for this screen as it's not the main list
             )
                 .onEach { resource ->
                     when (resource) {
@@ -356,7 +358,7 @@ class OrdersViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isLoading = false,
-                                    orders = resource.data ?: emptyList(),
+                                    orders = resource.data?.items ?: emptyList(),
                                     error = null
                                 )
                             }

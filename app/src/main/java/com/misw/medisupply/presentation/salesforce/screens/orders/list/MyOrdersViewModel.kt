@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 /**
  * ViewModel for My Orders Screen
- * Manages the state and business logic for displaying seller's orders
+ * Manages the state and business logic for displaying seller's orders with pagination
  */
 @HiltViewModel
 class MyOrdersViewModel @Inject constructor(
@@ -30,6 +30,11 @@ class MyOrdersViewModel @Inject constructor(
      */
     private val currentSellerId: String = "SELLER-001"
     
+    /**
+     * Número de órdenes por página
+     */
+    private val ordersPerPage: Int = 20
+    
     init {
         loadOrders()
     }
@@ -40,6 +45,8 @@ class MyOrdersViewModel @Inject constructor(
     fun onEvent(event: MyOrdersEvent) {
         when (event) {
             is MyOrdersEvent.LoadOrders -> loadOrders()
+            is MyOrdersEvent.LoadNextPage -> loadNextPage()
+            is MyOrdersEvent.LoadPreviousPage -> loadPreviousPage()
             is MyOrdersEvent.RefreshOrders -> refreshOrders()
             is MyOrdersEvent.FilterByStatus -> filterByStatus(event.status)
             is MyOrdersEvent.SelectOrder -> selectOrder(event.order)
@@ -48,21 +55,70 @@ class MyOrdersViewModel @Inject constructor(
     }
     
     /**
-     * Load orders from repository
+     * Load first page of orders from repository
      */
     private fun loadOrders() {
+        loadPage(1)
+    }
+    
+    /**
+     * Load next page of orders
+     */
+    private fun loadNextPage() {
+        val currentState = _state.value
+        if (currentState.currentPage < currentState.totalPages && !currentState.isLoadingMore) {
+            loadPage(currentState.currentPage + 1)
+        }
+    }
+    
+    /**
+     * Load previous page of orders
+     */
+    private fun loadPreviousPage() {
+        val currentState = _state.value
+        if (currentState.currentPage > 1 && !currentState.isLoadingMore) {
+            loadPage(currentState.currentPage - 1)
+        }
+    }
+    
+    /**
+     * Load a specific page of orders
+     */
+    private fun loadPage(page: Int) {
         viewModelScope.launch {
-            getOrdersUseCase(sellerId = currentSellerId).collect { resource ->
+            // Set loading state based on whether it's first load or page change
+            if (page == 1 && _state.value.orders.isEmpty()) {
+                _state.update { it.copy(isLoading = true, error = null) }
+            } else {
+                _state.update { it.copy(isLoadingMore = true, error = null) }
+            }
+            
+            // Get selected status to pass to backend
+            val statusFilter = _state.value.selectedStatus?.value
+            
+            getOrdersUseCase(
+                sellerId = currentSellerId,
+                status = statusFilter,  // Apply filter on backend
+                page = page,
+                perPage = ordersPerPage
+            ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.update { it.copy(isLoading = true, error = null) }
+                        // Loading already set above
                     }
                     is Resource.Success -> {
+                        val paginatedResult = resource.data
                         _state.update { 
                             it.copy(
                                 isLoading = false,
+                                isLoadingMore = false,
                                 isRefreshing = false,
-                                orders = resource.data ?: emptyList(),
+                                // Replace orders with the new page (not append)
+                                orders = paginatedResult?.items ?: emptyList(),
+                                currentPage = paginatedResult?.page ?: page,
+                                totalPages = paginatedResult?.totalPages ?: 1,
+                                totalOrders = paginatedResult?.total ?: 0,
+                                hasMore = paginatedResult?.hasMore ?: false,
                                 error = null
                             )
                         }
@@ -71,6 +127,7 @@ class MyOrdersViewModel @Inject constructor(
                         _state.update { 
                             it.copy(
                                 isLoading = false,
+                                isLoadingMore = false,
                                 isRefreshing = false,
                                 error = resource.message
                             )
@@ -82,44 +139,23 @@ class MyOrdersViewModel @Inject constructor(
     }
     
     /**
-     * Refresh orders (pull to refresh)
+     * Refresh orders (pull to refresh - resets to page 1)
      */
     private fun refreshOrders() {
         viewModelScope.launch {
             _state.update { it.copy(isRefreshing = true) }
-            
-            getOrdersUseCase(sellerId = currentSellerId).collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        // Keep isRefreshing = true
-                    }
-                    is Resource.Success -> {
-                        _state.update { 
-                            it.copy(
-                                isRefreshing = false,
-                                orders = resource.data ?: emptyList(),
-                                error = null
-                            )
-                        }
-                    }
-                    is Resource.Error -> {
-                        _state.update { 
-                            it.copy(
-                                isRefreshing = false,
-                                error = resource.message
-                            )
-                        }
-                    }
-                }
-            }
+            loadPage(1)
         }
     }
     
     /**
      * Filter orders by status
+     * Resets to page 1 and reloads with filter applied on backend
      */
     private fun filterByStatus(status: com.misw.medisupply.domain.model.order.OrderStatus?) {
         _state.update { it.copy(selectedStatus = status) }
+        // Reload from page 1 with the new filter
+        loadPage(1)
     }
     
     /**
