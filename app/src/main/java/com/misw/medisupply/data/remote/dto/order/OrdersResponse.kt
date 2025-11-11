@@ -8,8 +8,17 @@ import com.google.gson.annotations.SerializedName
  */
 data class OrdersResponse(
     @SerializedName("orders")
-    val orders: List<OrderDto>,
+    val orders: List<OrderDto>? = null,
     
     @SerializedName("total")
-    val total: Int
+    val total: Int = 0,
+    
+    @SerializedName("page")
+    val page: Int = 1,
+    
+    @SerializedName("per_page")
+    val perPage: Int = 20,
+    
+    @SerializedName("total_pages")
+    val totalPages: Int = 1
 )

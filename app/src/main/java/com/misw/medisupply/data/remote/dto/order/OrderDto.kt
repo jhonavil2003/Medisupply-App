@@ -82,7 +82,7 @@ data class OrderDto(
     val customer: CustomerDto?,
     
     @SerializedName("items")
-    val items: List<OrderItemDto>
+    val items: List<OrderItemDto>? = null  // Nullable because it's not included when include_details=false
 )
 
 /**
@@ -136,5 +136,5 @@ fun OrderDto.toDomain() = Order(
     createdAt = createdAt?.parseIso8601(),
     updatedAt = updatedAt?.parseIso8601(),
     customer = customer?.toDomain(),
-    items = items.map { it.toDomain() }
+    items = items?.map { it.toDomain() } ?: emptyList()  // Handle null items when include_details=false
 )
