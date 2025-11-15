@@ -9,6 +9,7 @@ import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.PaymentMethod
 import com.misw.medisupply.domain.model.order.PaymentTerms
 import com.misw.medisupply.domain.repository.order.OrderItemRequest
+import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
 import com.misw.medisupply.domain.usecase.order.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -25,7 +27,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OrderViewModel @Inject constructor(
-    private val createOrderUseCase: CreateOrderUseCase
+    private val createOrderUseCase: CreateOrderUseCase,
+    private val clearCartUseCase: ClearCartUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OrderState())
@@ -93,6 +96,9 @@ class OrderViewModel @Inject constructor(
                             createdOrder = resource.data
                         )
                     }
+                    
+                    // Clear cart reservations after successful order creation
+                    clearCartReservations()
                 }
                 is Resource.Error -> {
                     _state.update {
@@ -119,6 +125,27 @@ class OrderViewModel @Inject constructor(
      */
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+    
+    /**
+     * Clear cart reservations after order confirmation
+     * This releases all temporary stock reservations
+     */
+    private fun clearCartReservations() {
+        viewModelScope.launch {
+            clearCartUseCase().collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        println("✅ Cart reservations cleared: ${resource.data?.clearedCount} products")
+                    }
+                    is Resource.Error -> {
+                        println("⚠️ Failed to clear cart reservations: ${resource.message}")
+                        // Don't fail the order - backend will auto-expire reservations
+                    }
+                    is Resource.Loading -> {}
+                }
+            }
+        }
     }
 }
 

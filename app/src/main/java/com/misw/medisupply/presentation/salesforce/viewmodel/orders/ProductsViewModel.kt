@@ -11,6 +11,9 @@ import com.misw.medisupply.domain.model.product.Pagination
 import com.misw.medisupply.domain.model.product.Product
 import com.misw.medisupply.domain.model.stock.DistributionCenter
 import com.misw.medisupply.domain.model.stock.StockLevel
+import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
+import com.misw.medisupply.domain.usecase.cart.ReleaseStockUseCase
+import com.misw.medisupply.domain.usecase.cart.ReserveStockUseCase
 import com.misw.medisupply.domain.usecase.product.GetProductsUseCase
 import com.misw.medisupply.domain.usecase.stock.GetMultipleProductsStockUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,12 +38,16 @@ private const val PRODUCTS_CACHE_DURATION_MS = 3_600_000L // 1 hour
  * ViewModel for Products Screen
  * Manages product catalog state, filtering and search with intelligent caching
  * Stock is always loaded fresh (no cache)
- * Now includes real-time stock updates via WebSocket
+ * Includes real-time stock updates via WebSocket
+ * Includes cart stock reservation system
  */
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
     private val getMultipleProductsStockUseCase: GetMultipleProductsStockUseCase,
+    private val reserveStockUseCase: ReserveStockUseCase,
+    private val releaseStockUseCase: ReleaseStockUseCase,
+    private val clearCartUseCase: ClearCartUseCase,
     private val webSocketClient: InventoryWebSocketClient
 ) : ViewModel() {
 
@@ -234,12 +241,6 @@ class ProductsViewModel @Inject constructor(
             val productSkus = products.map { it.sku }
             webSocketClient.subscribeToProducts(productSkus)
         }
-    }
-    
-    override fun onCleared() {
-        super.onCleared()
-        webSocketClient.disconnect()
-        println("🔌 WebSocket desconectado (ViewModel cleared)")
     }
     
     // ============================================================================
@@ -490,8 +491,13 @@ class ProductsViewModel @Inject constructor(
     }
     
     // ============================================================================
-    // Shopping Cart Management
+    // Shopping Cart Management with Stock Reservation
     // ============================================================================
+    
+    /**
+     * Add product to cart with backend stock reservation
+     * Uses optimistic update with rollback on failure
+     */
     fun addToCart(product: Product) {
         val normalizedSku = normalizedSku(product.sku)
         val stockLevel = _state.value.productStockMap[normalizedSku]
@@ -499,69 +505,137 @@ class ProductsViewModel @Inject constructor(
         
         println("🛒 Adding to cart: ${product.name} (SKU: ${product.sku})")
         println("   Normalized SKU: $normalizedSku")
-        println("   Stock Level: $stockLevel")
         println("   Stock Available: $stockAvailable")
         
+        // 1. Local validation
+        val currentCart = _state.value.cartItems
+        val existingItem = currentCart[normalizedSku]
+        val newQuantity = if (existingItem != null) existingItem.quantity + 1 else 1
+        
+        if (stockAvailable != null && newQuantity > stockAvailable) {
+            _state.update { it.copy(error = "Stock insuficiente (disponible: $stockAvailable)") }
+            println("   ❌ Cannot exceed stock: $newQuantity > $stockAvailable")
+            return
+        }
+        
+        // 2. Optimistic UI update
+        val updatedCartItem = if (existingItem != null) {
+            existingItem.copy(quantity = newQuantity)
+        } else {
+            CartItem(
+                productSku = product.sku,
+                productName = product.name,
+                quantity = 1,
+                unitPrice = product.unitPrice,
+                stockAvailable = stockAvailable,
+                requiresColdChain = product.requiresColdChain,
+                category = product.category
+            )
+        }
+        
         _state.update { currentState ->
-            val currentCart = currentState.cartItems.toMutableMap()
-            val existingItem = currentCart[normalizedSku]
-            
-            println("   Existing item in cart: $existingItem")
-            
-            if (existingItem != null) {
-                // Check if we can increase quantity
-                val newQuantity = existingItem.quantity + 1
-                if (stockAvailable != null && newQuantity > stockAvailable) {
-                    // Cannot exceed stock
-                    println("   ❌ Cannot exceed stock: $newQuantity > $stockAvailable")
-                    return@update currentState
+            val updatedCart = currentState.cartItems.toMutableMap()
+            updatedCart[normalizedSku] = updatedCartItem
+            currentState.copy(
+                cartItems = updatedCart,
+                isReservingStock = true,
+                error = null
+            )
+        }
+        
+        println("   ✅ Optimistic update: quantity = $newQuantity")
+        
+        // 3. Reserve stock in backend
+        viewModelScope.launch {
+            reserveStockUseCase(
+                productSku = product.sku,
+                quantity = 1 // Always reserve 1 unit at a time
+            ).collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        println("   ✅ Stock reserved in backend: ${resource.data?.quantityReserved} units")
+                        _state.update { it.copy(isReservingStock = false) }
+                        // WebSocket will update the stock automatically
+                    }
+                    
+                    is Resource.Error -> {
+                        println("   ❌ Failed to reserve stock: ${resource.message}")
+                        
+                        // Rollback optimistic update
+                        _state.update { currentState ->
+                            val revertedCart = currentState.cartItems.toMutableMap()
+                            
+                            if (existingItem != null) {
+                                // Restore previous quantity
+                                revertedCart[normalizedSku] = existingItem
+                            } else {
+                                // Remove item that couldn't be added
+                                revertedCart.remove(normalizedSku)
+                            }
+                            
+                            currentState.copy(
+                                cartItems = revertedCart,
+                                isReservingStock = false,
+                                error = resource.message ?: "No se pudo reservar el stock"
+                            )
+                        }
+                    }
+                    
+                    is Resource.Loading -> {
+                        // Already showing loading state
+                    }
                 }
-                
-                println("   ✅ Increasing quantity: ${existingItem.quantity} → $newQuantity")
-                currentCart[normalizedSku] = existingItem.copy(quantity = newQuantity)
-            } else {
-                // Add new item to cart
-                if (stockAvailable != null && stockAvailable < 1) {
-                    // No stock available
-                    println("   ❌ No stock available: $stockAvailable")
-                    return@update currentState
-                }
-                
-                println("   ✅ Adding new item to cart with quantity: 1")
-                currentCart[normalizedSku] = CartItem(
-                    productSku = product.sku,
-                    productName = product.name,
-                    quantity = 1,
-                    unitPrice = product.unitPrice,
-                    stockAvailable = stockAvailable,
-                    requiresColdChain = product.requiresColdChain,
-                    category = product.category
-                )
             }
-            
-            println("   Cart now has ${currentCart.size} unique products")
-            currentState.copy(cartItems = currentCart)
         }
     }
     
+    /**
+     * Remove product from cart or decrease quantity with backend stock release
+     */
     fun removeFromCart(productSku: String) {
         val normalizedSku = normalizedSku(productSku)
+        val cartItem = _state.value.cartItems[normalizedSku] ?: return
         
+        println("🗑️ Removing from cart: ${cartItem.productName} (qty: ${cartItem.quantity})")
+        
+        // Determine new quantity
+        val newQuantity = cartItem.quantity - 1
+        val quantityToRelease = 1
+        
+        // Optimistic update
         _state.update { currentState ->
-            val currentCart = currentState.cartItems.toMutableMap()
-            val existingItem = currentCart[normalizedSku]
+            val updatedCart = currentState.cartItems.toMutableMap()
             
-            if (existingItem != null) {
-                if (existingItem.quantity > 1) {
-                    // Decrease quantity
-                    currentCart[normalizedSku] = existingItem.copy(quantity = existingItem.quantity - 1)
-                } else {
-                    // Remove from cart
-                    currentCart.remove(normalizedSku)
-                }
+            if (newQuantity > 0) {
+                updatedCart[normalizedSku] = cartItem.copy(quantity = newQuantity)
+            } else {
+                updatedCart.remove(normalizedSku)
             }
             
-            currentState.copy(cartItems = currentCart)
+            currentState.copy(cartItems = updatedCart)
+        }
+        
+        // Release stock in backend
+        viewModelScope.launch {
+            releaseStockUseCase(
+                productSku = productSku,
+                quantity = quantityToRelease
+            ).collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        println("   ✅ Stock released in backend: ${resource.data?.quantityReleased} units")
+                        // WebSocket will update the stock automatically
+                    }
+                    
+                    is Resource.Error -> {
+                        println("   ⚠️ Failed to release stock: ${resource.message}")
+                        // Don't rollback - backend will auto-release on timeout
+                        // Just log the error
+                    }
+                    
+                    is Resource.Loading -> {}
+                }
+            }
         }
     }
     
@@ -598,6 +672,7 @@ class ProductsViewModel @Inject constructor(
     fun removeProductFromCart(productSku: String) {
         val normalizedSku = normalizedSku(productSku)
         
+        
         _state.update { currentState ->
             val currentCart = currentState.cartItems.toMutableMap()
             currentCart.remove(normalizedSku)
@@ -605,13 +680,38 @@ class ProductsViewModel @Inject constructor(
         }
     }
     
+    /**
+     * Clear all cart items and release all stock reservations
+     * Call this when order is confirmed or user explicitly clears cart
+     */
     fun clearCart() {
+        println("🧹 Clearing cart...")
+        
+        // Clear UI immediately
         _state.update { it.copy(cartItems = emptyMap()) }
+        
+        // Release all reservations in backend
+        viewModelScope.launch {
+            clearCartUseCase().collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        println("   ✅ Cart cleared in backend: ${resource.data?.clearedCount} reservations")
+                    }
+                    is Resource.Error -> {
+                        println("   ⚠️ Failed to clear cart in backend: ${resource.message}")
+                        // Cart is already cleared in UI, backend will auto-expire
+                    }
+                    is Resource.Loading -> {}
+                }
+            }
+        }
     }
     
     /**
      * Load initial cart items (for edit mode)
      * Populates the cart with items from an existing order
+     * NOTE: These items are not reserved in the cart reservation system
+     * They are from an existing confirmed order
      */
     fun loadInitialCartItems(items: Map<String, CartItem>) {
         _state.update { it.copy(cartItems = items) }
@@ -633,6 +733,26 @@ class ProductsViewModel @Inject constructor(
     fun hasItemsInCart(): Boolean {
         return _state.value.cartItems.isNotEmpty()
     }
+    
+    /**
+     * Clean up when ViewModel is destroyed
+     * Release all cart reservations
+     */
+    override fun onCleared() {
+        super.onCleared()
+        
+        // Clear cart reservations before destroying
+        if (_state.value.cartItems.isNotEmpty()) {
+            println("🔄 ViewModel cleared - releasing cart reservations")
+            // Launch in a separate scope since viewModelScope is already cancelled
+            kotlinx.coroutines.GlobalScope.launch {
+                clearCartUseCase().collect { /* Best effort release */ }
+            }
+        }
+        
+        webSocketClient.disconnect()
+        println("🔌 WebSocket desconectado (ViewModel cleared)")
+    }
 }
 
 data class ProductsState(
@@ -647,5 +767,7 @@ data class ProductsState(
     val isLoadingStock: Boolean = false,
     val stockError: String? = null,
     val stockRetryAttempt: Int = 0,
-    val cartItems: Map<String, CartItem> = emptyMap()
+    val cartItems: Map<String, CartItem> = emptyMap(),
+    val isReservingStock: Boolean = false // New field for reservation loading state
 )
+

@@ -112,6 +112,9 @@ dependencies {
     // Socket.IO Client for WebSockets
     implementation("io.socket:socket.io-client:2.1.0")
     
+    // DataStore for preferences (Session Management)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")

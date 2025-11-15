@@ -13,6 +13,12 @@ import com.misw.medisupply.domain.model.stock.MultipleStockLevels
 import com.misw.medisupply.domain.model.stock.StockLevel
 import com.misw.medisupply.domain.usecase.product.GetProductsUseCase
 import com.misw.medisupply.domain.usecase.stock.GetMultipleProductsStockUseCase
+import com.misw.medisupply.domain.usecase.cart.ReserveStockUseCase
+import com.misw.medisupply.domain.usecase.cart.ReleaseStockUseCase
+import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
+import com.misw.medisupply.domain.usecase.cart.ReserveStockResult
+import com.misw.medisupply.domain.usecase.cart.ReleaseStockResult
+import com.misw.medisupply.domain.usecase.cart.ClearCartResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +55,9 @@ class ProductsViewModelTest {
     
     private lateinit var getProductsUseCase: GetProductsUseCase
     private lateinit var getMultipleProductsStockUseCase: GetMultipleProductsStockUseCase
+    private lateinit var reserveStockUseCase: ReserveStockUseCase
+    private lateinit var releaseStockUseCase: ReleaseStockUseCase
+    private lateinit var clearCartUseCase: ClearCartUseCase
     private lateinit var webSocketClient: InventoryWebSocketClient
     private lateinit var viewModel: ProductsViewModel
 
@@ -197,6 +206,9 @@ class ProductsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         getProductsUseCase = mock()
         getMultipleProductsStockUseCase = mock()
+        reserveStockUseCase = mock()
+        releaseStockUseCase = mock()
+        clearCartUseCase = mock()
         webSocketClient = mock()
         
         // Mock WebSocket client behavior
@@ -208,6 +220,36 @@ class ProductsViewModelTest {
             .thenReturn(flowOf(Resource.Loading()))
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Loading()))
+        
+        // Mock cart use cases with default success responses
+        whenever(reserveStockUseCase.invoke(any(), any(), any(), any())).thenReturn(
+            flowOf(Resource.Success(ReserveStockResult(
+                success = true,
+                reservationId = 1,
+                productSku = "PROD001",
+                quantityReserved = 1,
+                stockAvailable = 99,
+                expiresAt = null,
+                remainingTimeSeconds = null
+            )))
+        )
+        
+        whenever(releaseStockUseCase.invoke(any(), any())).thenReturn(
+            flowOf(Resource.Success(ReleaseStockResult(
+                success = true,
+                productSku = "PROD001",
+                quantityReleased = 1,
+                stockAvailable = 100
+            )))
+        )
+        
+        whenever(clearCartUseCase.invoke()).thenReturn(
+            flowOf(Resource.Success(ClearCartResult(
+                success = true,
+                clearedCount = 0,
+                productsAffected = emptyList()
+            )))
+        )
     }
 
     @After
@@ -222,7 +264,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
 
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         verify(getProductsUseCase).invoke(isNull(), isNull(), isNull(), isNull(), isNull(), eq(true), isNull(), eq(1), eq(20))
     }
@@ -232,7 +274,7 @@ class ProductsViewModelTest {
         whenever(getProductsUseCase.invoke(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading()))
 
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.state.test {
             val state = awaitItem()
@@ -249,7 +291,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
 
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.state.test {
             val state = awaitItem()
@@ -268,7 +310,7 @@ class ProductsViewModelTest {
         whenever(getProductsUseCase.invoke(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
             .thenReturn(flowOf(Resource.Error(errorMessage)))
 
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.state.test {
             val state = awaitItem()
@@ -286,7 +328,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.onSearchQueryChange("Product 1")
 
@@ -305,7 +347,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         viewModel.onSearchQueryChange("test")
 
         viewModel.onSearchQueryChange("")
@@ -324,7 +366,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.onCategoryFilterChange("Medicamentos")
 
@@ -343,7 +385,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         viewModel.onSearchQueryChange("test")
         viewModel.onCategoryFilterChange("Medicamentos")
 
@@ -366,7 +408,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.loadNextPage()
 
@@ -380,7 +422,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.loadNextPage()
 
@@ -395,7 +437,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.loadPreviousPage()
 
@@ -409,7 +451,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.refresh()
 
@@ -423,7 +465,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
 
         viewModel.addToCart(product)
@@ -444,7 +486,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
 
         viewModel.addToCart(product)
@@ -470,7 +512,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(limitedStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
 
         viewModel.addToCart(product)
@@ -491,7 +533,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
         viewModel.addToCart(product)
         viewModel.addToCart(product)
@@ -512,7 +554,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
         viewModel.addToCart(product)
 
@@ -532,7 +574,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
         viewModel.addToCart(product)
 
@@ -552,7 +594,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
         viewModel.addToCart(product)
 
@@ -571,7 +613,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
         viewModel.addToCart(product)
         viewModel.addToCart(product)
@@ -591,7 +633,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         viewModel.addToCart(testProducts[0])
         viewModel.addToCart(testProducts[1])
 
@@ -611,7 +653,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         val product = testProducts[0]
         viewModel.addToCart(product)
         viewModel.addToCart(product)
@@ -628,7 +670,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         viewModel.addToCart(testProducts[0])
         viewModel.addToCart(testProducts[0])
         viewModel.addToCart(testProducts[1])
@@ -645,7 +687,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         viewModel.addToCart(testProducts[0]) // 100.0
         viewModel.addToCart(testProducts[0]) // 100.0
         viewModel.addToCart(testProducts[1]) // 50.0
@@ -662,7 +704,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
         viewModel.addToCart(testProducts[0])
 
         val hasItems = viewModel.hasItemsInCart()
@@ -677,7 +719,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         val hasItems = viewModel.hasItemsInCart()
 
@@ -691,7 +733,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Success(testMultipleStockLevels)))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         val stock = viewModel.getStockForProduct("PROD001")
 
@@ -706,7 +748,7 @@ class ProductsViewModelTest {
         whenever(getMultipleProductsStockUseCase.invoke(any(), anyOrNull(), anyOrNull(), any(), any()))
             .thenReturn(flowOf(Resource.Error("Stock error")))
         
-        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, webSocketClient)
+        viewModel = ProductsViewModel(getProductsUseCase, getMultipleProductsStockUseCase, reserveStockUseCase, releaseStockUseCase, clearCartUseCase, webSocketClient)
 
         viewModel.retryStockLoading()
 

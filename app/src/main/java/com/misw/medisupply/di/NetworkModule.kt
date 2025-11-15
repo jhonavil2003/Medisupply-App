@@ -201,6 +201,15 @@ object NetworkModule {
     }
     
     /**
+     * Provides CartApiService for cart reservation operations
+     */
+    @Provides
+    @Singleton
+    fun provideCartApiService(@LogisticsRetrofit retrofit: Retrofit): com.misw.medisupply.data.remote.api.cart.CartApiService {
+        return retrofit.create(com.misw.medisupply.data.remote.api.cart.CartApiService::class.java)
+    }
+    
+    /**
      * Provides OrderApiService
      */
     @Provides
