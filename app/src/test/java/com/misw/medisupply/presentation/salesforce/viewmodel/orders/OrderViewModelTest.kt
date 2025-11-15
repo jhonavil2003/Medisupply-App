@@ -13,6 +13,8 @@ import com.misw.medisupply.domain.model.order.PaymentTerms
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.order.CreateOrderUseCase
+import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
+import com.misw.medisupply.domain.usecase.cart.ClearCartResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -42,6 +44,7 @@ class OrderViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     
     private lateinit var createOrderUseCase: CreateOrderUseCase
+    private lateinit var clearCartUseCase: ClearCartUseCase
     private lateinit var viewModel: OrderViewModel
 
     private val testCustomer = Customer(
@@ -116,7 +119,18 @@ class OrderViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         createOrderUseCase = mock()
-        viewModel = OrderViewModel(createOrderUseCase)
+        clearCartUseCase = mock()
+        
+        // Mock clearCartUseCase to return success by default
+        whenever(clearCartUseCase.invoke()).thenReturn(
+            flowOf(Resource.Success(ClearCartResult(
+                success = true,
+                clearedCount = 0,
+                productsAffected = emptyList()
+            )))
+        )
+        
+        viewModel = OrderViewModel(createOrderUseCase, clearCartUseCase)
     }
 
     @After
