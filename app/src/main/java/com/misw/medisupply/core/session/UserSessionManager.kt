@@ -1,9 +1,12 @@
 package com.misw.medisupply.core.session
 
 import com.misw.medisupply.domain.model.salesperson.Salesperson
+import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +14,9 @@ import javax.inject.Singleton
  * Manages user session including role and salesperson information
  */
 @Singleton
-class UserSessionManager @Inject constructor() {
+class UserSessionManager @Inject constructor(
+    private val clearCartUseCase: ClearCartUseCase
+) {
     
     private val _currentSalesperson = MutableStateFlow<Salesperson?>(null)
     val currentSalesperson: StateFlow<Salesperson?> = _currentSalesperson.asStateFlow()
@@ -60,10 +65,28 @@ class UserSessionManager @Inject constructor() {
     
     /**
      * Clear session (logout)
+     * Also releases all cart reservations
      */
     fun clearSession() {
+        // Clear cart reservations BEFORE clearing session
+        // Use GlobalScope since we're in a singleton and need guaranteed execution
+        GlobalScope.launch {
+            try {
+                clearCartUseCase().collect { resource ->
+                    // Best effort - don't block logout if it fails
+                    println("🧹 Logout: Cart cleanup result = ${resource.javaClass.simpleName}")
+                }
+            } catch (e: Exception) {
+                println("⚠️ Logout: Failed to clear cart reservations: ${e.message}")
+                // Don't block logout - backend will auto-expire reservations
+            }
+        }
+        
+        // Clear session data
         _currentSalesperson.value = null
         _currentRole.value = null
+        
+        println("👋 Session cleared - User logged out")
     }
     
     /**

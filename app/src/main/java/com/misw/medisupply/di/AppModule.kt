@@ -24,8 +24,4 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSessionManager(): SessionManager = SessionManager()
-    
-    @Provides
-    @Singleton
-    fun provideUserSessionManager(): UserSessionManager = UserSessionManager()
 }

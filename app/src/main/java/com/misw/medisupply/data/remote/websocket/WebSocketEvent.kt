@@ -42,12 +42,14 @@ sealed class WebSocketEvent {
 
 /**
  * Stock update data from WebSocket notification
+ * Now includes cart reservation information
  */
 data class StockUpdateData(
     val productSku: String,
     val totalAvailable: Int,
     val totalReserved: Int,
     val totalInTransit: Int,
+    val totalCartReserved: Int = 0, // New field for cart reservations
     val distributionCenters: List<DistributionCenterStock>,
     val quantityChange: Int?,
     val previousQuantity: Int?,

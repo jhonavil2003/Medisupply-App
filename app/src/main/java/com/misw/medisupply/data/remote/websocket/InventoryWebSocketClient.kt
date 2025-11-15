@@ -321,6 +321,7 @@ class InventoryWebSocketClient @Inject constructor() {
             totalAvailable = json.getInt("total_available"),
             totalReserved = json.optInt("total_reserved", 0),
             totalInTransit = json.optInt("total_in_transit", 0),
+            totalCartReserved = json.optInt("total_cart_reserved", 0), // Parse new field
             distributionCenters = distributionCenters,
             quantityChange = json.optInt("quantity_change"),
             previousQuantity = json.optInt("previous_quantity"),
