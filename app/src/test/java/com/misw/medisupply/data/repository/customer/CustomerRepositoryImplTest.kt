@@ -51,8 +51,6 @@ class CustomerRepositoryImplTest {
             latitude = null,
             longitude = null,
             creditLimit = 10000000.0,
-            longitude = null,
-            creditLimit = 10000000.0,
             creditDays = 30,
             isActive = true,
             createdAt = null,
@@ -152,7 +150,9 @@ class CustomerRepositoryImplTest {
             createdAt = null,
             updatedAt = null,
             salespersonId = null,
-            salesperson = null
+            salesperson = null,
+            latitude = null,
+            longitude = null
         )
         whenever(apiService.getCustomerById(any()))
             .thenReturn(Response.success(mockCustomerDto))
