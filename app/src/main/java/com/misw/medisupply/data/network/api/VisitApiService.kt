@@ -3,6 +3,7 @@ package com.misw.medisupply.data.network.api
 import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
 import com.misw.medisupply.data.network.dto.visit.CreateVisitResponse
 import com.misw.medisupply.data.network.dto.visit.CreateVisitApiResponse
+import com.misw.medisupply.data.network.dto.visit.GetVisitsResponse
 import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
 import com.misw.medisupply.domain.model.visit.*
 import okhttp3.MultipartBody
@@ -19,6 +20,17 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface VisitApiService {
+    
+    /**
+     * Obtener visitas con filtros opcionales
+     * GET /visits/?customer_id={id}&salesperson_id={id}&status={status}
+     */
+    @GET("visits/")
+    suspend fun getVisits(
+        @Query("customer_id") customerId: Int? = null,
+        @Query("salesperson_id") salespersonId: Int? = null,
+        @Query("status") status: String? = null
+    ): Response<GetVisitsResponse>
     
     @POST("visits")
     suspend fun createVisit(

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.Order
+import com.misw.medisupply.domain.model.visit.Visit
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
+import com.misw.medisupply.domain.usecase.visit.GetVisitsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,15 +15,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * ViewModel for Customer Detail Screen
- * Manages customer orders and statistics
+ * Manages customer orders, visits and statistics
  */
 @HiltViewModel
 class CustomerDetailViewModel @Inject constructor(
-    private val getOrdersUseCase: GetOrdersUseCase
+    private val getOrdersUseCase: GetOrdersUseCase,
+    private val getVisitsUseCase: GetVisitsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CustomerDetailState())
@@ -64,6 +68,41 @@ class CustomerDetailViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    /**
+     * Load customer visits filtered by salesperson
+     */
+    fun loadCustomerVisits(customerId: Int, salespersonId: Int) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoadingVisits = true, visitsError = null) }
+            
+            val result = getVisitsUseCase(
+                customerId = customerId,
+                salespersonId = salespersonId,
+                status = null // Sin filtro de estado, traer todas las visitas del cliente
+            )
+            
+            result.fold(
+                onSuccess = { visits ->
+                    _state.update {
+                        it.copy(
+                            isLoadingVisits = false,
+                            visits = visits.sortedByDescending { visit -> visit.visitDate },
+                            visitsError = null
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _state.update {
+                        it.copy(
+                            isLoadingVisits = false,
+                            visitsError = error.message ?: "Error al cargar visitas"
+                        )
+                    }
+                }
+            )
+        }
     }
 
     /**
@@ -127,7 +166,10 @@ data class CustomerDetailState(
     val orders: List<Order> = emptyList(),
     val recentOrders: List<Order> = emptyList(),
     val statistics: CustomerStatistics = CustomerStatistics(),
-    val ordersError: String? = null
+    val ordersError: String? = null,
+    val isLoadingVisits: Boolean = false,
+    val visits: List<Visit> = emptyList(),
+    val visitsError: String? = null
 )
 
 /**

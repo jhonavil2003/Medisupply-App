@@ -45,7 +45,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
@@ -65,6 +67,8 @@ import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
+import com.misw.medisupply.domain.model.visit.Visit
+import com.misw.medisupply.domain.model.visit.VisitStatus
 import com.misw.medisupply.presentation.salesforce.viewmodel.customers.CustomerDetailViewModel
 import com.misw.medisupply.presentation.salesforce.viewmodel.customers.CustomerStatistics
 import java.text.SimpleDateFormat
@@ -81,9 +85,15 @@ fun CustomerDetailScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: CustomerDetailViewModel = hiltViewModel()
 ) {
-    // Load customer orders on screen launch
+    // Load customer orders and visits on screen launch
     DisposableEffect(customer.id) {
         viewModel.loadCustomerOrders(customer.id)
+        
+        // Load visits if customer has salesperson assigned
+        customer.salesperson?.let { salesperson ->
+            viewModel.loadCustomerVisits(customer.id, salesperson.id)
+        }
+        
         onDispose {
             viewModel.clearState()
         }
@@ -185,8 +195,65 @@ private fun CustomerDetailContent(
             }
         }
         
+        // Recent Visits Card
+        if (!state.isLoadingVisits && state.visits.isNotEmpty()) {
+            item {
+                RecentVisitsCard(visits = state.visits.take(5))
+            }
+        }
+        
+        // No Visits Message (only if customer has salesperson)
+        if (!state.isLoadingVisits && state.visits.isEmpty() && state.visitsError == null && customer.salesperson != null) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Sin visitas realizadas",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "No se encontraron visitas completadas para este cliente",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+        
         // Loading Orders Indicator
         if (state.isLoadingOrders) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        
+        // Loading Visits Indicator
+        if (state.isLoadingVisits) {
             item {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -208,6 +275,24 @@ private fun CustomerDetailContent(
                 ) {
                     Text(
                         text = error,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+        
+        // Visits Error Message
+        state.visitsError?.let { error ->
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = "Error al cargar visitas: $error",
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
@@ -881,6 +966,11 @@ private fun RecentOrdersCard(
     orders: List<Order>,
     modifier: Modifier = Modifier
 ) {
+    var showAllOrders by remember { mutableStateOf(false) }
+    val maxOrdersToShow = 3
+    val ordersToDisplay = if (showAllOrders) orders else orders.take(maxOrdersToShow)
+    val hasMoreOrders = orders.size > maxOrdersToShow
+    
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -919,10 +1009,46 @@ private fun RecentOrdersCard(
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
             } else {
-                orders.forEach { order ->
+                ordersToDisplay.forEach { order ->
                     OrderListItem(order = order)
-                    if (order != orders.last()) {
+                    if (order != ordersToDisplay.last()) {
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    }
+                }
+                
+                if (hasMoreOrders && !showAllOrders) {
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showAllOrders = true }
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+ Ver ${orders.size - maxOrdersToShow} pedido${if (orders.size - maxOrdersToShow > 1) "s" else ""} más",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                
+                if (showAllOrders && hasMoreOrders) {
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showAllOrders = false }
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "- Ver menos",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
@@ -1006,6 +1132,208 @@ private fun OrderListItem(
                 text = "${order.items.size} producto${if (order.items.size != 1) "s" else ""}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecentVisitsCard(
+    visits: List<Visit>,
+    modifier: Modifier = Modifier
+) {
+    var showAllVisits by remember { mutableStateOf(false) }
+    val maxVisitsToShow = 3
+    val visitsToDisplay = if (showAllVisits) visits else visits.take(maxVisitsToShow)
+    val hasMoreVisits = visits.size > maxVisitsToShow
+    
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Visitas",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Divider(modifier = Modifier.padding(bottom = 8.dp))
+
+            if (visits.isEmpty()) {
+                Text(
+                    text = "No hay visitas registradas",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            } else {
+                visitsToDisplay.forEach { visit ->
+                    VisitListItem(visit = visit)
+                    if (visit != visitsToDisplay.last()) {
+                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    }
+                }
+                
+                if (hasMoreVisits && !showAllVisits) {
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showAllVisits = true }
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+ Ver ${visits.size - maxVisitsToShow} visita${if (visits.size - maxVisitsToShow > 1) "s" else ""} más",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                
+                if (showAllVisits && hasMoreVisits) {
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showAllVisits = false }
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "- Ver menos",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun VisitListItem(
+    visit: Visit,
+    modifier: Modifier = Modifier
+) {
+    val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+    
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Visita #${visit.id}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = visit.visitDate.format(dateFormatter),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Hora y estado
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = visit.visitTime.format(timeFormatter),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            // Badge de estado
+            Surface(
+                color = when (visit.status) {
+                    VisitStatus.PROGRAMADA -> MaterialTheme.colorScheme.tertiaryContainer
+                    VisitStatus.COMPLETADA -> MaterialTheme.colorScheme.secondaryContainer
+                    VisitStatus.ELIMINADA -> MaterialTheme.colorScheme.errorContainer
+                },
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = visit.status.displayName,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    color = when (visit.status) {
+                        VisitStatus.PROGRAMADA -> MaterialTheme.colorScheme.onTertiaryContainer
+                        VisitStatus.COMPLETADA -> MaterialTheme.colorScheme.onSecondaryContainer
+                        VisitStatus.ELIMINADA -> MaterialTheme.colorScheme.onErrorContainer
+                    }
+                )
+            }
+        }
+
+        // Dirección si está disponible
+        visit.address?.let { address ->
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = address,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // Hallazgos clínicos si están disponibles
+        visit.clinicalFindings?.let { findings ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Hallazgos:",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = findings,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
     }

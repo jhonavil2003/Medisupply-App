@@ -7,6 +7,15 @@ import okhttp3.ResponseBody
 import java.io.File
 
 interface VisitRepository {
+    /**
+     * Obtener visitas con filtros opcionales
+     */
+    suspend fun getVisits(
+        customerId: Int? = null,
+        salespersonId: Int? = null,
+        status: String? = null
+    ): Result<List<Visit>>
+    
     suspend fun createVisit(visit: Visit): Result<Visit>
     suspend fun updateVisit(visitId: Int, visit: Visit): Result<Visit>
     suspend fun completeVisit(visitId: Int): Result<Visit>

@@ -3,6 +3,7 @@ package com.misw.medisupply.data.repository
 import com.misw.medisupply.data.network.api.VisitApiService
 import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
 import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
+import com.misw.medisupply.data.network.mapper.toVisit
 import com.misw.medisupply.domain.model.visit.*
 import com.misw.medisupply.domain.repository.VisitRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -18,6 +19,34 @@ import javax.inject.Singleton
 class VisitRepositoryImpl @Inject constructor(
     private val visitApiService: VisitApiService
 ) : VisitRepository {
+
+    override suspend fun getVisits(
+        customerId: Int?,
+        salespersonId: Int?,
+        status: String?
+    ): Result<List<Visit>> {
+        return try {
+            val response = visitApiService.getVisits(
+                customerId = customerId,
+                salespersonId = salespersonId,
+                status = status
+            )
+            
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    val visits = responseBody.visits.map { it.toVisit() }
+                    Result.success(visits)
+                } else {
+                    Result.failure(Exception("Response body is null"))
+                }
+            } else {
+                Result.failure(Exception("Error: ${response.code()} - ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun createVisit(visit: Visit): Result<Visit> {
         return try {
