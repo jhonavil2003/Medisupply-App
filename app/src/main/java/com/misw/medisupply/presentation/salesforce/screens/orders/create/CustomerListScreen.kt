@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.presentation.salesforce.components.CustomerItem
 import com.misw.medisupply.presentation.common.components.ErrorView
@@ -51,7 +52,8 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
 @Composable
 fun CustomerListScreen(
     viewModel: OrdersViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigateToCustomerDetail: (Customer) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -118,7 +120,8 @@ fun CustomerListScreen(
                         CustomerList(
                             customers = state.getFilteredCustomers(),
                             onCustomerClick = { customer ->
-                                viewModel.onEvent(OrdersEvent.SelectCustomer(customer))
+                                // Navigate to customer detail instead of just selecting
+                                onNavigateToCustomerDetail(customer)
                             }
                         )
                     }
@@ -194,8 +197,8 @@ private fun FilterChips(
  */
 @Composable
 private fun CustomerList(
-    customers: List<com.misw.medisupply.domain.model.customer.Customer>,
-    onCustomerClick: (com.misw.medisupply.domain.model.customer.Customer) -> Unit,
+    customers: List<Customer>,
+    onCustomerClick: (Customer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(

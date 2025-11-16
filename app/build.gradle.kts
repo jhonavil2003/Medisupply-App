@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +8,17 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
+
+// Leer Google Maps API Key desde local.properties o variable de entorno
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
+val googleMapsApiKey: String = localProperties.getProperty("GOOGLE_MAPS_API_KEY") 
+    ?: System.getenv("GOOGLE_MAPS_API_KEY") 
+    ?: "" // Fallback vacío si no está configurado
 
 android {
     namespace = "com.misw.medisupply"
@@ -18,6 +32,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Google Maps API Key desde variable segura
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = googleMapsApiKey
     }
 
     buildTypes {
@@ -59,8 +76,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
     buildFeatures {
         compose = true
@@ -111,6 +130,10 @@ dependencies {
     
     // Socket.IO Client for WebSockets
     implementation("io.socket:socket.io-client:2.1.0")
+    
+    // Google Maps for Compose
+    implementation("com.google.maps.android:maps-compose:4.4.1")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
     
     // DataStore for preferences (Session Management)
     implementation("androidx.datastore:datastore-preferences:1.0.0")

@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.customer.DocumentType
+import com.misw.medisupply.data.remote.dto.salesperson.SalespersonDto
+import com.misw.medisupply.data.remote.dto.salesperson.toDomain
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -51,6 +53,12 @@ data class CustomerDto(
     @SerializedName("country")
     val country: String,
     
+    @SerializedName("latitude")
+    val latitude: Double?,
+    
+    @SerializedName("longitude")
+    val longitude: Double?,
+    
     @SerializedName("credit_limit")
     val creditLimit: Double,
     
@@ -64,7 +72,13 @@ data class CustomerDto(
     val createdAt: String?,
     
     @SerializedName("updated_at")
-    val updatedAt: String?
+    val updatedAt: String?,
+    
+    @SerializedName("salesperson_id")
+    val salespersonId: Int?,
+    
+    @SerializedName("salesperson")
+    val salesperson: com.misw.medisupply.data.remote.dto.salesperson.SalespersonDto?
 )
 
 /**
@@ -94,11 +108,15 @@ fun CustomerDto.toDomain(): Customer {
         city = city,
         department = department,
         country = country,
+        latitude = latitude,
+        longitude = longitude,
         creditLimit = creditLimit,
         creditDays = creditDays,
         isActive = isActive,
         createdAt = createdAt?.parseIso8601(),
-        updatedAt = updatedAt?.parseIso8601()
+        updatedAt = updatedAt?.parseIso8601(),
+        salespersonId = salespersonId,
+        salesperson = salesperson?.toDomain()
     )
 }
 

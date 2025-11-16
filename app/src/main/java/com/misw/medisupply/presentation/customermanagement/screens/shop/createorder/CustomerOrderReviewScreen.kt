@@ -97,11 +97,15 @@ fun CustomerOrderReviewScreen(
         city = "Bogotá",
         department = "Cundinamarca",
         country = "Colombia",
+        latitude = null,
+        longitude = null,
         creditLimit = 10000000.0,
         creditDays = 30,
         isActive = true,
         createdAt = null,
-        updatedAt = null
+        updatedAt = null,
+        salespersonId = null,
+        salesperson = null
     )
 
     Scaffold(

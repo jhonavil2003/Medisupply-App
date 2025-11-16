@@ -36,11 +36,15 @@ class GetCustomersUseCaseTest {
             city = "Bogotá",
             department = "Cundinamarca",
             country = "Colombia",
+            latitude = null,
+            longitude = null,
             creditLimit = 10000.0,
             creditDays = 30,
             isActive = true,
             createdAt = Date(),
-            updatedAt = Date()
+            updatedAt = Date(),
+            salespersonId = null,
+            salesperson = null
         ),
         Customer(
             id = 2,
@@ -56,11 +60,15 @@ class GetCustomersUseCaseTest {
             city = "Medellín",
             department = "Antioquia",
             country = "Colombia",
+            latitude = null,
+            longitude = null,
             creditLimit = 15000.0,
             creditDays = 45,
             isActive = true,
             createdAt = Date(),
-            updatedAt = Date()
+            updatedAt = Date(),
+            salespersonId = null,
+            salesperson = null
         )
     )
 

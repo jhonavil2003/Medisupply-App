@@ -67,4 +67,21 @@ interface CustomerApiService {
     suspend fun registerCustomer(
         @Body request: CreateCustomerRequest
     ): Response<CreateCustomerResponse>
+    
+    /**
+     * Get customers assigned to a specific salesperson
+     * 
+     * @param salespersonId The ID of the salesperson
+     * @param isActive Filter by active status (optional)
+     * @param page Page number for pagination (default: 1)
+     * @param perPage Number of results per page (default: 50)
+     * @return Response containing CustomersResponse with list of customers and total count
+     */
+    @GET("customers/by-salesperson/{salesperson_id}")
+    suspend fun getCustomersBySalesperson(
+        @Path("salesperson_id") salespersonId: Int,
+        @Query("is_active") isActive: Boolean? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 50
+    ): Response<CustomersResponse>
 }

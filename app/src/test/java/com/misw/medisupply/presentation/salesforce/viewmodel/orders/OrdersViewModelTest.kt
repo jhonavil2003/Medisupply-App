@@ -14,6 +14,7 @@ import com.misw.medisupply.domain.model.order.PaymentMethod
 import com.misw.medisupply.domain.model.order.PaymentTerms
 import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
+import com.misw.medisupply.domain.usecase.customer.GetCustomersBySalespersonUseCase
 import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrderByIdUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
@@ -46,6 +47,7 @@ class OrdersViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     
     private lateinit var getCustomersUseCase: GetCustomersUseCase
+    private lateinit var getCustomersBySalespersonUseCase: GetCustomersBySalespersonUseCase
     private lateinit var getOrdersUseCase: GetOrdersUseCase
     private lateinit var getOrderByIdUseCase: GetOrderByIdUseCase
     private lateinit var updateOrderUseCase: UpdateOrderUseCase
@@ -67,11 +69,15 @@ class OrdersViewModelTest {
             city = "Bogotá",
             department = "Cundinamarca",
             country = "Colombia",
-            creditLimit = 50000000.0,
+            latitude = null,
+            longitude = null,
+            creditLimit = 10000.0,
             creditDays = 30,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null
         ),
         Customer(
             id = 2,
@@ -87,11 +93,15 @@ class OrdersViewModelTest {
             city = "Medellín",
             department = "Antioquia",
             country = "Colombia",
-            creditLimit = 20000000.0,
+            latitude = null,
+            longitude = null,
+            creditLimit = 15000.0,
             creditDays = 30,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null
         ),
         Customer(
             id = 3,
@@ -107,11 +117,15 @@ class OrdersViewModelTest {
             city = "Cali",
             department = "Valle del Cauca",
             country = "Colombia",
-            creditLimit = 30000000.0,
+            latitude = null,
+            longitude = null,
+            creditLimit = 20000.0,
             creditDays = 45,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null
         )
     )
 
@@ -119,12 +133,14 @@ class OrdersViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         getCustomersUseCase = mock()
+        getCustomersBySalespersonUseCase = mock()
         getOrdersUseCase = mock()
         getOrderByIdUseCase = mock()
         updateOrderUseCase = mock()
         deleteOrderUseCase = mock()
         
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), anyOrNull()))
+        // Mock default behavior for GetCustomersBySalespersonUseCase
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading()))
     }
 
@@ -136,6 +152,7 @@ class OrdersViewModelTest {
     private fun createViewModel(): OrdersViewModel {
         return OrdersViewModel(
             getCustomersUseCase,
+            getCustomersBySalespersonUseCase,
             getOrderByIdUseCase,
             getOrdersUseCase,
             updateOrderUseCase,
@@ -145,18 +162,18 @@ class OrdersViewModelTest {
 
     @Test
     fun `init loads customers automatically`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
 
         viewModel = createViewModel()
 
-        verify(getCustomersUseCase).invoke(null, null, true)
+        verify(getCustomersBySalespersonUseCase).invoke(2, true) // TEMP_SALESPERSON_ID = 2
     }
 
     @Test
     fun `loading customers shows loading state`() = runTest {
 
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading()))
 
 
@@ -171,7 +188,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `loading customers successfully updates state with customers`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(
                 Resource.Loading(),
                 Resource.Success(testCustomers)
@@ -192,7 +209,7 @@ class OrdersViewModelTest {
     fun `loading customers with error updates error state`() = runTest {
 
         val errorMessage = "Error al cargar clientes"
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(
                 Resource.Loading(),
                 Resource.Error(errorMessage)
@@ -210,7 +227,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `onEvent RefreshCustomers sets refreshing state`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
 
@@ -228,64 +245,30 @@ class OrdersViewModelTest {
     }
 
     @Test
-    fun `onEvent FilterByType filters customers by hospital`() = runTest {
-        val hospitalCustomers = listOf(testCustomers[0])
-        
-        // Mock for initial load (null filter)
-        whenever(getCustomersUseCase.invoke(null, null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
-        
-        // Mock for hospital filter
-        whenever(getCustomersUseCase.invoke("hospital", null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(hospitalCustomers)))
-        
-        viewModel = createViewModel()
-
-        // Just verify the use case was called with correct parameters
-        viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.HOSPITAL))
-        
-        verify(getCustomersUseCase).invoke("hospital", null, true)
-    }
-
-    @Test
-    fun `onEvent FilterByType with null clears filter`() = runTest {
-        val pharmacyCustomers = listOf(testCustomers[1])
-        
-        // Mock for initial load
-        whenever(getCustomersUseCase.invoke(null, null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
-        
-        // Mock for pharmacy filter
-        whenever(getCustomersUseCase.invoke("farmacia", null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(pharmacyCustomers)))
-        
-        viewModel = createViewModel()
-        
-        // Apply filter then clear it
-        viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.FARMACIA))
-        viewModel.onEvent(OrdersEvent.FilterByType(null))
-        
-        // Verify clearing filter calls use case with null
-        verify(getCustomersUseCase, atLeast(1)).invoke(null, null, true)
-    }
-
-    @Test
     fun `onEvent SearchCustomers updates search query`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
+        
+        // Mock GetCustomersUseCase for search functionality
+        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), anyOrNull()))
+            .thenReturn(flowOf(Resource.Success(testCustomers)))
+        
         viewModel = createViewModel()
-
-        viewModel.onEvent(OrdersEvent.SearchCustomers("Hospital"))
 
         viewModel.state.test {
+            skipItems(1) // Skip initial state from viewModel creation
+            
+            viewModel.onEvent(OrdersEvent.SearchCustomers("Hospital"))
+            
             val state = awaitItem()
             assertEquals("Hospital", state.searchQuery)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `onEvent SelectCustomer updates selected customer`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
         viewModel = createViewModel()
         val customerToSelect = testCustomers[0]
@@ -300,7 +283,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `onEvent ClearError clears error message`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Error("Test error")))
         viewModel = createViewModel()
 
@@ -314,7 +297,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `selectCustomer directly updates selected customer`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         viewModel = createViewModel()
         val customerToSelect = testCustomers[1]
@@ -333,7 +316,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `getCustomerTypes returns all customer types`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading(), Resource.Success(emptyList())))
         viewModel = createViewModel()
 
@@ -347,55 +330,8 @@ class OrdersViewModelTest {
     }
 
     @Test
-    fun `filtering by pharmacy type loads only pharmacy customers`() = runTest {
-        val pharmacyCustomers = listOf(testCustomers[1])
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
-        whenever(getCustomersUseCase.invoke("farmacia", null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(pharmacyCustomers)))
-        
-        viewModel = createViewModel()
-
-    viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.FARMACIA))
-    verify(getCustomersUseCase).invoke("farmacia", null, true)
-    }
-
-    @Test
-    fun `multiple filter changes update state correctly`() = runTest {
-        val hospitalCustomers = listOf(testCustomers[0])
-        val pharmacyCustomers = listOf(testCustomers[1])
-        val clinicCustomers = listOf(testCustomers[2])
-        
-        // Mock for initial load
-        whenever(getCustomersUseCase.invoke(null, null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
-        
-        // Mock for each filter type
-        whenever(getCustomersUseCase.invoke("hospital", null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(hospitalCustomers)))
-        
-        whenever(getCustomersUseCase.invoke("farmacia", null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(pharmacyCustomers)))
-        
-        whenever(getCustomersUseCase.invoke("clinica", null, true))
-            .thenReturn(flowOf(Resource.Loading(), Resource.Success(clinicCustomers)))
-        
-        viewModel = createViewModel()
-
-        // Apply multiple filters
-        viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.HOSPITAL))
-        viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.FARMACIA))
-        viewModel.onEvent(OrdersEvent.FilterByType(CustomerType.CLINICA))
-        
-        // Verify all filters were called
-        verify(getCustomersUseCase).invoke("hospital", null, true)
-        verify(getCustomersUseCase).invoke("farmacia", null, true)
-        verify(getCustomersUseCase).invoke("clinica", null, true)
-    }
-
-    @Test
     fun `loading empty list updates state with empty customers`() = runTest {
-        whenever(getCustomersUseCase.invoke(null, null, true))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Loading(), Resource.Success(emptyList())))
 
         viewModel = createViewModel()
@@ -460,7 +396,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `updateOrder with success updates state and shows success message`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         whenever(getOrderByIdUseCase.invoke(any()))
@@ -522,7 +458,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `updateOrder with error updates error state`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         val errorMessage = "Datos incompletos para actualizar la orden"
@@ -586,7 +522,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `loadOrderForEdit loads order and sets cart items`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         whenever(getOrderByIdUseCase.invoke(any()))
@@ -617,7 +553,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `ClearUpdateSuccess clears update success message`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         viewModel = createViewModel()
@@ -634,7 +570,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `deleteOrder with success updates state and shows success message`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         whenever(deleteOrderUseCase.invoke(any()))
@@ -659,7 +595,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `deleteOrder with error updates error state`() = runTest {
-        whenever(getCustomersUseCase.invoke(null, null, true))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         val errorMessage = "Solo se pueden eliminar pedidos en estado Pendiente"
@@ -688,7 +624,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `deleteOrder sets isDeleting to true during deletion`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         whenever(deleteOrderUseCase.invoke(any()))
@@ -706,7 +642,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `ClearDeleteSuccess clears delete success message`() = runTest {
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), any()))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         viewModel = createViewModel()
@@ -721,7 +657,7 @@ class OrdersViewModelTest {
 
     @Test
     fun `deleteOrder with order not found returns 404 error`() = runTest {
-        whenever(getCustomersUseCase.invoke(null, null, true))
+        whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
 
         whenever(deleteOrderUseCase.invoke(any()))

@@ -15,7 +15,9 @@ class CustomerTest {
         contactPhone: String? = "123456789",
         address: String? = "123 Main St",
         city: String? = "Bogotá",
-        department: String? = "Cundinamarca"
+        department: String? = "Cundinamarca",
+        latitude: Double? = null,
+        longitude: Double? = null
     ): Customer {
         return Customer(
             id = 1,
@@ -31,11 +33,15 @@ class CustomerTest {
             city = city,
             department = department,
             country = "Colombia",
+            latitude = latitude,
+            longitude = longitude,
             creditLimit = creditLimit,
             creditDays = 30,
             isActive = true,
             createdAt = Date(),
-            updatedAt = Date()
+            updatedAt = Date(),
+            salespersonId = null,
+            salesperson = null
         )
     }
 

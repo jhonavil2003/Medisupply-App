@@ -21,11 +21,15 @@ data class Customer(
     val city: String?,
     val department: String?,
     val country: String,
+    val latitude: Double?,
+    val longitude: Double?,
     val creditLimit: Double,
     val creditDays: Int,
     val isActive: Boolean,
     val createdAt: Date?,
-    val updatedAt: Date?
+    val updatedAt: Date?,
+    val salespersonId: Int?,
+    val salesperson: com.misw.medisupply.domain.model.salesperson.Salesperson?
 ) {
     /**
      * Get formatted credit limit as currency

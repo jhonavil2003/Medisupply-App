@@ -250,7 +250,11 @@ class CustomerRepositoryImpl @Inject constructor(
                     creditDays = 0,
                     isActive = true,
                     createdAt = null,
-                    updatedAt = null
+                    updatedAt = null,
+                    salespersonId = null,
+                    salesperson = null,
+                    latitude = null,
+                    longitude = null
                 )
                 
                 Log.d(TAG, "✅ Cliente objeto creado exitosamente: $registeredCustomer")
@@ -273,6 +277,54 @@ class CustomerRepositoryImpl @Inject constructor(
                 400 -> "Datos inválidos. Verifique la información ingresada"
                 409 -> "El NIT/RUC ya está registrado en el sistema"
                 422 -> "Email inválido o datos incompletos"
+                408 -> Constants.ErrorMessages.TIMEOUT
+                500, 502, 503 -> Constants.ErrorMessages.SERVER_ERROR
+                else -> Constants.ErrorMessages.UNKNOWN_ERROR
+            }
+            emit(Resource.Error(errorMessage))
+            
+        } catch (e: IOException) {
+            emit(Resource.Error(Constants.ErrorMessages.NETWORK_ERROR))
+            
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
+        }
+    }
+    
+    override fun getCustomersBySalesperson(
+        salespersonId: Int,
+        isActive: Boolean?
+    ): Flow<Resource<List<Customer>>> = flow {
+        try {
+            emit(Resource.Loading())
+            
+            val response = apiService.getCustomersBySalesperson(
+                salespersonId = salespersonId,
+                isActive = isActive
+            )
+            
+            if (response.isSuccessful) {
+                val customersResponse = response.body()
+                if (customersResponse != null) {
+                    val customers = customersResponse.customers.map { it.toDomain() }
+                    emit(Resource.Success(customers))
+                } else {
+                    emit(Resource.Error(Constants.ErrorMessages.NOT_FOUND))
+                }
+            } else {
+                val errorMessage = when (response.code()) {
+                    401 -> Constants.ErrorMessages.UNAUTHORIZED
+                    404 -> "Vendedor no encontrado"
+                    500 -> Constants.ErrorMessages.SERVER_ERROR
+                    else -> "${Constants.ErrorMessages.SERVER_ERROR} (${response.code()})"
+                }
+                emit(Resource.Error(errorMessage))
+            }
+            
+        } catch (e: HttpException) {
+            val errorMessage = when (e.code()) {
+                401 -> Constants.ErrorMessages.UNAUTHORIZED
+                404 -> "Vendedor no encontrado"
                 408 -> Constants.ErrorMessages.TIMEOUT
                 500, 502, 503 -> Constants.ErrorMessages.SERVER_ERROR
                 else -> Constants.ErrorMessages.UNKNOWN_ERROR

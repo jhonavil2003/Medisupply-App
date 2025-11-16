@@ -61,11 +61,15 @@ class OrderViewModelTest {
         city = "Bogotá",
         department = "Cundinamarca",
         country = "Colombia",
-        creditLimit = 50000000.0,
+        latitude = null,
+        longitude = null,
+        creditLimit = 10000.0,
         creditDays = 30,
         isActive = true,
         createdAt = null,
-        updatedAt = null
+        updatedAt = null,
+        salespersonId = null,
+        salesperson = null
     )
 
     private val testCartItems = mapOf(

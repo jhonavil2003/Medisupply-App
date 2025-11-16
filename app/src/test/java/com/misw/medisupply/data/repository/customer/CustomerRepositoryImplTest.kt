@@ -48,11 +48,15 @@ class CustomerRepositoryImplTest {
             city = "Bogotá",
             department = "Cundinamarca",
             country = "Colombia",
+            latitude = null,
+            longitude = null,
             creditLimit = 10000000.0,
             creditDays = 30,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null
         )
         val mockResponse = CustomersResponse(customers = listOf(mockCustomerDto), total = 1)
         whenever(apiService.getCustomers(anyOrNull(), anyOrNull(), anyOrNull()))
@@ -144,7 +148,11 @@ class CustomerRepositoryImplTest {
             creditDays = 30,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null,
+            latitude = null,
+            longitude = null
         )
         whenever(apiService.getCustomerById(any()))
             .thenReturn(Response.success(mockCustomerDto))
