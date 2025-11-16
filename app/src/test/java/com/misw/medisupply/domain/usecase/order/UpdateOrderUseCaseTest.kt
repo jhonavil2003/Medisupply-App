@@ -47,7 +47,9 @@ class UpdateOrderUseCaseTest {
         creditDays = 30,
         isActive = true,
         createdAt = null,
-        updatedAt = null
+        updatedAt = null,
+        salespersonId = null,
+        salesperson = null
     )
 
     private val testOrderItems = listOf(

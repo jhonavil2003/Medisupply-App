@@ -250,7 +250,9 @@ class CustomerRepositoryImpl @Inject constructor(
                     creditDays = 0,
                     isActive = true,
                     createdAt = null,
-                    updatedAt = null
+                    updatedAt = null,
+                    salespersonId = null,
+                    salesperson = null
                 )
                 
                 Log.d(TAG, "✅ Cliente objeto creado exitosamente: $registeredCustomer")

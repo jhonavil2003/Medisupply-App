@@ -52,7 +52,9 @@ class CustomerRepositoryImplTest {
             creditDays = 30,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null
         )
         val mockResponse = CustomersResponse(customers = listOf(mockCustomerDto), total = 1)
         whenever(apiService.getCustomers(anyOrNull(), anyOrNull(), anyOrNull()))
@@ -144,7 +146,9 @@ class CustomerRepositoryImplTest {
             creditDays = 30,
             isActive = true,
             createdAt = null,
-            updatedAt = null
+            updatedAt = null,
+            salespersonId = null,
+            salesperson = null
         )
         whenever(apiService.getCustomerById(any()))
             .thenReturn(Response.success(mockCustomerDto))

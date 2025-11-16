@@ -40,7 +40,9 @@ class GetCustomersUseCaseTest {
             creditDays = 30,
             isActive = true,
             createdAt = Date(),
-            updatedAt = Date()
+            updatedAt = Date(),
+            salespersonId = null,
+            salesperson = null
         ),
         Customer(
             id = 2,
@@ -60,7 +62,9 @@ class GetCustomersUseCaseTest {
             creditDays = 45,
             isActive = true,
             createdAt = Date(),
-            updatedAt = Date()
+            updatedAt = Date(),
+            salespersonId = null,
+            salesperson = null
         )
     )
 

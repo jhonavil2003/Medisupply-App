@@ -39,7 +39,9 @@ class GetCustomerByIdUseCaseTest {
         creditDays = 30,
         isActive = true,
         createdAt = Date(),
-        updatedAt = Date()
+        updatedAt = Date(),
+        salespersonId = null,
+        salesperson = null
     )
 
     @Before
