@@ -9,6 +9,7 @@ import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.order.PaymentTerms
 import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
+import com.misw.medisupply.domain.usecase.customer.GetCustomersBySalespersonUseCase
 import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrderByIdUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
     private val getCustomersUseCase: GetCustomersUseCase,
+    private val getCustomersBySalespersonUseCase: GetCustomersBySalespersonUseCase,
     private val getOrderByIdUseCase: GetOrderByIdUseCase,
     private val getOrdersUseCase: GetOrdersUseCase,
     private val updateOrderUseCase: UpdateOrderUseCase,
@@ -35,6 +37,8 @@ class OrdersViewModel @Inject constructor(
     
     companion object {
         private const val TAG = "OrdersViewModel"
+        // TODO: Reemplazar con el ID del vendedor logueado cuando se implemente autenticación
+        private const val TEMP_SALESPERSON_ID = 2
     }
     
     private val _state = MutableStateFlow(OrdersState())
@@ -64,17 +68,32 @@ class OrdersViewModel @Inject constructor(
         city: String? = null,
         isActive: Boolean? = true
     ) {
-        getCustomersUseCase(customerType, city, isActive)
+        // TODO: Usar vendedor de la sesión cuando se implemente login
+        // Por ahora usa TEMP_SALESPERSON_ID = 2
+        getCustomersBySalespersonUseCase(
+            salespersonId = TEMP_SALESPERSON_ID,
+            isActive = isActive
+        )
             .onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> {
                         _state.update { it.copy(isLoading = true, error = null) }
                     }
                     is Resource.Success -> {
+                        // Aplicar filtros locales si es necesario
+                        val allCustomers = resource.data ?: emptyList()
+                        val filteredCustomers = allCustomers.filter { customer ->
+                            val matchesType = customerType == null || 
+                                customer.customerType.name.equals(customerType, ignoreCase = true)
+                            val matchesCity = city == null || 
+                                customer.city?.equals(city, ignoreCase = true) == true
+                            matchesType && matchesCity
+                        }
+                        
                         _state.update {
                             it.copy(
                                 isLoading = false,
-                                customers = resource.data ?: emptyList(),
+                                customers = filteredCustomers,
                                 error = null,
                                 isRefreshing = false
                             )

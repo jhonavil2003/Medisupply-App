@@ -53,6 +53,12 @@ data class CustomerDto(
     @SerializedName("country")
     val country: String,
     
+    @SerializedName("latitude")
+    val latitude: Double?,
+    
+    @SerializedName("longitude")
+    val longitude: Double?,
+    
     @SerializedName("credit_limit")
     val creditLimit: Double,
     
@@ -102,6 +108,8 @@ fun CustomerDto.toDomain(): Customer {
         city = city,
         department = department,
         country = country,
+        latitude = latitude,
+        longitude = longitude,
         creditLimit = creditLimit,
         creditDays = creditDays,
         isActive = isActive,

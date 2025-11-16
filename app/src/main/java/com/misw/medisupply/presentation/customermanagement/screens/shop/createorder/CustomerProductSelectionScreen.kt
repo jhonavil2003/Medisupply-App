@@ -39,6 +39,8 @@ fun CustomerProductSelectionScreen(
         city = "Bogotá",
         department = "Cundinamarca",
         country = "Colombia",
+        latitude = null,
+        longitude = null,
         creditLimit = 10000000.0,
         creditDays = 30,
         isActive = true,

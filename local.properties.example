@@ -1,0 +1,18 @@
+# ⚠️ ARCHIVO DE EJEMPLO - NO USAR DIRECTAMENTE
+# Copia este archivo como "local.properties" y reemplaza con tus valores reales
+
+## SDK Location (Android Studio lo genera automáticamente)
+sdk.dir=/ruta/a/tu/Android/Sdk
+
+## Google Maps API Key
+## Obtén tu API key en: https://console.cloud.google.com/google/maps-apis
+## 1. Crea un proyecto en Google Cloud Console
+## 2. Habilita "Maps SDK for Android"
+## 3. Crea credenciales → API Key
+## 4. Restringe la API key a tu package name: com.misw.medisupply
+GOOGLE_MAPS_API_KEY=TU_GOOGLE_MAPS_API_KEY_AQUI
+
+## NOTAS IMPORTANTES:
+## - Este archivo (local.properties) NO se sube a Git (está en .gitignore)
+## - Cada desarrollador debe tener su propia API key
+## - Para producción, usa GitHub Secrets en el repositorio

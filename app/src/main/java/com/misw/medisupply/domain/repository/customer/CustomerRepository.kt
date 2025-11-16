@@ -65,4 +65,16 @@ interface CustomerRepository {
         department: String? = null,
         customerType: String = "HOSPITAL"
     ): Flow<Resource<Customer>>
+    
+    /**
+     * Get customers assigned to a specific salesperson
+     * 
+     * @param salespersonId The ID of the salesperson
+     * @param isActive Filter by active status (optional)
+     * @return Flow emitting Resource with list of customers
+     */
+    fun getCustomersBySalesperson(
+        salespersonId: Int,
+        isActive: Boolean? = null
+    ): Flow<Resource<List<Customer>>>
 }

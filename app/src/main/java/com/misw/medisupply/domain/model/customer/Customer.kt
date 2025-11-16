@@ -21,6 +21,8 @@ data class Customer(
     val city: String?,
     val department: String?,
     val country: String,
+    val latitude: Double?,
+    val longitude: Double?,
     val creditLimit: Double,
     val creditDays: Int,
     val isActive: Boolean,

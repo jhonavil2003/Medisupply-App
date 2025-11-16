@@ -109,8 +109,34 @@ fun SalesForceNavGraph(
                 viewModel = viewModel,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToCustomerDetail = { customer ->
+                    val customerJson = Uri.encode(Gson().toJson(customer))
+                    navController.navigate("${SalesForceRoutes.CUSTOMER_DETAIL}/$customerJson")
                 }
             )
+        }
+        
+        // Customer Detail Screen - Detalle del cliente
+        composable(
+            route = "${SalesForceRoutes.CUSTOMER_DETAIL}/{customerJson}",
+            arguments = listOf(
+                navArgument("customerJson") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val customerJson = backStackEntry.arguments?.getString("customerJson")
+            val customer = customerJson?.let { 
+                Gson().fromJson(Uri.decode(it), Customer::class.java) 
+            }
+            
+            customer?.let {
+                com.misw.medisupply.presentation.salesforce.screens.customers.detail.CustomerDetailScreen(
+                    customer = it,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
         
         // Create Order Screen - Crear pedido
