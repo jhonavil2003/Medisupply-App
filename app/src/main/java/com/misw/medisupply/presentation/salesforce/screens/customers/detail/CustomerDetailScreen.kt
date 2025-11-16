@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,8 +26,12 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,8 +39,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +52,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -52,6 +63,12 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.customer.Customer
+import com.misw.medisupply.domain.model.order.Order
+import com.misw.medisupply.domain.model.order.OrderStatus
+import com.misw.medisupply.presentation.salesforce.viewmodel.customers.CustomerDetailViewModel
+import com.misw.medisupply.presentation.salesforce.viewmodel.customers.CustomerStatistics
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * Customer Detail Screen
@@ -61,8 +78,19 @@ import com.misw.medisupply.domain.model.customer.Customer
 @Composable
 fun CustomerDetailScreen(
     customer: Customer,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    viewModel: CustomerDetailViewModel = hiltViewModel()
 ) {
+    // Load customer orders on screen launch
+    DisposableEffect(customer.id) {
+        viewModel.loadCustomerOrders(customer.id)
+        onDispose {
+            viewModel.clearState()
+        }
+    }
+    
+    val state by viewModel.state.collectAsState()
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,6 +119,7 @@ fun CustomerDetailScreen(
     ) { paddingValues ->
         CustomerDetailContent(
             customer = customer,
+            state = state,
             modifier = Modifier.padding(paddingValues)
         )
     }
@@ -102,6 +131,7 @@ fun CustomerDetailScreen(
 @Composable
 private fun CustomerDetailContent(
     customer: Customer,
+    state: com.misw.medisupply.presentation.salesforce.viewmodel.customers.CustomerDetailState,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -113,6 +143,13 @@ private fun CustomerDetailContent(
         // Customer Header Card
         item {
             CustomerHeaderCard(customer = customer)
+        }
+        
+        // Sales Statistics Card (if orders loaded)
+        if (!state.isLoadingOrders && state.statistics.totalOrders > 0) {
+            item {
+                SalesStatisticsCard(statistics = state.statistics)
+            }
         }
         
         // Business Information Card
@@ -138,6 +175,43 @@ private fun CustomerDetailContent(
                     longitude = customer.longitude,
                     businessName = customer.getDisplayName()
                 )
+            }
+        }
+        
+        // Recent Orders Card
+        if (!state.isLoadingOrders && state.recentOrders.isNotEmpty()) {
+            item {
+                RecentOrdersCard(orders = state.recentOrders)
+            }
+        }
+        
+        // Loading Orders Indicator
+        if (state.isLoadingOrders) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        
+        // Orders Error Message
+        state.ordersError?.let { error ->
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = error,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
             }
         }
         
@@ -669,6 +743,269 @@ private fun LocationMapCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SalesStatisticsCard(
+    statistics: CustomerStatistics,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.TrendingUp,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Estadísticas de Ventas",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Divider(modifier = Modifier.padding(bottom = 12.dp))
+
+            // Grid de estadísticas principales
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                StatisticItem(
+                    label = "Total Pedidos",
+                    value = statistics.totalOrders.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = "Pedidos Activos",
+                    value = statistics.activeOrdersCount.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                StatisticItem(
+                    label = "Ingresos Totales",
+                    value = "$${String.format("%,.2f", statistics.totalRevenue)}",
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = "Promedio por Pedido",
+                    value = "$${String.format("%,.2f", statistics.averageOrderValue)}",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // Top productos
+            if (statistics.topProducts.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider(modifier = Modifier.padding(bottom = 8.dp))
+                Text(
+                    text = "Productos Más Solicitados",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                statistics.topProducts.take(3).forEach { product ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = product.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "${product.totalQuantity} unidades",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatisticItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun RecentOrdersCard(
+    orders: List<Order>,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Pedidos Recientes",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Divider(modifier = Modifier.padding(bottom = 8.dp))
+
+            if (orders.isEmpty()) {
+                Text(
+                    text = "No hay pedidos recientes",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            } else {
+                orders.forEach { order ->
+                    OrderListItem(order = order)
+                    if (order != orders.last()) {
+                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrderListItem(
+    order: Order,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Pedido #${order.id ?: "N/A"}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = order.createdAt?.let { 
+                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) 
+                } ?: "N/A",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "$${String.format("%,.2f", order.totalAmount)}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            // Badge de estado
+            Surface(
+                color = when (order.status) {
+                    OrderStatus.PENDING -> MaterialTheme.colorScheme.tertiaryContainer
+                    OrderStatus.CONFIRMED, OrderStatus.PROCESSING -> MaterialTheme.colorScheme.primaryContainer
+                    OrderStatus.SHIPPED -> MaterialTheme.colorScheme.secondaryContainer
+                    OrderStatus.DELIVERED -> MaterialTheme.colorScheme.secondaryContainer
+                    OrderStatus.CANCELLED -> MaterialTheme.colorScheme.errorContainer
+                },
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = order.status.displayName,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    color = when (order.status) {
+                        OrderStatus.PENDING -> MaterialTheme.colorScheme.onTertiaryContainer
+                        OrderStatus.CONFIRMED, OrderStatus.PROCESSING -> MaterialTheme.colorScheme.onPrimaryContainer
+                        OrderStatus.SHIPPED -> MaterialTheme.colorScheme.onSecondaryContainer
+                        OrderStatus.DELIVERED -> MaterialTheme.colorScheme.onSecondaryContainer
+                        OrderStatus.CANCELLED -> MaterialTheme.colorScheme.onErrorContainer
+                    }
+                )
+            }
+        }
+
+        // Mostrar cantidad de productos si está disponible
+        if (order.items.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${order.items.size} producto${if (order.items.size != 1) "s" else ""}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
