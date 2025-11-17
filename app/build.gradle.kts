@@ -35,6 +35,9 @@ android {
         
         // Google Maps API Key desde variable segura
         manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = googleMapsApiKey
+        
+        // Agregar API Key a BuildConfig para uso en código
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"$googleMapsApiKey\"")
     }
 
     buildTypes {
@@ -134,6 +137,10 @@ dependencies {
     // Google Maps for Compose
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    
+    // Accompanist for permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
     
     // DataStore for preferences (Session Management)
     implementation("androidx.datastore:datastore-preferences:1.0.0")

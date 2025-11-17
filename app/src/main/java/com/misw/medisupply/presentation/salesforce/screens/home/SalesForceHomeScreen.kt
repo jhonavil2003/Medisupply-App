@@ -86,7 +86,7 @@ fun SalesForceHomeScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "• Visitas - Gestión de visitas a clientes",
+                text = "• Visitas - Gestión de visitas a clientes y rutas optimizadas",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier

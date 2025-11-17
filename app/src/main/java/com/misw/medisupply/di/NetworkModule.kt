@@ -8,6 +8,7 @@ import com.misw.medisupply.data.remote.api.product.ProductApiService
 import com.misw.medisupply.data.remote.api.stock.StockApiService
 import com.misw.medisupply.data.remote.websocket.InventoryWebSocketClient
 import com.misw.medisupply.data.network.api.VisitApiService
+import com.misw.medisupply.data.network.api.RouteApiService
 import com.misw.medisupply.core.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -234,5 +235,14 @@ object NetworkModule {
     @Singleton
     fun provideVisitApiService(@SalesRetrofit retrofit: Retrofit): VisitApiService {
         return retrofit.create(VisitApiService::class.java)
+    }
+    
+    /**
+     * Provides RouteApiService (uses Logistics Service)
+     */
+    @Provides
+    @Singleton
+    fun provideRouteApiService(@LogisticsRetrofit retrofit: Retrofit): RouteApiService {
+        return retrofit.create(RouteApiService::class.java)
     }
 }

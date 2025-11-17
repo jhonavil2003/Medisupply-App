@@ -249,9 +249,9 @@ class OrdersViewModelTest {
         whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
             .thenReturn(flowOf(Resource.Success(testCustomers)))
         
-        // Mock GetCustomersUseCase for search functionality
-        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), anyOrNull()))
-            .thenReturn(flowOf(Resource.Success(testCustomers)))
+        // Mock GetCustomersUseCase for search functionality - 4 parameters required
+        whenever(getCustomersUseCase.invoke(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+            .thenReturn(flowOf(Resource.Loading(), Resource.Success(testCustomers)))
         
         viewModel = createViewModel()
 
@@ -260,8 +260,19 @@ class OrdersViewModelTest {
             
             viewModel.onEvent(OrdersEvent.SearchCustomers("Hospital"))
             
-            val state = awaitItem()
-            assertEquals("Hospital", state.searchQuery)
+            // First update: searchQuery is set
+            val queryUpdated = awaitItem()
+            assertEquals("Hospital", queryUpdated.searchQuery)
+            
+            // Second update: isLoadingCustomers = true (from Resource.Loading)
+            val loading = awaitItem()
+            assertTrue(loading.isLoadingCustomers)
+            
+            // Third update: customerSearchResults populated (from Resource.Success)
+            val withResults = awaitItem()
+            assertEquals("Hospital", withResults.searchQuery)
+            assertFalse(withResults.isLoadingCustomers)
+            
             cancelAndIgnoreRemainingEvents()
         }
     }

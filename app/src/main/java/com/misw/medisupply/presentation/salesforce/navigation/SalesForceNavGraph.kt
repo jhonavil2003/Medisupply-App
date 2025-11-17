@@ -36,6 +36,10 @@ import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.screens.orders.products.ProductSelectionScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.OrderReviewScreen
 import com.misw.medisupply.presentation.salesforce.screens.performance.PerformanceScreen
+import com.misw.medisupply.presentation.salesforce.screens.routes.GenerateRouteScreen
+import com.misw.medisupply.presentation.salesforce.screens.routes.RouteDetailScreen
+import com.misw.medisupply.presentation.salesforce.screens.routes.RouteExecutionScreen
+import com.misw.medisupply.presentation.salesforce.screens.routes.RouteListScreen
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
 /**
@@ -68,6 +72,9 @@ fun SalesForceNavGraph(
             com.misw.medisupply.presentation.salesforce.screens.visits.screens.VisitHomeScreen(
                 onNavigateToRegisterVisit = {
                     navController.navigate(SalesForceRoutes.VISIT_LIST)
+                },
+                onNavigateToVisitRoute = {
+                    navController.navigate(SalesForceRoutes.ROUTE_LIST)
                 }
             )
         }
@@ -374,6 +381,101 @@ fun SalesForceNavGraph(
         // Performance Screen - Métricas y desempeño
         composable(route = SalesForceRoutes.PERFORMANCE) {
             PerformanceScreen()
+        }
+        
+        // ========== ROUTES MODULE ==========
+        
+        // Routes Menu Screen
+        composable(route = SalesForceRoutes.ROUTES) {
+            // TODO: Implementar RouteMenuScreen o navegar directamente a ROUTE_LIST
+            RouteListScreen(
+                onNavigateToGenerate = {
+                    navController.navigate(SalesForceRoutes.GENERATE_ROUTE)
+                },
+                onNavigateToDetail = { routeId ->
+                    navController.navigate(VisitRouteNavigation.detail(routeId))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        // Route List Screen - Lista de rutas
+        composable(route = SalesForceRoutes.ROUTE_LIST) {
+            RouteListScreen(
+                onNavigateToGenerate = {
+                    navController.navigate(SalesForceRoutes.GENERATE_ROUTE)
+                },
+                onNavigateToDetail = { routeId ->
+                    navController.navigate(VisitRouteNavigation.detail(routeId))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        // Generate Route Screen - Generar ruta optimizada
+        composable(route = SalesForceRoutes.GENERATE_ROUTE) {
+            GenerateRouteScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onRouteGenerated = { routeId ->
+                    // Navegar al detalle de la ruta generada
+                    navController.navigate(VisitRouteNavigation.detail(routeId)) {
+                        // Limpiar back stack hasta la lista de rutas
+                        popUpTo(SalesForceRoutes.ROUTE_LIST) {
+                            inclusive = false
+                        }
+                    }
+                }
+            )
+        }
+        
+        // Route Detail Screen - Detalle de ruta
+        composable(
+            route = "${SalesForceRoutes.ROUTE_DETAIL}/{routeId}",
+            arguments = listOf(
+                navArgument("routeId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val routeId = backStackEntry.arguments?.getInt("routeId") ?: 0
+            RouteDetailScreen(
+                routeId = routeId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToExecution = { routeIdToExecute ->
+                    navController.navigate(VisitRouteNavigation.execution(routeIdToExecute))
+                }
+            )
+        }
+        
+        // Route Execution Screen - Ejecución de ruta en tiempo real
+        composable(
+            route = "${SalesForceRoutes.ROUTE_EXECUTION}/{routeId}",
+            arguments = listOf(
+                navArgument("routeId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val routeId = backStackEntry.arguments?.getInt("routeId") ?: 0
+            RouteExecutionScreen(
+                routeId = routeId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onRouteCompleted = {
+                    // Volver al detalle de la ruta
+                    navController.popBackStack()
+                },
+                onNavigateToCreateVisit = { customerId ->
+                    // Navegar a CreateVisitScreen con el customerId
+                    // TODO: Pasar el customerId como argumento si es necesario
+                    navController.navigate(SalesForceRoutes.CREATE_VISIT)
+                }
+            )
         }
     }
 }
