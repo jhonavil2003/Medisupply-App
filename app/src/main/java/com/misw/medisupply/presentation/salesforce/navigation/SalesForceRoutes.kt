@@ -27,6 +27,13 @@ object SalesForceRoutes {
     // Future routes for detail screens
     const val VISIT_DETAIL = "salesforce_visit_detail"
     const val CUSTOMER_DETAIL = "salesforce_customer_detail"
+    
+    // Routes navigation
+    const val ROUTES = "salesforce_routes"
+    const val ROUTE_LIST = "salesforce_route_list"
+    const val GENERATE_ROUTE = "salesforce_generate_route"
+    const val ROUTE_DETAIL = "salesforce_route_detail"
+    const val ROUTE_EXECUTION = "salesforce_route_execution"
 }
 
 /**
@@ -52,5 +59,24 @@ object OrderRoute {
      */
     fun detail(orderId: String): String {
         return "${SalesForceRoutes.ORDER_DETAIL}/$orderId"
+    }
+}
+
+/**
+ * Helper object to build navigation routes for visit routes module
+ */
+object VisitRouteNavigation {
+    /**
+     * Build route for route detail
+     */
+    fun detail(routeId: Int): String {
+        return "${SalesForceRoutes.ROUTE_DETAIL}/$routeId"
+    }
+    
+    /**
+     * Build route for route execution
+     */
+    fun execution(routeId: Int): String {
+        return "${SalesForceRoutes.ROUTE_EXECUTION}/$routeId"
     }
 }

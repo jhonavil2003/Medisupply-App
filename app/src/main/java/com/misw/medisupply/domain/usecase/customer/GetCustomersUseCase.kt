@@ -19,13 +19,20 @@ class GetCustomersUseCase @Inject constructor(
      * @param customerType Optional filter by customer type
      * @param city Optional filter by city
      * @param isActive Optional filter by active status
+     * @param sellerId Optional filter by assigned salesperson (if provided, other filters are ignored)
      * @return Flow emitting Resource with list of customers
      */
     operator fun invoke(
         customerType: String? = null,
         city: String? = null,
-        isActive: Boolean? = null
+        isActive: Boolean? = null,
+        sellerId: Int? = null
     ): Flow<Resource<List<Customer>>> {
-        return repository.getCustomers(customerType, city, isActive)
+        // Si se proporciona sellerId, usar el método específico para vendedor
+        return if (sellerId != null) {
+            repository.getCustomersBySalesperson(sellerId, isActive)
+        } else {
+            repository.getCustomers(customerType, city, isActive)
+        }
     }
 }
