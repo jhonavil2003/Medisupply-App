@@ -31,6 +31,7 @@ fun RouteExecutionScreen(
     routeId: Int,
     onNavigateBack: () -> Unit,
     onRouteCompleted: () -> Unit,
+    onNavigateToCreateVisit: (customerId: Int) -> Unit = {},
     viewModel: RouteExecutionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -168,6 +169,8 @@ fun RouteExecutionScreen(
     // Complete stop dialog
     if (uiState.showCompleteStopDialog && uiState.selectedStopId != null) {
         val stopName = uiState.route?.stops?.find { it.id == uiState.selectedStopId }?.customerName ?: ""
+        val customerId = uiState.route?.stops?.find { it.id == uiState.selectedStopId }?.customerId
+        
         CompleteStopDialog(
             stopName = stopName,
             notes = uiState.stopNotes,
@@ -180,7 +183,14 @@ fun RouteExecutionScreen(
                     )
                 }
             },
-            onDismiss = { viewModel.showCompleteStopDialog(false) },
+            onDismiss = {
+                viewModel.showCompleteStopDialog(false, null)
+            },
+            onRegisterVisit = {
+                // Cerrar el diálogo y navegar a registro de visita
+                viewModel.showCompleteStopDialog(false, null)
+                customerId?.let { onNavigateToCreateVisit(it) }
+            },
             isLoading = uiState.isCompletingStop
         )
     }
@@ -614,6 +624,7 @@ private fun CompleteStopDialog(
     onNotesChange: (String) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    onRegisterVisit: () -> Unit = {},
     isLoading: Boolean
 ) {
     AlertDialog(
@@ -636,31 +647,62 @@ private fun CompleteStopDialog(
             }
         },
         confirmButton = {
-            Button(
-                onClick = onConfirm,
-                enabled = !isLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ColorSuccess
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                // Fila superior: Cancelar y Registrar
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextButton(
+                        onClick = onDismiss,
+                        enabled = !isLoading,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancelar")
+                    }
+                    
+                    Button(
+                        onClick = onRegisterVisit,
+                        enabled = !isLoading,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Registrar")
+                    }
+                }
+                
+                // Fila inferior: Completar (ancho completo)
+                Button(
+                    onClick = onConfirm,
+                    enabled = !isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ColorSuccess
                     )
-                } else {
-                    Text("Completar")
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Completar")
+                    }
                 }
             }
         },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                enabled = !isLoading
-            ) {
-                Text("Cancelar")
-            }
-        }
+        dismissButton = null
     )
 }
 

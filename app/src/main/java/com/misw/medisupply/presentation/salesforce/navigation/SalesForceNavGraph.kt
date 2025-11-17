@@ -469,6 +469,11 @@ fun SalesForceNavGraph(
                 onRouteCompleted = {
                     // Volver al detalle de la ruta
                     navController.popBackStack()
+                },
+                onNavigateToCreateVisit = { customerId ->
+                    // Navegar a CreateVisitScreen con el customerId
+                    // TODO: Pasar el customerId como argumento si es necesario
+                    navController.navigate(SalesForceRoutes.CREATE_VISIT)
                 }
             )
         }

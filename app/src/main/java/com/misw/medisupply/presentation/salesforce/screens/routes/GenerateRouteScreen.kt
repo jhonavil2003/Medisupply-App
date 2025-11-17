@@ -39,7 +39,7 @@ fun GenerateRouteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Generar Ruta Optimizada") },
+                title = { Text("Generar Ruta") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
