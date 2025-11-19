@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.salesforce.screens.routes.components
 
+import android.Manifest
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -7,6 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -22,6 +25,7 @@ import kotlinx.coroutines.launch
  * Componente de mapa para visualizar ruta con todas las paradas
  * Muestra marcadores, números de secuencia y polyline siguiendo calles reales
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RouteMapView(
     route: Route,
@@ -29,6 +33,14 @@ fun RouteMapView(
     showPolyline: Boolean = true,
     onStopClick: ((RouteStop) -> Unit)? = null
 ) {
+    // Permisos de ubicación
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
+    
     // Calcular centro del mapa basado en todas las paradas
     val mapCenter = remember(route.stops) {
         calculateMapCenter(route.stops)
@@ -89,12 +101,12 @@ fun RouteMapView(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
         properties = MapProperties(
-            isMyLocationEnabled = false,
+            isMyLocationEnabled = locationPermissions.allPermissionsGranted,
             mapType = MapType.NORMAL
         ),
         uiSettings = MapUiSettings(
             zoomControlsEnabled = true,
-            myLocationButtonEnabled = false,
+            myLocationButtonEnabled = locationPermissions.allPermissionsGranted,
             compassEnabled = true
         )
     ) {
@@ -133,9 +145,10 @@ fun RouteMapView(
 }
 
 /**
- * Componente de mapa para ejecución en tiempo real
- * Muestra ubicación actual del vendedor y siguiente parada con rutas reales
+ * Componente de mapa para ejecución de ruta en tiempo real
+ * Muestra ubicación actual, próximas paradas y ruta restante siguiendo calles reales
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RouteExecutionMapView(
     route: Route,
@@ -143,6 +156,21 @@ fun RouteExecutionMapView(
     modifier: Modifier = Modifier,
     onStopClick: ((RouteStop) -> Unit)? = null
 ) {
+    // Permisos de ubicación
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
+    
+    // Solicitar permisos automáticamente al cargar
+    LaunchedEffect(Unit) {
+        if (!locationPermissions.allPermissionsGranted) {
+            locationPermissions.launchMultiplePermissionRequest()
+        }
+    }
+    
     // Determinar centro del mapa (ubicación actual o siguiente parada)
     val mapCenter = remember(currentLocation, route.stops) {
         currentLocation?.let {
@@ -225,12 +253,12 @@ fun RouteExecutionMapView(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
         properties = MapProperties(
-            isMyLocationEnabled = true,
+            isMyLocationEnabled = locationPermissions.allPermissionsGranted,
             mapType = MapType.NORMAL
         ),
         uiSettings = MapUiSettings(
             zoomControlsEnabled = true,
-            myLocationButtonEnabled = true,
+            myLocationButtonEnabled = locationPermissions.allPermissionsGranted,
             compassEnabled = true
         )
     ) {
