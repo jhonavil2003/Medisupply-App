@@ -38,7 +38,7 @@ fun RoleSelectionScreen(
                 localeManager = viewModel.localeManager,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(16.dp)
+                    .padding(top = 32.dp, end = 16.dp)
             )
             
             // Main content
