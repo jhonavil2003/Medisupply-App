@@ -8,10 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.core.session.UserRole
+import com.misw.medisupply.presentation.components.CompactLanguageToggle
 
 /**
  * Role Selection Screen
@@ -21,22 +25,33 @@ import com.misw.medisupply.core.session.UserRole
 fun RoleSelectionScreen(
     onRoleSelected: (UserRole) -> Unit,
     onRegisterClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: RoleSelectionViewModel = hiltViewModel()
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Language toggle button in top-right corner
+            CompactLanguageToggle(
+                localeManager = viewModel.localeManager,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            )
+            
+            // Main content
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
             // App Logo or Title
             Text(
-                text = "MediSupply",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -44,7 +59,7 @@ fun RoleSelectionScreen(
             )
             
             Text(
-                text = "Selecciona tu rol para continuar",
+                text = stringResource(R.string.role_selection_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -53,8 +68,8 @@ fun RoleSelectionScreen(
             
             // Sales Force Card
             RoleCard(
-                title = "Fuerza de Ventas",
-                description = "Acceso completo para personal interno",
+                title = stringResource(R.string.role_sales_force_title),
+                description = stringResource(R.string.role_sales_force_description),
                 icon = Icons.Filled.Business,
                 onClick = { onRoleSelected(UserRole.SALES_FORCE) },
                 modifier = Modifier.fillMaxWidth()
@@ -64,8 +79,8 @@ fun RoleSelectionScreen(
             
             // Customer Management Card
             RoleCard(
-                title = "Cliente",
-                description = "Autogestión de compras y pedidos",
+                title = stringResource(R.string.role_customer_title),
+                description = stringResource(R.string.role_customer_description),
                 icon = Icons.Filled.Person,
                 onClick = { onRoleSelected(UserRole.CUSTOMER_MANAGEMENT) },
                 modifier = Modifier.fillMaxWidth()
@@ -78,7 +93,7 @@ fun RoleSelectionScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "¿Nuevo cliente? ",
+                    text = "${stringResource(R.string.register_new_customer)} ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -86,7 +101,7 @@ fun RoleSelectionScreen(
                     onClick = onRegisterClick
                 ) {
                     Text(
-                        text = "Registrarse",
+                        text = stringResource(R.string.register_button),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -98,12 +113,13 @@ fun RoleSelectionScreen(
             
             // Help text
             Text(
-                text = "¿No sabes qué rol elegir? Contacta al administrador",
+                text = stringResource(R.string.help_text),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 16.dp)
             )
+        }
         }
     }
 }
