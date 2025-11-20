@@ -10,6 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.core.i18n.LocaleManager
 
 /**
  * Confirmation dialog
@@ -18,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 @Composable
 fun ConfirmOrderDialog(
     isEditMode: Boolean = false,
+    localeManager: LocaleManager,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -32,7 +36,7 @@ fun ConfirmOrderDialog(
         },
         title = {
             Text(
-                text = if (isEditMode) "Actualizar Pedido" else "Confirmar Pedido",
+                text = if (isEditMode) localizedStringResource(R.string.update_order_title, localeManager) else localizedStringResource(R.string.confirm_order_title, localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -40,20 +44,20 @@ fun ConfirmOrderDialog(
         text = {
             Text(
                 text = if (isEditMode) 
-                    "¿Está seguro que desea actualizar este pedido? Una vez confirmada, se procesará inmediatamente." 
+                    localizedStringResource(R.string.confirm_update_order_message, localeManager)
                 else 
-                    "¿Está seguro que desea crear este pedido? Una vez confirmado, se procesará inmediatamente.",
+                    localizedStringResource(R.string.confirm_order_message, localeManager),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
         confirmButton = {
             Button(onClick = onConfirm) {
-                Text("Confirmar")
+                Text(localizedStringResource(R.string.confirm_button, localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.button_cancel, localeManager))
             }
         }
     )

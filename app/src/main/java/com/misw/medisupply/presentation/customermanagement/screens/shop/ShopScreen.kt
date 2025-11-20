@@ -142,7 +142,7 @@ private fun HistorySection(
                 var showDropdown by remember { mutableStateOf(false) }
                 
                 Text(
-                    text = "Mostrar",
+                    text = localizedStringResource(R.string.shop_show_label, viewModel.localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -160,7 +160,7 @@ private fun HistorySection(
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Dropdown",
+                            contentDescription = localizedStringResource(R.string.label_dropdown, viewModel.localeManager),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
@@ -201,7 +201,8 @@ private fun HistorySection(
             error != null -> {
                 ErrorView(
                     message = error,
-                    onRetry = onRetry
+                    onRetry = onRetry,
+                    localeManager = viewModel.localeManager
                 )
             }
             orders.isEmpty() -> {
@@ -251,7 +252,7 @@ private fun OrderCard(order: Order, viewModel: CustomerShopViewModel) {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${order.orderNumber ?: "N/A"} - ${formatDate(order.orderDate)}",
+                    text = "${order.orderNumber ?: localizedStringResource(R.string.label_not_available, viewModel.localeManager)} - ${formatDate(order.orderDate)}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
@@ -330,13 +331,13 @@ private fun RejectedProductsSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "3",
+                    text = "3", // TODO: Make this dynamic from viewModel
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Dropdown",
+                    contentDescription = localizedStringResource(R.string.label_dropdown, viewModel.localeManager),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
@@ -433,16 +434,19 @@ private fun AgreementConditionsSection(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ConditionCard(
-                title = "Descuento:",
-                value = "8% hasta 15/dic/25"
+                title = localizedStringResource(R.string.condition_discount_title, viewModel.localeManager),
+                value = localizedStringResource(R.string.condition_discount_value, viewModel.localeManager),
+                viewModel = viewModel
             )
             ConditionCard(
-                title = "Plazo pago:",
-                value = "30 días"
+                title = localizedStringResource(R.string.condition_payment_term_title, viewModel.localeManager),
+                value = localizedStringResource(R.string.condition_payment_term_value, viewModel.localeManager),
+                viewModel = viewModel
             )
             ConditionCard(
-                title = "Impuestos:",
-                value = "19% IVA incluido"
+                title = localizedStringResource(R.string.condition_taxes_title, viewModel.localeManager),
+                value = localizedStringResource(R.string.condition_taxes_value, viewModel.localeManager),
+                viewModel = viewModel
             )
         }
     }
@@ -454,7 +458,8 @@ private fun AgreementConditionsSection(
 @Composable
 private fun ConditionCard(
     title: String,
-    value: String
+    value: String,
+    viewModel: CustomerShopViewModel? = null
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -490,7 +495,7 @@ private fun formatDate(date: java.util.Date?): String {
     return if (date != null) {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
     } else {
-        "N/A"
+        "N/A" // This will be replaced inline where it's used
     }
 }
 

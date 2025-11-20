@@ -3,7 +3,9 @@ package com.misw.medisupply.presentation.customermanagement.screens.orders.viewm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.repository.order.OrderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +21,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OrderDetailViewModel @Inject constructor(
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     companion object {

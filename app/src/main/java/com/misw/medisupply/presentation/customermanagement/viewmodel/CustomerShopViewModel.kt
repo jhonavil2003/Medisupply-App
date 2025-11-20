@@ -88,7 +88,11 @@ class CustomerShopViewModel @Inject constructor(
      * Get the display text for page size
      */
     fun getPageSizeDisplayText(size: Int): String {
-        return if (size == -1) "Todas" else size.toString()
+        return if (size == -1) {
+            localeManager.getLocalizedString(com.misw.medisupply.R.string.label_all_items)
+        } else {
+            size.toString()
+        }
     }
 }
 

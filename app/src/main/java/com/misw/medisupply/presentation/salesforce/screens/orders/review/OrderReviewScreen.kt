@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.order.OrderStatus
@@ -238,6 +239,7 @@ fun OrderReviewScreen(
     if (showConfirmDialog) {
         ConfirmOrderDialog(
             isEditMode = mode == Mode.EDIT,
+            localeManager = createViewModel.localeManager,
             onConfirm = {
                 showConfirmDialog = false
                 if (mode == Mode.EDIT && orderId != null) {
@@ -260,7 +262,11 @@ fun OrderReviewScreen(
         val orderNumber = successOrder.orderNumber ?: "N/A"
         SuccessDialog(
             orderNumber = orderNumber,
-            message = if (mode == Mode.EDIT) "Pedido actualizado exitosamente" else "Pedido creado exitosamente",
+            message = if (mode == Mode.EDIT) 
+                createViewModel.localeManager.getLocalizedString(R.string.order_updated_success_message)
+            else 
+                createViewModel.localeManager.getLocalizedString(R.string.order_created_success_message),
+            localeManager = createViewModel.localeManager,
             onDismiss = {
                 showSuccessDialog = false
                 if (mode == Mode.EDIT) {

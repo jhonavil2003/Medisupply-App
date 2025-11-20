@@ -63,10 +63,12 @@ import com.misw.medisupply.core.utils.FormatUtils
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.product.Product
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.ProductsState
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.ProductsViewModel
@@ -88,6 +90,9 @@ fun ProductSelectionScreen(
     val state by viewModel.state.collectAsState()
     var searchText by remember { mutableStateOf("") }
     val pullToRefreshState = rememberPullToRefreshState()
+    
+    // Pre-calculate localized strings
+    val localeManager = viewModel.localeManager
 
     // Load initial cart items for edit mode
     LaunchedEffect(mode, orderId, initialCartItems) {
@@ -99,8 +104,8 @@ fun ProductSelectionScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = if (mode == Mode.EDIT) "Editar Productos" else "Seleccionar Productos",
-                subtitle = "Fuerza de ventas - Medisupply",
+                title = if (mode == Mode.EDIT) localizedStringResource(R.string.edit_products_title, localeManager) else localizedStringResource(R.string.select_products_title, localeManager),
+                subtitle = localizedStringResource(R.string.salesforce_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         },
@@ -110,6 +115,7 @@ fun ProductSelectionScreen(
                     itemCount = state.cartItems.values.sumOf { it.quantity },
                     totalAmount = state.cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat(),
                     mode = mode,
+                    localeManager = localeManager,
                     onConfirmOrder = { 
                         onConfirmOrder(state.cartItems)
                     }
@@ -131,13 +137,14 @@ fun ProductSelectionScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 
                 // Customer Information Card
-                CustomerInfoCard(customer = customer)
+                CustomerInfoCard(customer = customer, localeManager = localeManager)
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 // Search Bar
                 SearchBar(
                     searchText = searchText,
+                    localeManager = localeManager,
                     onSearchTextChange = { 
                         searchText = it
                     },
@@ -170,7 +177,7 @@ fun ProductSelectionScreen(
                                 strokeWidth = 2.dp
                             )
                             Text(
-                                text = "Cargando stock...",
+                                text = localizedStringResource(R.string.loading_stock_text, localeManager),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -184,6 +191,7 @@ fun ProductSelectionScreen(
                 state.stockError?.let { errorMessage ->
                     StockErrorBanner(
                         errorMessage = errorMessage,
+                        localeManager = localeManager,
                         onRetry = { viewModel.retryStockLoading() }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -204,12 +212,14 @@ fun ProductSelectionScreen(
                         state.error != null && state.products.isEmpty() -> {
                             ErrorMessage(
                                 message = state.error!!,
+                                localeManager = localeManager,
                                 onRetry = { viewModel.refresh() },
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
                         state.products.isEmpty() -> {
                             EmptyProductsMessage(
+                                localeManager = localeManager,
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
@@ -221,6 +231,7 @@ fun ProductSelectionScreen(
                                 pagination = state.pagination,
                                 state = state,
                                 viewModel = viewModel,
+                                localeManager = localeManager,
                                 onLoadNextPage = { viewModel.loadNextPage() },
                                 onLoadPreviousPage = { viewModel.loadPreviousPage() }
                             )
@@ -233,7 +244,7 @@ fun ProductSelectionScreen(
 }
 
 @Composable
-private fun CustomerInfoCard(customer: Customer) {
+private fun CustomerInfoCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
@@ -248,7 +259,7 @@ private fun CustomerInfoCard(customer: Customer) {
                 .padding(12.dp)
         ) {
             Text(
-                text = "Cliente Seleccionado",
+                text = localizedStringResource(R.string.selected_customer_label, localeManager),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -258,26 +269,26 @@ private fun CustomerInfoCard(customer: Customer) {
             
             // Customer details
             CustomerDetailRow(
-                label = "Nombre:",
+                label = localizedStringResource(R.string.customer_name_label, localeManager),
                 value = customer.getDisplayName()
             )
             Spacer(modifier = Modifier.height(6.dp))
             
             CustomerDetailRow(
-                label = "NIT:",
+                label = localizedStringResource(R.string.customer_nit_label, localeManager),
                 value = customer.documentNumber
             )
             Spacer(modifier = Modifier.height(6.dp))
             
             CustomerDetailRow(
-                label = "Código:",
+                label = localizedStringResource(R.string.customer_code_label, localeManager),
                 value = customer.id.toString()
             )
             
             customer.contactEmail?.let { email ->
                 Spacer(modifier = Modifier.height(6.dp))
                 CustomerDetailRow(
-                    label = "Correo:",
+                    label = localizedStringResource(R.string.customer_email_label, localeManager),
                     value = email
                 )
             }
@@ -315,6 +326,7 @@ private fun CustomerDetailRow(label: String, value: String) {
 @Composable
 private fun SearchBar(
     searchText: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onSearchTextChange: (String) -> Unit,
     onClearSearch: () -> Unit,
     onSearch: () -> Unit
@@ -329,14 +341,14 @@ private fun SearchBar(
             .height(48.dp),
         placeholder = { 
             Text(
-                "Buscar productos...",
+                localizedStringResource(R.string.search_products_hint, localeManager),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Buscar",
+                contentDescription = localizedStringResource(R.string.search_description, localeManager),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp)
             )
@@ -349,7 +361,7 @@ private fun SearchBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Limpiar búsqueda",
+                        contentDescription = localizedStringResource(R.string.clear_search_description, localeManager),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
@@ -379,6 +391,7 @@ private fun ProductsList(
     pagination: com.misw.medisupply.domain.model.product.Pagination?,
     state: ProductsState,
     viewModel: ProductsViewModel,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onLoadNextPage: () -> Unit,
     onLoadPreviousPage: () -> Unit
 ) {
@@ -386,7 +399,9 @@ private fun ProductsList(
         // Pagination info
         if (pagination != null) {
             Text(
-                text = "Página ${pagination.page} de ${pagination.totalPages} - ${pagination.totalItems} productos",
+                text = localeManager.getLocalizedString(
+                    R.string.page_info
+                ).format(pagination.page, pagination.totalPages, pagination.totalItems),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -411,6 +426,7 @@ private fun ProductsList(
                     stockLevel = stockLevel,
                     hasStockError = hasStockError,
                     cartItems = state.cartItems,
+                    localeManager = localeManager,
                     onAddToCart = { viewModel.addToCart(product) },
                     onRemoveFromCart = { viewModel.removeFromCart(product.sku) }
                 )
@@ -423,6 +439,7 @@ private fun ProductsList(
             PaginationButtons(
                 hasPrev = pagination.hasPrev,
                 hasNext = pagination.hasNext,
+                localeManager = localeManager,
                 onPreviousClick = onLoadPreviousPage,
                 onNextClick = onLoadNextPage
             )
@@ -437,6 +454,7 @@ private fun ProductCard(
     stockLevel: com.misw.medisupply.domain.model.stock.StockLevel?,
     hasStockError: Boolean = false,
     cartItems: Map<String, com.misw.medisupply.domain.model.order.CartItem>,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onAddToCart: () -> Unit,
     onRemoveFromCart: () -> Unit
 ) {
@@ -472,7 +490,7 @@ private fun ProductCard(
                     )
                     Spacer(modifier = Modifier.height(3.dp))
                     Text(
-                        text = "SKU: ${product.sku}",
+                        text = localeManager.getLocalizedString(R.string.product_sku_label).format(product.sku),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -480,9 +498,9 @@ private fun ProductCard(
                 
                 // Stock badge
                 if (stockLevel != null) {
-                    StockBadge(stockLevel)
+                    StockBadge(stockLevel, localeManager)
                 } else if (hasStockError) {
-                    StockNotAvailableBadge()
+                    StockNotAvailableBadge(localeManager)
                 }
             }
             
@@ -504,7 +522,7 @@ private fun ProductCard(
                 // Cold chain indicator
                 if (product.requiresColdChain) {
                     Text(
-                        text = "❄️ Cadena de frío",
+                        text = localizedStringResource(R.string.cold_chain_indicator, localeManager),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary
                     )
@@ -518,6 +536,7 @@ private fun ProductCard(
                 cartQuantity = cartQuantity,
                 stockAvailable = stockLevel?.totalAvailable,
                 isOutOfStock = stockLevel?.isOutOfStock() ?: hasStockError,
+                localeManager = localeManager,
                 onAddToCart = onAddToCart,
                 onRemoveFromCart = onRemoveFromCart
             )
@@ -529,6 +548,7 @@ private fun ProductCard(
 private fun PaginationButtons(
     hasPrev: Boolean,
     hasNext: Boolean,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -544,7 +564,7 @@ private fun PaginationButtons(
             modifier = Modifier.height(32.dp)
         ) {
             Text(
-                "← Anterior",
+                localizedStringResource(R.string.previous_button, localeManager),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -559,7 +579,7 @@ private fun PaginationButtons(
             modifier = Modifier.height(32.dp)
         ) {
             Text(
-                "Siguiente →",
+                localizedStringResource(R.string.next_button, localeManager),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -569,6 +589,7 @@ private fun PaginationButtons(
 @Composable
 private fun ErrorMessage(
     message: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -577,7 +598,7 @@ private fun ErrorMessage(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "❌ Error",
+            text = localizedStringResource(R.string.error_title, localeManager),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.error
@@ -590,13 +611,13 @@ private fun ErrorMessage(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text("Reintentar")
+            Text(localizedStringResource(R.string.button_retry, localeManager))
         }
     }
 }
 
 @Composable
-private fun EmptyProductsMessage(modifier: Modifier = Modifier) {
+private fun EmptyProductsMessage(localeManager: com.misw.medisupply.core.i18n.LocaleManager, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -607,36 +628,36 @@ private fun EmptyProductsMessage(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No se encontraron productos",
+            text = localizedStringResource(R.string.no_products_found, localeManager),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Intenta ajustar los filtros de búsqueda",
+            text = localizedStringResource(R.string.adjust_search_filters, localeManager),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 @Composable
-private fun StockBadge(stockLevel: com.misw.medisupply.domain.model.stock.StockLevel) {
+private fun StockBadge(stockLevel: com.misw.medisupply.domain.model.stock.StockLevel, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     val (backgroundColor, textColor, text) = when {
         stockLevel.isOutOfStock() -> Triple(
             Color(0xFFFFEBEE), // Light red
             Color(0xFFC62828), // Dark red
-            "Sin stock"
+            localizedStringResource(R.string.out_of_stock, localeManager)
         )
         stockLevel.hasLowStock() -> Triple(
             Color(0xFFFFF3E0), // Light orange
             Color(0xFFEF6C00), // Dark orange
-            "${stockLevel.totalAvailable} disponibles"
+            localeManager.getLocalizedString(R.string.available_units).format(stockLevel.totalAvailable)
         )
         else -> Triple(
             Color(0xFFE8F5E9), // Light green
             Color(0xFF2E7D32), // Dark green
-            "${stockLevel.totalAvailable} disponibles"
+            localeManager.getLocalizedString(R.string.available_units).format(stockLevel.totalAvailable)
         )
     }
     
@@ -658,7 +679,7 @@ private fun StockBadge(stockLevel: com.misw.medisupply.domain.model.stock.StockL
 }
 
 @Composable
-private fun StockNotAvailableBadge() {
+private fun StockNotAvailableBadge(localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
@@ -667,7 +688,7 @@ private fun StockNotAvailableBadge() {
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Text(
-            text = "Stock N/D",
+            text = localizedStringResource(R.string.stock_not_available, localeManager),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF757575), // Dark gray text
@@ -679,6 +700,7 @@ private fun StockNotAvailableBadge() {
 @Composable
 private fun StockErrorBanner(
     errorMessage: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onRetry: () -> Unit
 ) {
     Card(
@@ -703,13 +725,13 @@ private fun StockErrorBanner(
             ) {
                 Icon(
                     imageVector = Icons.Default.Warning,
-                    contentDescription = "Warning",
+                    contentDescription = localizedStringResource(R.string.warning_content_description, localeManager),
                     tint = Color(0xFFF57C00), // Orange warning color
                     modifier = Modifier.size(20.dp)
                 )
                 Column {
                     Text(
-                        text = "Stock no disponible",
+                        text = localizedStringResource(R.string.stock_not_available_banner, localeManager),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFF57C00)
@@ -729,11 +751,11 @@ private fun StockErrorBanner(
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
-                    contentDescription = "Retry",
+                    contentDescription = localizedStringResource(R.string.retry_content_description, localeManager),
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Reintentar")
+                Text(localizedStringResource(R.string.button_retry, localeManager))
             }
         }
     }
@@ -744,6 +766,7 @@ private fun CartControls(
     cartQuantity: Int,
     stockAvailable: Int?,
     isOutOfStock: Boolean,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onAddToCart: () -> Unit,
     onRemoveFromCart: () -> Unit
 ) {
@@ -766,7 +789,7 @@ private fun CartControls(
             ) {
                 Icon(
                     imageVector = Icons.Default.Remove,
-                    contentDescription = "Quitar del carrito",
+                    contentDescription = localizedStringResource(R.string.remove_from_cart_description, localeManager),
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -811,7 +834,7 @@ private fun CartControls(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Agregar al carrito",
+                    contentDescription = localizedStringResource(R.string.add_to_cart_description, localeManager),
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -821,7 +844,7 @@ private fun CartControls(
         if (isOutOfStock) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Sin stock disponible",
+                text = localizedStringResource(R.string.out_of_stock_message, localeManager),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.fillMaxWidth(),
@@ -830,7 +853,7 @@ private fun CartControls(
         } else if (stockAvailable != null && cartQuantity >= stockAvailable) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Cantidad máxima alcanzada",
+                text = localizedStringResource(R.string.max_quantity_reached, localeManager),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.fillMaxWidth(),
@@ -845,6 +868,7 @@ private fun CartBottomBar(
     itemCount: Int,
     totalAmount: Float,
     mode: Mode,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onConfirmOrder: () -> Unit
 ) {
     Card(
@@ -876,7 +900,7 @@ private fun CartBottomBar(
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "$itemCount ${if (itemCount == 1) "producto" else "productos"}",
+                        text = "$itemCount ${if (itemCount == 1) localizedStringResource(R.string.product_singular, localeManager) else localizedStringResource(R.string.product_plural, localeManager)}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
@@ -888,7 +912,7 @@ private fun CartBottomBar(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "Total:",
+                        text = localizedStringResource(R.string.total_label, localeManager),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -911,7 +935,7 @@ private fun CartBottomBar(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = if (mode == Mode.EDIT) "Actualizar Pedido" else "Confirmar Pedido",
+                    text = if (mode == Mode.EDIT) localizedStringResource(R.string.update_order_button, localeManager) else localizedStringResource(R.string.confirm_order_button, localeManager),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )

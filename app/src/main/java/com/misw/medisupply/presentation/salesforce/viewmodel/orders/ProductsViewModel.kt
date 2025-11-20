@@ -2,6 +2,7 @@ package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.data.remote.websocket.InventoryWebSocketClient
 import com.misw.medisupply.data.remote.websocket.WebSocketEvent
@@ -16,6 +17,7 @@ import com.misw.medisupply.domain.usecase.cart.ReleaseStockUseCase
 import com.misw.medisupply.domain.usecase.cart.ReserveStockUseCase
 import com.misw.medisupply.domain.usecase.product.GetProductsUseCase
 import com.misw.medisupply.domain.usecase.stock.GetMultipleProductsStockUseCase
+import com.misw.medisupply.core.i18n.LocaleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -48,7 +50,8 @@ class ProductsViewModel @Inject constructor(
     private val reserveStockUseCase: ReserveStockUseCase,
     private val releaseStockUseCase: ReleaseStockUseCase,
     private val clearCartUseCase: ClearCartUseCase,
-    private val webSocketClient: InventoryWebSocketClient
+    private val webSocketClient: InventoryWebSocketClient,
+    val localeManager: LocaleManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductsState())
@@ -401,7 +404,7 @@ class ProductsViewModel @Inject constructor(
                     includeInTransit = false
                 ).catch { e ->
                     // Handle flow errors
-                    lastError = e.message ?: "Unknown error"
+                    lastError = e.message ?: localeManager.getLocalizedString(R.string.error_unknown_generic)
                     println("Stock loading error (attempt ${attempt + 1}/$maxRetries): $lastError")
                 }.collect { resource ->
                     when (resource) {
@@ -439,7 +442,7 @@ class ProductsViewModel @Inject constructor(
                             }
                         }
                         is Resource.Error -> {
-                            lastError = resource.message ?: "Unknown error"
+                            lastError = resource.message ?: localeManager.getLocalizedString(R.string.error_unknown_generic)
                             println("Stock loading failed (attempt ${attempt + 1}/$maxRetries): $lastError")
                         }
                     }
@@ -513,7 +516,7 @@ class ProductsViewModel @Inject constructor(
         val newQuantity = if (existingItem != null) existingItem.quantity + 1 else 1
         
         if (stockAvailable != null && newQuantity > stockAvailable) {
-            _state.update { it.copy(error = "Stock insuficiente (disponible: $stockAvailable)") }
+            _state.update { it.copy(error = localeManager.getLocalizedString(R.string.error_insufficient_stock).format(stockAvailable)) }
             println("   ❌ Cannot exceed stock: $newQuantity > $stockAvailable")
             return
         }
@@ -576,7 +579,7 @@ class ProductsViewModel @Inject constructor(
                             currentState.copy(
                                 cartItems = revertedCart,
                                 isReservingStock = false,
-                                error = resource.message ?: "No se pudo reservar el stock"
+                                error = resource.message ?: localeManager.getLocalizedString(R.string.error_stock_reservation_failed)
                             )
                         }
                     }

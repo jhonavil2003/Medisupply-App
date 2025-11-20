@@ -44,6 +44,8 @@ import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.R
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.OrderReviewScreen
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrderViewModel
 import androidx.compose.foundation.lazy.LazyColumn
@@ -111,8 +113,8 @@ fun CustomerOrderReviewScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Revisar pedido",
-                subtitle = "Compras - Medisupply",
+                title = localizedStringResource(R.string.order_review_title, viewModel.localeManager),
+                subtitle = localizedStringResource(R.string.order_review_subtitle, viewModel.localeManager),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -125,7 +127,8 @@ fun CustomerOrderReviewScreen(
             // Sección específica para clientes: Selección de fecha de entrega
             CustomerDeliveryDateSection(
                 selectedDate = selectedDeliveryDate,
-                onDateSelected = { selectedDeliveryDate = it }
+                onDateSelected = { selectedDeliveryDate = it },
+                viewModel = viewModel
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -156,7 +159,8 @@ fun CustomerOrderReviewScreen(
 @Composable
 private fun CustomerDeliveryDateSection(
     selectedDate: String,
-    onDateSelected: (String) -> Unit
+    onDateSelected: (String) -> Unit,
+    viewModel: OrderViewModel
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     
@@ -207,7 +211,7 @@ private fun CustomerDeliveryDateSection(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Fecha de Entrega Preferida",
+                text = localizedStringResource(R.string.delivery_date_title, viewModel.localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = androidx.compose.ui.graphics.Color(0xFF1565C0)
@@ -223,7 +227,7 @@ private fun CustomerDeliveryDateSection(
                 )
             ) {
                 Text(
-                    text = "📦 Selecciona tu fecha de entrega preferida. La confirmación está sujeta a disponibilidad y políticas de distribución.",
+                    text = localizedStringResource(R.string.delivery_date_info, viewModel.localeManager),
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = androidx.compose.ui.graphics.Color(0xFF1565C0)
@@ -244,11 +248,11 @@ private fun CustomerDeliveryDateSection(
                 OutlinedTextField(
                     value = selectedDate,
                     onValueChange = { },
-                    label = { Text("Fecha de entrega") },
+                    label = { Text(localizedStringResource(R.string.delivery_date_label, viewModel.localeManager)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Seleccionar fecha",
+                            contentDescription = localizedStringResource(R.string.delivery_date_select, viewModel.localeManager),
                             tint = androidx.compose.ui.graphics.Color(0xFF1565C0)
                         )
                     },
@@ -292,7 +296,8 @@ private fun CustomerDeliveryDateSection(
                 showDatePicker = false
             },
             onDismiss = { showDatePicker = false },
-            datePickerState = datePickerState
+            datePickerState = datePickerState,
+            viewModel = viewModel
         )
     }
 }
@@ -305,18 +310,19 @@ private fun CustomerDeliveryDateSection(
 private fun CustomDatePickerDialog(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit,
-    datePickerState: androidx.compose.material3.DatePickerState
+    datePickerState: androidx.compose.material3.DatePickerState,
+    viewModel: OrderViewModel
 ) {
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
-                Text("OK")
+                Text(localizedStringResource(R.string.button_ok, viewModel.localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.button_cancel, viewModel.localeManager))
             }
         }
     ) {
@@ -335,6 +341,12 @@ private fun OrderReviewContent(
     viewModel: OrderViewModel
 ) {
     val state by viewModel.state.collectAsState()
+    
+    // Pre-calculate localized strings for dialogs
+    val localeManager = viewModel.localeManager
+    val notAvailableText = localizedStringResource(R.string.label_not_available, localeManager)
+    val orderSuccessText = localizedStringResource(R.string.order_created_success, localeManager)
+    val unknownErrorText = localizedStringResource(R.string.error_unknown, localeManager)
     
     // Dialog states
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -367,14 +379,25 @@ private fun OrderReviewContent(
     ) {
         // Customer Information Section
         item {
-            SectionTitle(text = "Información del Cliente")
+            SectionTitle(text = localizedStringResource(R.string.customer_info_section, viewModel.localeManager))
             CustomerSummaryCard(customer = customer)
         }
 
         // Order Items Section
         item {
             Spacer(modifier = Modifier.height(8.dp))
-            SectionTitle(text = "Productos ($itemCount ${if (itemCount == 1) "item" else "items"})")
+            val itemText = if (itemCount == 1) {
+                localizedStringResource(R.string.product_item, viewModel.localeManager)
+            } else {
+                localizedStringResource(R.string.product_items, viewModel.localeManager)
+            }
+            SectionTitle(
+                text = String.format(
+                    localizedStringResource(R.string.products_section, viewModel.localeManager),
+                    itemCount,
+                    itemText
+                )
+            )
         }
 
         items(cartItems.values.toList()) { cartItem ->
@@ -384,7 +407,7 @@ private fun OrderReviewContent(
         // Order Summary Section
         item {
             Spacer(modifier = Modifier.height(8.dp))
-            SectionTitle(text = "Resumen del Pedido")
+            SectionTitle(text = localizedStringResource(R.string.order_summary_section, viewModel.localeManager))
             OrderSummaryCard(
                 subtotal = subtotal,
                 tax = 0f,
@@ -411,7 +434,7 @@ private fun OrderReviewContent(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Creando pedido...")
+                    Text(localizedStringResource(R.string.creating_order, viewModel.localeManager))
                 } else {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
@@ -420,7 +443,7 @@ private fun OrderReviewContent(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Confirmar y Crear Pedido",
+                        text = localizedStringResource(R.string.button_confirm_order, viewModel.localeManager),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -435,6 +458,7 @@ private fun OrderReviewContent(
     if (showConfirmDialog) {
         ConfirmOrderDialog(
             isEditMode = false,
+            localeManager = localeManager,
             onConfirm = {
                 showConfirmDialog = false
                 viewModel.createOrder(
@@ -449,8 +473,9 @@ private fun OrderReviewContent(
     if (showSuccessDialog) {
         state.createdOrder?.let { order ->
             SuccessDialog(
-                orderNumber = order.orderNumber ?: "N/A",
-                message = "Su pedido ha sido creado correctamente.",
+                orderNumber = order.orderNumber ?: notAvailableText,
+                message = orderSuccessText,
+                localeManager = localeManager,
                 onDismiss = { 
                     showSuccessDialog = false
                     order.orderNumber?.let { orderNumber ->
@@ -463,7 +488,7 @@ private fun OrderReviewContent(
     
     if (showErrorDialog) {
         ErrorDialog(
-            errorMessage = state.error ?: "Error desconocido",
+            errorMessage = state.error ?: unknownErrorText,
             onDismiss = { 
                 showErrorDialog = false 
                 viewModel.clearError()

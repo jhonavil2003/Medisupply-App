@@ -80,4 +80,126 @@
     <string name="visits_title">Visits</string>
     <string name="visits_subtitle">Customer visit management</string>
     <string name="visits_coming_soon">This screen will be available soon</string>
+    
+    <!-- Agreement Conditions -->
+    <string name="condition_discount_title">Discount:</string>
+    <string name="condition_payment_term_title">Payment term:</string>
+    <string name="condition_taxes_title">Taxes:</string>
+    <string name="condition_discount_value">8% until Dec 15, 2025</string>
+    <string name="condition_payment_term_value">30 days</string>
+    <string name="condition_taxes_value">19% VAT included</string>
+    
+    <!-- General labels -->
+    <string name="label_not_available">N/A</string>
+    <string name="label_dropdown">Dropdown menu</string>
+    
+    <!-- Error messages and components -->
+    <string name="error_content_description">Error</string>
+    <string name="button_retry">Retry</string>
+    <string name="label_all_items">All</string>
+    <string name="error_loading_orders">Error loading orders</string>
+    <string name="error_network">Connection error</string>
+    
+    <!-- Customer Order Review Screen -->
+    <string name="order_review_title">Review order</string>
+    <string name="order_review_subtitle">Shop - Medisupply</string>
+    <string name="delivery_date_title">Preferred Delivery Date</string>
+    <string name="delivery_date_info">📦 Select your preferred delivery date. Confirmation is subject to availability and distribution policies.</string>
+    <string name="delivery_date_label">Delivery date</string>
+    <string name="delivery_date_select">Select date</string>
+    <string name="customer_info_section">Customer Information</string>
+    <string name="products_section">Products (%1$d %2$s)</string>
+    <string name="product_item">item</string>
+    <string name="product_items">items</string>
+    <string name="order_summary_section">Order Summary</string>
+    <string name="button_confirm_order">Confirm and Create Order</string>
+    <string name="creating_order">Creating order...</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+    
+    <!-- Order creation messages -->
+    <string name="order_created_success">Your order has been created successfully.</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="error_creating_order">Error creating the order</string>
+    
+    <!-- Product Selection Screen -->
+    <string name="select_products_title">Select Products</string>
+    <string name="edit_products_title">Edit Products</string>
+    <string name="salesforce_subtitle">Sales force - Medisupply</string>
+    <string name="selected_customer_label">Selected Customer</string>
+    <string name="customer_name_label">Name:</string>
+    <string name="customer_nit_label">Tax ID:</string>
+    <string name="customer_code_label">Code:</string>
+    <string name="customer_email_label">Email:</string>
+    <string name="search_products_hint">Search products...</string>
+    <string name="search_description">Search</string>
+    <string name="clear_search_description">Clear search</string>
+    <string name="loading_stock_text">Loading stock...</string>
+    <string name="stock_not_available">Stock N/A</string>
+    <string name="stock_not_available_banner">Stock not available</string>
+    <string name="page_info">Page %1$d of %2$d - %3$d products</string>
+    <string name="cold_chain_indicator">❄️ Cold chain</string>
+    <string name="previous_button">← Previous</string>
+    <string name="next_button">Next →</string>
+    <string name="error_title">❌ Error</string>
+    <string name="no_products_found">No products found</string>
+    <string name="adjust_search_filters">Try adjusting the search filters</string>
+    <string name="out_of_stock">Out of stock</string>
+    <string name="available_units">%d available</string>
+    <string name="add_to_cart_description">Add to cart</string>
+    <string name="remove_from_cart_description">Remove from cart</string>
+    <string name="out_of_stock_message">No stock available</string>
+    <string name="max_quantity_reached">Maximum quantity reached</string>
+    <string name="product_singular">product</string>
+    <string name="product_plural">products</string>
+    <string name="total_label">Total:</string>
+    <string name="confirm_order_button">Confirm Order</string>
+    <string name="update_order_button">Update Order</string>
+    
+    <!-- Content descriptions and additional strings -->
+    <string name="warning_content_description">Warning</string>
+    <string name="retry_content_description">Retry</string>
+    <string name="product_sku_label">SKU: %s</string>
+    
+    <!-- Product ViewModel error messages -->
+    <string name="error_loading_products">Error loading products</string>
+    <string name="error_unknown_generic">Unknown error</string>
+    <string name="error_stock_load_failed">Could not load stock. %s</string>
+    <string name="error_stock_load_retry">Please try again</string>
+    <string name="error_insufficient_stock">Insufficient stock (available: %d)</string>
+    <string name="error_stock_reservation_failed">Could not reserve stock</string>
+    
+    <!-- Confirmation and Success Dialogs -->
+    <string name="confirm_order_title">Confirm Order</string>
+    <string name="update_order_title">Update Order</string>
+    <string name="confirm_order_message">Are you sure you want to create this order? Once confirmed, it will be processed immediately.</string>
+    <string name="confirm_update_order_message">Are you sure you want to update this order? Once confirmed, it will be processed immediately.</string>
+    <string name="confirm_button">Confirm</string>
+    <string name="success_title">Success!</string>
+    <string name="order_number_label">Order Number:</string>
+    <string name="accept_button">Accept</string>
+    <string name="order_created_success_message">Order created successfully</string>
+    <string name="order_updated_success_message">Order updated successfully</string>
+    
+    <!-- Order Detail Screen -->
+    <string name="order_detail_title">Order Detail</string>
+    <string name="back_button_description">Back</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="order_header_date_label">Order date:</string>
+    <string name="order_status_label">Status:</string>
+    <string name="customer_data_title">Customer Data</string>
+    <string name="customer_label">Customer:</string>
+    <string name="customer_id_label">Customer ID: %d</string>
+    <string name="email_label">Email:</string>
+    <string name="medisupply_data_title">Medisupply Data</string>
+    <string name="delivery_date_detail_label">Delivery date:</string>
+    <string name="delivery_time_label">Delivery time:</string>
+    <string name="partial_delivery_label">Partial delivery:</string>
+    <string name="carrier_label">Carrier:</string>
+    <string name="items_count_label">Items: %d</string>
+    <string name="quantities_label">Quantities: %d ea</string>
+    <string name="date_undefined">To be defined</string>
+    <string name="delivery_time_default">8:50 am</string>
+    <string name="partial_delivery_none">None</string>
+    <string name="carrier_default">Truck 1</string>
 </resources>

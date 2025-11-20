@@ -18,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.presentation.components.localizedStringResource
 
 /**
  * Error view component
@@ -27,7 +30,8 @@ import androidx.compose.ui.unit.dp
 fun ErrorView(
     message: String,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    localeManager: LocaleManager? = null
 ) {
     Column(
         modifier = modifier
@@ -38,7 +42,11 @@ fun ErrorView(
     ) {
         Icon(
             imageVector = Icons.Default.Error,
-            contentDescription = "Error",
+            contentDescription = if (localeManager != null) {
+                localizedStringResource(R.string.error_content_description, localeManager)
+            } else {
+                "Error"
+            },
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(64.dp)
         )
@@ -55,7 +63,11 @@ fun ErrorView(
         Spacer(modifier = Modifier.height(24.dp))
         
         Button(onClick = onRetry) {
-            Text(text = "Reintentar")
+            Text(text = if (localeManager != null) {
+                localizedStringResource(R.string.button_retry, localeManager)
+            } else {
+                "Reintentar"
+            })
         }
     }
 }

@@ -2,6 +2,7 @@ package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
@@ -11,6 +12,7 @@ import com.misw.medisupply.domain.model.order.PaymentTerms
 import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
 import com.misw.medisupply.domain.usecase.order.CreateOrderUseCase
+import com.misw.medisupply.core.i18n.LocaleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val createOrderUseCase: CreateOrderUseCase,
-    private val clearCartUseCase: ClearCartUseCase
+    private val clearCartUseCase: ClearCartUseCase,
+    val localeManager: LocaleManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OrderState())
@@ -104,7 +107,7 @@ class OrderViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            error = resource.message ?: "Error al crear la orden",
+                            error = resource.message ?: localeManager.getLocalizedString(R.string.error_creating_order),
                             createdOrder = null
                         )
                     }
