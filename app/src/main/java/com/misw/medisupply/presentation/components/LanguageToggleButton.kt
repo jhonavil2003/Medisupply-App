@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
 import com.misw.medisupply.core.i18n.LocaleManager
+
+/**
+ * Reactive string resource that responds to language changes
+ */
+@Composable
+fun localizedStringResource(@StringRes id: Int, localeManager: LocaleManager): String {
+    val currentLanguage by localeManager.currentLanguage.collectAsState()
+    return remember(currentLanguage) {
+        localeManager.getLocalizedString(id)
+    }
+}
 
 /**
  * Language toggle button component

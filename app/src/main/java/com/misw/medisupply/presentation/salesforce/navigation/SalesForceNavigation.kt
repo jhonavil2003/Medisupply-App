@@ -25,12 +25,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.misw.medisupply.R
 import com.misw.medisupply.ui.theme.NavBarBackground
 import com.misw.medisupply.ui.theme.NavBarIconBlue
 import com.misw.medisupply.ui.theme.NavBarIconGreen
@@ -70,28 +72,28 @@ private fun SalesForceBottomNavigationBar(navController: NavHostController) {
     
     val navigationItems = listOf(
         NavigationItem(
-            title = "Inicio",
+            title = stringResource(R.string.nav_home),
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = SalesForceRoutes.HOME,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = "Visitas",
+            title = stringResource(R.string.nav_visits),
             selectedIcon = Icons.Filled.Route,
             unselectedIcon = Icons.Outlined.Route,
             route = SalesForceRoutes.VISITS,
             iconColor = NavBarIconGreen
         ),
         NavigationItem(
-            title = "Pedidos",
+            title = stringResource(R.string.nav_orders),
             selectedIcon = Icons.Filled.Archive,
             unselectedIcon = Icons.Outlined.Archive,
             route = SalesForceRoutes.ORDERS,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = "Desempeño",
+            title = stringResource(R.string.nav_performance),
             selectedIcon = Icons.Filled.BarChart,
             unselectedIcon = Icons.Outlined.BarChart,
             route = SalesForceRoutes.PERFORMANCE,

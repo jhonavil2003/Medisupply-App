@@ -23,12 +23,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.misw.medisupply.R
 import com.misw.medisupply.ui.theme.NavBarBackground
 import com.misw.medisupply.ui.theme.NavBarIconBlue
 import com.misw.medisupply.ui.theme.NavBarIconGreen
@@ -68,28 +70,28 @@ private fun CustomerManagementBottomNavigationBar(navController: NavHostControll
     
     val navigationItems = listOf(
         NavigationItem(
-            title = "Inicio",
+            title = stringResource(R.string.nav_home),
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = CustomerManagementRoutes.HOME,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = "Compras",
+            title = stringResource(R.string.nav_shop),
             selectedIcon = Icons.Filled.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
             route = CustomerManagementRoutes.SHOP,
             iconColor = NavBarIconGreen
         ),
         NavigationItem(
-            title = "Pedidos",
+            title = stringResource(R.string.nav_orders),
             selectedIcon = Icons.Filled.Receipt,
             unselectedIcon = Icons.Outlined.Receipt,
             route = CustomerManagementRoutes.ORDERS,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = "Cuenta",
+            title = stringResource(R.string.nav_account),
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
             route = CustomerManagementRoutes.ACCOUNT,

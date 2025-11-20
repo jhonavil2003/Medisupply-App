@@ -141,6 +141,15 @@ class LocaleManager @Inject constructor(
             LanguageOption(LANG_ENGLISH, "English", "🇺🇸")
         )
     }
+
+    /**
+     * Get a localized string for the current language
+     * This method creates a localized context and retrieves the string
+     */
+    fun getLocalizedString(stringId: Int): String {
+        val localizedContext = createLocalizedContext(_currentLanguage.value)
+        return localizedContext.getString(stringId)
+    }
 }
 
 /**

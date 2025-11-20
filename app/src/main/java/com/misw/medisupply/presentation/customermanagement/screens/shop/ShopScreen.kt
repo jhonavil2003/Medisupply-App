@@ -47,7 +47,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.presentation.common.components.ErrorView
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.customermanagement.viewmodel.CustomerShopViewModel
+import com.misw.medisupply.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -67,7 +69,7 @@ fun ShopScreen(
             FloatingActionButton(onClick = onNavigateToCreateOrder) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Crear pedido"
+                    contentDescription = localizedStringResource(R.string.shop_create_order_description, viewModel.localeManager)
                 )
             }
         },
@@ -88,18 +90,19 @@ fun ShopScreen(
                 ordersToShow = uiState.ordersToShow,
                 availablePageSizes = uiState.availablePageSizes,
                 onChangePageSize = { newSize -> viewModel.changeOrdersToShow(newSize) },
-                getPageSizeDisplayText = { size -> viewModel.getPageSizeDisplayText(size) }
+                getPageSizeDisplayText = { size -> viewModel.getPageSizeDisplayText(size) },
+                viewModel = viewModel
             )
             
             Spacer(modifier = Modifier.height(24.dp))
             
             // Productos rechazados (mock data como en la imagen)
-            RejectedProductsSection()
+            RejectedProductsSection(viewModel)
             
             Spacer(modifier = Modifier.height(24.dp))
             
             // Condiciones pactadas
-            AgreementConditionsSection()
+            AgreementConditionsSection(viewModel)
         }
     }
 }
@@ -116,7 +119,8 @@ private fun HistorySection(
     availablePageSizes: List<Int>,
     onRetry: () -> Unit,
     onChangePageSize: (Int) -> Unit,
-    getPageSizeDisplayText: (Int) -> String
+    getPageSizeDisplayText: (Int) -> String,
+    viewModel: CustomerShopViewModel
 ) {
     Column {
         // Header
@@ -126,7 +130,7 @@ private fun HistorySection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Historial de compras",
+                text = localizedStringResource(R.string.shop_history_title, viewModel.localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -201,7 +205,7 @@ private fun HistorySection(
                 )
             }
             orders.isEmpty() -> {
-                EmptyOrdersView()
+                EmptyOrdersView(viewModel)
             }
             else -> {
                 val ordersToDisplay = if (ordersToShow == -1) orders else orders.take(ordersToShow)
@@ -209,7 +213,7 @@ private fun HistorySection(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(ordersToDisplay) { order ->
-                        OrderCard(order = order)
+                        OrderCard(order = order, viewModel = viewModel)
                     }
                 }
             }
@@ -221,7 +225,7 @@ private fun HistorySection(
  * Card de orden individual
  */
 @Composable
-private fun OrderCard(order: Order) {
+private fun OrderCard(order: Order, viewModel: CustomerShopViewModel) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -253,7 +257,7 @@ private fun OrderCard(order: Order) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Total: ${formatCurrency(order.totalAmount)}",
+                    text = String.format(localizedStringResource(R.string.shop_total_label, viewModel.localeManager), formatCurrency(order.totalAmount)),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -266,7 +270,9 @@ private fun OrderCard(order: Order) {
  * Vista cuando no hay órdenes
  */
 @Composable
-private fun EmptyOrdersView() {
+private fun EmptyOrdersView(
+    viewModel: CustomerShopViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -281,12 +287,12 @@ private fun EmptyOrdersView() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No tienes compras aún",
+            text = localizedStringResource(R.string.shop_no_orders_title, viewModel.localeManager),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            text = "Crea tu primera orden tocando el botón Crear",
+            text = localizedStringResource(R.string.shop_no_orders_subtitle, viewModel.localeManager),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -297,7 +303,9 @@ private fun EmptyOrdersView() {
  * Sección de productos rechazados (mock data como en la imagen)
  */
 @Composable
-private fun RejectedProductsSection() {
+private fun RejectedProductsSection(
+    viewModel: CustomerShopViewModel
+) {
     Column {
         // Header
         Row(
@@ -306,7 +314,7 @@ private fun RejectedProductsSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Productos rechazados",
+                text = localizedStringResource(R.string.shop_rejected_products_title, viewModel.localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -316,7 +324,7 @@ private fun RejectedProductsSection() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Mostrar",
+                    text = localizedStringResource(R.string.shop_show_label, viewModel.localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -343,11 +351,13 @@ private fun RejectedProductsSection() {
         ) {
             RejectedProductCard(
                 productName = "Guantes de nitrilo M",
-                quantity = 5
+                quantity = 5,
+                viewModel = viewModel
             )
             RejectedProductCard(
                 productName = "Termómetro digital T-200",
-                quantity = 20
+                quantity = 20,
+                viewModel = viewModel
             )
         }
     }
@@ -359,7 +369,8 @@ private fun RejectedProductsSection() {
 @Composable
 private fun RejectedProductCard(
     productName: String,
-    quantity: Int
+    quantity: Int,
+    viewModel: CustomerShopViewModel
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -392,7 +403,7 @@ private fun RejectedProductCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Cantidad: $quantity",
+                    text = String.format(localizedStringResource(R.string.shop_quantity_label, viewModel.localeManager), quantity),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -405,10 +416,12 @@ private fun RejectedProductCard(
  * Sección de condiciones pactadas
  */
 @Composable
-private fun AgreementConditionsSection() {
+private fun AgreementConditionsSection(
+    viewModel: CustomerShopViewModel
+) {
     Column {
         Text(
-            text = "Condiciones pactadas",
+            text = localizedStringResource(R.string.shop_agreement_conditions_title, viewModel.localeManager),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface

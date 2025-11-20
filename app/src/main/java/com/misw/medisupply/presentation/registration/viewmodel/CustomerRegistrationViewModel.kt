@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.data.remote.dto.customer.CreateCustomerRequest
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.usecase.customer.RegisterCustomerUseCase
@@ -21,7 +22,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CustomerRegistrationViewModel @Inject constructor(
-    private val registerCustomerUseCase: RegisterCustomerUseCase
+    private val registerCustomerUseCase: RegisterCustomerUseCase,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     companion object {

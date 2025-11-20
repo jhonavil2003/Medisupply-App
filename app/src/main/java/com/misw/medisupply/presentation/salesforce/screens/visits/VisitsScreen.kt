@@ -17,13 +17,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
 
 /**
  * Visits Screen
  * Placeholder for visits functionality
  */
 @Composable
-fun VisitsScreen() {
+fun VisitsScreen(
+    viewModel: VisitsViewModel = hiltViewModel()
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -33,7 +38,7 @@ fun VisitsScreen() {
     ) {
         Icon(
             imageVector = Icons.Default.Route,
-            contentDescription = "Visitas",
+            contentDescription = localizedStringResource(R.string.visits_content_description, viewModel.localeManager),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(80.dp)
         )
@@ -41,7 +46,7 @@ fun VisitsScreen() {
         Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "Visitas",
+            text = localizedStringResource(R.string.visits_title, viewModel.localeManager),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -50,7 +55,7 @@ fun VisitsScreen() {
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Gestión de visitas a clientes",
+            text = localizedStringResource(R.string.visits_subtitle, viewModel.localeManager),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -58,7 +63,7 @@ fun VisitsScreen() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Esta pantalla estará disponible próximamente",
+            text = localizedStringResource(R.string.visits_coming_soon, viewModel.localeManager),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

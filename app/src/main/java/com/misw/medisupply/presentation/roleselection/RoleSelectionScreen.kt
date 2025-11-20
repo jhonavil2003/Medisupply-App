@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
 import com.misw.medisupply.core.session.UserRole
 import com.misw.medisupply.presentation.components.CompactLanguageToggle
+import com.misw.medisupply.presentation.components.localizedStringResource
 
 /**
  * Role Selection Screen
@@ -51,7 +52,7 @@ fun RoleSelectionScreen(
             ) {
             // App Logo or Title
             Text(
-                text = stringResource(R.string.app_name),
+                text = localizedStringResource(R.string.app_name, viewModel.localeManager),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -59,7 +60,7 @@ fun RoleSelectionScreen(
             )
             
             Text(
-                text = stringResource(R.string.role_selection_title),
+                text = localizedStringResource(R.string.role_selection_title, viewModel.localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -68,8 +69,8 @@ fun RoleSelectionScreen(
             
             // Sales Force Card
             RoleCard(
-                title = stringResource(R.string.role_sales_force_title),
-                description = stringResource(R.string.role_sales_force_description),
+                title = localizedStringResource(R.string.role_sales_force_title, viewModel.localeManager),
+                description = localizedStringResource(R.string.role_sales_force_description, viewModel.localeManager),
                 icon = Icons.Filled.Business,
                 onClick = { onRoleSelected(UserRole.SALES_FORCE) },
                 modifier = Modifier.fillMaxWidth()
@@ -79,8 +80,8 @@ fun RoleSelectionScreen(
             
             // Customer Management Card
             RoleCard(
-                title = stringResource(R.string.role_customer_title),
-                description = stringResource(R.string.role_customer_description),
+                title = localizedStringResource(R.string.role_customer_title, viewModel.localeManager),
+                description = localizedStringResource(R.string.role_customer_description, viewModel.localeManager),
                 icon = Icons.Filled.Person,
                 onClick = { onRoleSelected(UserRole.CUSTOMER_MANAGEMENT) },
                 modifier = Modifier.fillMaxWidth()
@@ -93,7 +94,7 @@ fun RoleSelectionScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${stringResource(R.string.register_new_customer)} ",
+                    text = "${localizedStringResource(R.string.register_new_customer, viewModel.localeManager)} ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -101,7 +102,7 @@ fun RoleSelectionScreen(
                     onClick = onRegisterClick
                 ) {
                     Text(
-                        text = stringResource(R.string.register_button),
+                        text = localizedStringResource(R.string.register_button, viewModel.localeManager),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -113,7 +114,7 @@ fun RoleSelectionScreen(
             
             // Help text
             Text(
-                text = stringResource(R.string.help_text),
+                text = localizedStringResource(R.string.help_text, viewModel.localeManager),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

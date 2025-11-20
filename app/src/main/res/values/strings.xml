@@ -14,4 +14,70 @@
     <string name="language_spanish">Español</string>
     <string name="language_english">English</string>
     <string name="language_toggle_description">Cambiar idioma</string>
+    
+    <!-- Customer Home Screen -->
+    <string name="customer_home_welcome">Bienvenido a Medisupply</string>
+    <string name="customer_home_subtitle">Portal de Autogestión de Compras</string>
+    <string name="customer_home_instructions">Utiliza la barra de navegación inferior para acceder a las diferentes secciones:</string>
+    <string name="customer_home_shop_feature">• Compras - Explora y compra productos médicos</string>
+    <string name="customer_home_orders_feature">• Pedidos - Consulta el estado de tus pedidos</string>
+    <string name="customer_home_account_feature">• Cuenta - Gestiona tu perfil y configuración</string>
+    <string name="customer_home_change_role">🔧 Cambiar Rol (Provisional)</string>
+    <string name="content_description_home">Inicio</string>
+    
+    <!-- SalesForce Home Screen -->
+    <string name="salesforce_home_welcome">Bienvenido a Medisupply - Fuerza de Ventas</string>
+    <string name="salesforce_home_subtitle">Sistema de Gestión de Suministros Médicos</string>
+    <string name="salesforce_home_instructions">Utiliza la barra de navegación inferior para acceder a las diferentes secciones:</string>
+    <string name="salesforce_home_visits_feature">• Visitas - Gestión de visitas a clientes y rutas optimizadas</string>
+    <string name="salesforce_home_orders_feature">• Pedidos - Creación y gestión de pedidos</string>
+    <string name="salesforce_home_performance_feature">• Desempeño - Métricas y estadísticas de ventas</string>
+    <string name="salesforce_home_change_role">🔧 Cambiar Rol (Provisional)</string>
+    
+    <!-- Navigation Bar -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_shop">Compras</string>
+    <string name="nav_orders">Pedidos</string>
+    <string name="nav_account">Cuenta</string>
+    <string name="nav_visits">Visitas</string>
+    <string name="nav_performance">Desempeño</string>
+    
+    <!-- Customer Registration Screen -->
+    <string name="registration_title">Registrarse</string>
+    <string name="registration_back_description">Volver</string>
+    <string name="registration_app_name">MediSupply</string>
+    <string name="registration_basic_data">Datos básicos</string>
+    <string name="registration_business_name">Razón social</string>
+    <string name="registration_document_number">NIT</string>
+    <string name="registration_internal_code">Código interno</string>
+    <string name="registration_address">Dirección</string>
+    <string name="registration_phone">Teléfono</string>
+    <string name="registration_cell">Celular</string>
+    <string name="registration_email">Correo</string>
+    <string name="registration_access_data">Datos de acceso</string>
+    <string name="registration_username">Usuario</string>
+    <string name="registration_password">Contraseña</string>
+    <string name="registration_cancel">Cancelar</string>
+    <string name="registration_save">Guardar</string>
+    <string name="registration_valid">Válido</string>
+    <string name="registration_error">Error</string>
+    <string name="registration_show_password">Mostrar contraseña</string>
+    <string name="registration_hide_password">Ocultar contraseña</string>
+    
+    <!-- Shop Screen -->
+    <string name="shop_create_order_description">Crear pedido</string>
+    <string name="shop_history_title">Historial de compras</string>
+    <string name="shop_show_label">Mostrar</string>
+    <string name="shop_total_label">Total: %s</string>
+    <string name="shop_no_orders_title">No tienes compras aún</string>
+    <string name="shop_no_orders_subtitle">Crea tu primera orden tocando el botón Crear</string>
+    <string name="shop_rejected_products_title">Productos rechazados</string>
+    <string name="shop_quantity_label">Cantidad: %d</string>
+    <string name="shop_agreement_conditions_title">Condiciones pactadas</string>
+    
+    <!-- Visits Screen -->
+    <string name="visits_content_description">Visitas</string>
+    <string name="visits_title">Visitas</string>
+    <string name="visits_subtitle">Gestión de visitas a clientes</string>
+    <string name="visits_coming_soon">Esta pantalla estará disponible próximamente</string>
 </resources>

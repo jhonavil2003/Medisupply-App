@@ -14,4 +14,70 @@
     <string name="language_spanish">Español</string>
     <string name="language_english">English</string>
     <string name="language_toggle_description">Change language</string>
+    
+    <!-- Customer Home Screen -->
+    <string name="customer_home_welcome">Welcome to Medisupply</string>
+    <string name="customer_home_subtitle">Self-Service Purchasing Portal</string>
+    <string name="customer_home_instructions">Use the bottom navigation bar to access different sections:</string>
+    <string name="customer_home_shop_feature">• Shop - Explore and purchase medical products</string>
+    <string name="customer_home_orders_feature">• Orders - Check the status of your orders</string>
+    <string name="customer_home_account_feature">• Account - Manage your profile and settings</string>
+    <string name="customer_home_change_role">🔧 Change Role (Temporary)</string>
+    <string name="content_description_home">Home</string>
+    
+    <!-- SalesForce Home Screen -->
+    <string name="salesforce_home_welcome">Welcome to Medisupply - Sales Force</string>
+    <string name="salesforce_home_subtitle">Medical Supplies Management System</string>
+    <string name="salesforce_home_instructions">Use the bottom navigation bar to access different sections:</string>
+    <string name="salesforce_home_visits_feature">• Visits - Customer visit management and optimized routes</string>
+    <string name="salesforce_home_orders_feature">• Orders - Order creation and management</string>
+    <string name="salesforce_home_performance_feature">• Performance - Sales metrics and statistics</string>
+    <string name="salesforce_home_change_role">🔧 Change Role (Temporary)</string>
+    
+    <!-- Navigation Bar -->
+    <string name="nav_home">Home</string>
+    <string name="nav_shop">Shop</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_visits">Visits</string>
+    <string name="nav_performance">Performance</string>
+    
+    <!-- Customer Registration Screen -->
+    <string name="registration_title">Register</string>
+    <string name="registration_back_description">Back</string>
+    <string name="registration_app_name">MediSupply</string>
+    <string name="registration_basic_data">Basic Information</string>
+    <string name="registration_business_name">Business Name</string>
+    <string name="registration_document_number">Tax ID</string>
+    <string name="registration_internal_code">Internal Code</string>
+    <string name="registration_address">Address</string>
+    <string name="registration_phone">Phone</string>
+    <string name="registration_cell">Cell Phone</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_access_data">Access Information</string>
+    <string name="registration_username">Username</string>
+    <string name="registration_password">Password</string>
+    <string name="registration_cancel">Cancel</string>
+    <string name="registration_save">Save</string>
+    <string name="registration_valid">Valid</string>
+    <string name="registration_error">Error</string>
+    <string name="registration_show_password">Show password</string>
+    <string name="registration_hide_password">Hide password</string>
+    
+    <!-- Shop Screen -->
+    <string name="shop_create_order_description">Create order</string>
+    <string name="shop_history_title">Purchase history</string>
+    <string name="shop_show_label">Show</string>
+    <string name="shop_total_label">Total: %s</string>
+    <string name="shop_no_orders_title">You have no purchases yet</string>
+    <string name="shop_no_orders_subtitle">Create your first order by tapping the Create button</string>
+    <string name="shop_rejected_products_title">Rejected products</string>
+    <string name="shop_quantity_label">Quantity: %d</string>
+    <string name="shop_agreement_conditions_title">Agreed conditions</string>
+    
+    <!-- Visits Screen -->
+    <string name="visits_content_description">Visits</string>
+    <string name="visits_title">Visits</string>
+    <string name="visits_subtitle">Customer visit management</string>
+    <string name="visits_coming_soon">This screen will be available soon</string>
 </resources>
