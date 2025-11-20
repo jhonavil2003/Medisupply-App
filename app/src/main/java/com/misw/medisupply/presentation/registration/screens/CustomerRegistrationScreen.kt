@@ -106,6 +106,14 @@ fun CustomerRegistrationScreen(
                 enabled = !uiState.isLoading
             )
             
+            // Trade Name
+            CustomTextField(
+                value = uiState.tradeName,
+                onValueChange = viewModel::updateTradeName,
+                label = "Nombre comercial (Opcional)",
+                enabled = !uiState.isLoading
+            )
+            
             // Document Number Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -158,6 +166,14 @@ fun CustomerRegistrationScreen(
                 }
             }
             
+            // Contact Name
+            CustomTextField(
+                value = uiState.contactName,
+                onValueChange = viewModel::updateContactName,
+                label = "Nombre del contacto (Opcional)",
+                enabled = !uiState.isLoading
+            )
+            
             // Address Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -173,25 +189,55 @@ fun CustomerRegistrationScreen(
                 )
                 
                 CustomTextField(
-                    value = uiState.contactPhone,
-                    onValueChange = viewModel::updateContactPhone,
-                    label = "Teléfono",
-                    error = uiState.contactPhoneError,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    value = uiState.neighborhood,
+                    onValueChange = viewModel::updateNeighborhood,
+                    label = "Barrio",
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
             }
             
-            // Cell and Email Row
+            // City and Department Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 CustomTextField(
+                    value = uiState.city,
+                    onValueChange = viewModel::updateCity,
+                    label = "Ciudad",
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                CustomTextField(
                     value = uiState.department,
                     onValueChange = viewModel::updateDepartment,
-                    label = "Celular",
+                    label = "Departamento",
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            // Country Row
+            CustomTextField(
+                value = uiState.country,
+                onValueChange = viewModel::updateCountry,
+                label = "País",
+                enabled = !uiState.isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            // Phone and Email Row
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CustomTextField(
+                    value = uiState.contactPhone,
+                    onValueChange = viewModel::updateContactPhone,
+                    label = "Teléfono",
+                    error = uiState.contactPhoneError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
@@ -203,6 +249,32 @@ fun CustomerRegistrationScreen(
                     label = "Correo",
                     error = uiState.contactEmailError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            // Coordinates Section (Optional)
+            SectionTitle("Ubicación GPS (Opcional)")
+            
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CustomTextField(
+                    value = uiState.latitude,
+                    onValueChange = viewModel::updateLatitude,
+                    label = "Latitud",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                CustomTextField(
+                    value = uiState.longitude,
+                    onValueChange = viewModel::updateLongitude,
+                    label = "Longitud",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
