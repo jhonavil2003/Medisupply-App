@@ -40,6 +40,7 @@ import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CartItemCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
@@ -49,6 +50,7 @@ import com.misw.medisupply.presentation.salesforce.screens.orders.review.compone
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.DeleteOrderDialog
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ErrorDialog
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.SuccessDialog
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.viewmodel.OrderReviewScreenViewModel
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrderViewModel
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
@@ -66,7 +68,8 @@ fun OrderReviewScreen(
     orderId: String? = null,
     orderStatus: OrderStatus? = null,
     createViewModel: OrderViewModel = hiltViewModel(),
-    editViewModel: OrdersViewModel = hiltViewModel()
+    editViewModel: OrdersViewModel = hiltViewModel(),
+    localeViewModel: OrderReviewScreenViewModel = hiltViewModel()
 ) {
     // Use different ViewModel depending on mode
     val createState by createViewModel.state.collectAsState()
@@ -116,8 +119,11 @@ fun OrderReviewScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = if (mode == Mode.EDIT) "Editar Pedido" else "Revisar Pedido",
-                subtitle = "Fuerza de ventas - Medisupply",
+                title = if (mode == Mode.EDIT) 
+                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_edit_title)
+                else 
+                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_create_title),
+                subtitle = localeViewModel.localeManager.getLocalizedString(R.string.order_review_salesforce_subtitle),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -131,14 +137,25 @@ fun OrderReviewScreen(
         ) {
             // Customer Information Section
             item {
-                SectionTitle(text = "Información del Cliente")
+                SectionTitle(text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_customer_info))
                 CustomerSummaryCard(customer = customer)
             }
 
             // Order Items Section
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                SectionTitle(text = "Productos ($itemCount ${if (itemCount == 1) "item" else "items"})")
+                val productsText = if (itemCount == 1) {
+                    String.format(
+                        localeViewModel.localeManager.getLocalizedString(R.string.order_review_products_single),
+                        itemCount
+                    )
+                } else {
+                    String.format(
+                        localeViewModel.localeManager.getLocalizedString(R.string.order_review_products_plural),
+                        itemCount
+                    )
+                }
+                SectionTitle(text = productsText)
             }
 
             items(cartItems.values.toList()) { cartItem ->
@@ -148,7 +165,7 @@ fun OrderReviewScreen(
             // Order Summary Section
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                SectionTitle(text = "Resumen del Pedido")
+                SectionTitle(text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_summary))
                 OrderSummaryCard(
                     subtotal = subtotal,
                     tax = 0f, // TODO: Calculate tax
@@ -178,7 +195,7 @@ fun OrderReviewScreen(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Procesando...")
+                            Text(localeViewModel.localeManager.getLocalizedString(R.string.order_review_processing))
                         } else {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
@@ -187,7 +204,10 @@ fun OrderReviewScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (mode == Mode.EDIT) "Confirmar y Actualizar Pedido" else "Confirmar y Crear Pedido",
+                                text = if (mode == Mode.EDIT) 
+                                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_confirm_update)
+                                else 
+                                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_confirm_create),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -201,7 +221,7 @@ fun OrderReviewScreen(
                         shape = RoundedCornerShape(12.dp),
                         enabled = !isLoading
                     ) {
-                        Text("Cancelar")
+                        Text(localeViewModel.localeManager.getLocalizedString(R.string.order_review_cancel))
                     }
                     
                     // Delete button (only in EDIT mode for PENDING orders)
@@ -222,7 +242,7 @@ fun OrderReviewScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Eliminar Pedido",
+                                text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_delete_order),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -298,6 +318,7 @@ fun OrderReviewScreen(
     if (showDeleteDialog) {
         DeleteOrderDialog(
             orderNumber = orderNumber,
+            localeManager = localeViewModel.localeManager,
             onConfirm = {
                 showDeleteDialog = false
                 // Use the numeric ID from the state, not the string orderId parameter

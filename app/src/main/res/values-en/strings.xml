@@ -300,8 +300,6 @@
 
     <!-- OrdersScreen strings -->
     <string name="orders_title">Orders</string>
-    <string name="customer_consultation_title">Customer Consultation</string>
-    <string name="customer_consultation_subtitle">Search your portfolio and open each customer profile</string>
     <string name="create_order_title">Create Order</string>
     <string name="create_order_subtitle">Build your order with real-time availability</string>
     <string name="my_orders_title">My Orders</string>
@@ -381,5 +379,98 @@
     <string name="create_order_no_customers_available_description">Could not load customers. Please try again.</string>
     <string name="create_order_load_customers">Load Customers</string>
     <string name="create_order_selected">Selected</string>
+
+    <!-- Orders System Error Messages and Notifications -->
+    <string name="error_searching_customers">Error searching customers: %s</string>
+    <string name="order_not_found">Order not found</string>
+    <string name="error_loading_order">Error loading order</string>
+    <string name="incomplete_order_data">Incomplete data to update order</string>
+    <string name="order_updated_successfully">Order updated successfully</string>
+    <string name="error_updating_order">Error updating order</string>
+    <string name="order_deleted_successfully">Order deleted successfully</string>
+    <string name="error_deleting_order">Error deleting order</string>
+    
+    <!-- Additional Product System Messages -->
+    <string name="error_loading_stock">Could not load stock. %s</string>
+    <string name="try_again">Try again</string>
+
+    <!-- Route List Screen -->
+    <string name="route_list_title">Visit Routes</string>
+    <string name="route_list_go_back">Back</string>
+    <string name="route_list_filters">Filters</string>
+    <string name="route_list_refresh">Refresh</string>
+    <string name="route_list_new_route">New Route</string>
+    <string name="route_list_unknown_error">Unknown error</string>
+    <string name="route_list_active_filters">Active filters:</string>
+    <string name="route_list_date_filter">• Date: %s</string>
+    <string name="route_list_status_filter">• Status: %s</string>
+    <string name="route_list_clear">Clear</string>
+    <string name="route_list_total_routes">Total routes</string>
+    <string name="route_list_showing">Showing</string>
+    <string name="route_list_no_routes_with_filters">No routes with these filters</string>
+    <string name="route_list_no_routes_created">No routes created</string>
+    <string name="route_list_adjust_filters">Try adjusting the filters</string>
+    <string name="route_list_create_first_route">Create your first optimized route</string>
+    <string name="route_list_clear_filters">Clear filters</string>
+    <string name="route_list_create_route">Create route</string>
+    <string name="route_list_error_loading">Error loading routes</string>
+    <string name="route_list_retry">Retry</string>
+    <string name="route_list_filters_dialog_title">Route Filters</string>
+    <string name="route_list_date_label">Date</string>
+    <string name="route_list_today">Today</string>
+    <string name="route_list_all_dates">All</string>
+    <string name="route_list_status_label">Status</string>
+    <string name="route_list_all_statuses">All</string>
+    <string name="route_list_apply">Apply</string>
+    
+    <!-- Route Status Names -->
+    <string name="route_status_draft">Draft</string>
+    <string name="route_status_confirmed">Confirmed</string>
+    <string name="route_status_in_progress">In Progress</string>
+    <string name="route_status_completed">Completed</string>
+    <string name="route_status_cancelled">Cancelled</string>
+
+    <!-- Order Review Screen -->
+    <string name="order_review_edit_title">Edit Order</string>
+    <string name="order_review_create_title">Review Order</string>
+    <string name="order_review_salesforce_subtitle">Sales Force - Medisupply</string>
+    <string name="order_review_customer_info">Customer Information</string>
+    <string name="order_review_products_single">Products (%d item)</string>
+    <string name="order_review_products_plural">Products (%d items)</string>
+    <string name="order_review_summary">Order Summary</string>
+    <string name="order_review_processing">Processing...</string>
+    <string name="order_review_confirm_update">Confirm and Update Order</string>
+    <string name="order_review_confirm_create">Confirm and Create Order</string>
+    <string name="order_review_cancel">Cancel</string>
+    <string name="order_review_delete_order">Delete Order</string>
+
+
+    <!-- Order Card -->
+    <string name="order_card_edit_order">Edit order</string>
+
+    <!-- Delete Order Dialog -->
+    <string name="delete_order_title">Delete Order</string>
+    <string name="delete_order_message">Are you sure you want to delete order %s? This action cannot be undone.</string>
+    <string name="delete_order_button">Delete</string>
+
+    <!-- Customer Types -->
+    <string name="customer_type_hospital">Hospital</string>
+    <string name="customer_type_clinica">Clinic</string>
+    <string name="customer_type_farmacia">Pharmacy</string>
+    <string name="customer_type_distribuidor">Distributor</string>
+    <string name="customer_type_ips">IPS</string>
+    <string name="customer_type_eps">EPS</string>
+    
+    <!-- Customer List Screen -->
+    <string name="customer_consultation_title">Customer Consultation</string>
+    <string name="customer_consultation_subtitle">Sales Force - Medisupply</string>
+    <string name="customer_list_search_placeholder">Search customer...</string>
+    <string name="customer_list_search_action">Search</string>
+    <string name="customer_list_filter_all">All</string>
+    <string name="customer_list_no_customers">No customers found</string>
+    <string name="customer_list_no_customers_description">No customers found with the selected filters</string>
+    
+    <!-- Customer Item -->
+    <string name="customer_item_profile_button">Profile</string>
 
 </resources>

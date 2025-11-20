@@ -328,7 +328,7 @@ class ProductsViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            error = resource.message ?: "Error al cargar productos"
+                            error = resource.message ?: localeManager.getLocalizedString(R.string.error_loading_products)
                         )
                     }
                 }
@@ -473,7 +473,10 @@ class ProductsViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     isLoadingStock = false,
-                    stockError = "No se pudo cargar el stock. ${lastError ?: "Intente nuevamente"}",
+                    stockError = String.format(
+                        localeManager.getLocalizedString(R.string.error_loading_stock), 
+                        lastError ?: localeManager.getLocalizedString(R.string.try_again)
+                    ),
                     stockRetryAttempt = 0
                 )
             }

@@ -300,8 +300,6 @@
 
     <!-- OrdersScreen strings -->
     <string name="orders_title">Pedidos</string>
-    <string name="customer_consultation_title">Consulta de Clientes</string>
-    <string name="customer_consultation_subtitle">Busca tu cartera y abre el perfil de cada cliente</string>
     <string name="create_order_title">Crear Pedido</string>
     <string name="create_order_subtitle">Arma el pedido con disponibilidad en tiempo real</string>
     <string name="my_orders_title">Mis Pedidos</string>
@@ -381,5 +379,98 @@
     <string name="create_order_no_customers_available_description">No se pudieron cargar los clientes. Por favor, intenta de nuevo.</string>
     <string name="create_order_load_customers">Cargar Clientes</string>
     <string name="create_order_selected">Seleccionado</string>
+
+    <!-- Orders System Error Messages and Notifications -->
+    <string name="error_searching_customers">Error al buscar clientes: %s</string>
+    <string name="order_not_found">Orden no encontrada</string>
+    <string name="error_loading_order">Error al cargar la orden</string>
+    <string name="incomplete_order_data">Datos incompletos para actualizar la orden</string>
+    <string name="order_updated_successfully">Orden actualizada exitosamente</string>
+    <string name="error_updating_order">Error al actualizar la orden</string>
+    <string name="order_deleted_successfully">Pedido eliminado exitosamente</string>
+    <string name="error_deleting_order">Error al eliminar el pedido</string>
+    
+    <!-- Additional Product System Messages -->
+    <string name="error_loading_stock">No se pudo cargar el stock. %s</string>
+    <string name="try_again">Intente nuevamente</string>
+
+    <!-- Route List Screen -->
+    <string name="route_list_title">Rutas de Visita</string>
+    <string name="route_list_go_back">Volver</string>
+    <string name="route_list_filters">Filtros</string>
+    <string name="route_list_refresh">Actualizar</string>
+    <string name="route_list_new_route">Nueva Ruta</string>
+    <string name="route_list_unknown_error">Error desconocido</string>
+    <string name="route_list_active_filters">Filtros activos:</string>
+    <string name="route_list_date_filter">• Fecha: %s</string>
+    <string name="route_list_status_filter">• Estado: %s</string>
+    <string name="route_list_clear">Limpiar</string>
+    <string name="route_list_total_routes">Total de rutas</string>
+    <string name="route_list_showing">Mostrando</string>
+    <string name="route_list_no_routes_with_filters">No hay rutas con estos filtros</string>
+    <string name="route_list_no_routes_created">No hay rutas creadas</string>
+    <string name="route_list_adjust_filters">Intenta ajustar los filtros</string>
+    <string name="route_list_create_first_route">Crea tu primera ruta optimizada</string>
+    <string name="route_list_clear_filters">Limpiar filtros</string>
+    <string name="route_list_create_route">Crear ruta</string>
+    <string name="route_list_error_loading">Error al cargar rutas</string>
+    <string name="route_list_retry">Reintentar</string>
+    <string name="route_list_filters_dialog_title">Filtros de Rutas</string>
+    <string name="route_list_date_label">Fecha</string>
+    <string name="route_list_today">Hoy</string>
+    <string name="route_list_all_dates">Todas</string>
+    <string name="route_list_status_label">Estado</string>
+    <string name="route_list_all_statuses">Todos</string>
+    <string name="route_list_apply">Aplicar</string>
+    
+    <!-- Route Status Names -->
+    <string name="route_status_draft">Borrador</string>
+    <string name="route_status_confirmed">Confirmada</string>
+    <string name="route_status_in_progress">En Curso</string>
+    <string name="route_status_completed">Completada</string>
+    <string name="route_status_cancelled">Cancelada</string>
+
+    <!-- Order Review Screen -->
+    <string name="order_review_edit_title">Editar Pedido</string>
+    <string name="order_review_create_title">Revisar Pedido</string>
+    <string name="order_review_salesforce_subtitle">Fuerza de ventas - Medisupply</string>
+    <string name="order_review_customer_info">Información del Cliente</string>
+    <string name="order_review_products_single">Productos (%d item)</string>
+    <string name="order_review_products_plural">Productos (%d items)</string>
+    <string name="order_review_summary">Resumen del Pedido</string>
+    <string name="order_review_processing">Procesando...</string>
+    <string name="order_review_confirm_update">Confirmar y Actualizar Pedido</string>
+    <string name="order_review_confirm_create">Confirmar y Crear Pedido</string>
+    <string name="order_review_cancel">Cancelar</string>
+    <string name="order_review_delete_order">Eliminar Pedido</string>
+
+
+    <!-- Order Card -->
+    <string name="order_card_edit_order">Editar orden</string>
+
+    <!-- Delete Order Dialog -->
+    <string name="delete_order_title">Eliminar Pedido</string>
+    <string name="delete_order_message">¿Está seguro que desea eliminar el pedido %s? Esta acción no se puede deshacer.</string>
+    <string name="delete_order_button">Eliminar</string>
+
+    <!-- Customer Types -->
+    <string name="customer_type_hospital">Hospital</string>
+    <string name="customer_type_clinica">Clínica</string>
+    <string name="customer_type_farmacia">Farmacia</string>
+    <string name="customer_type_distribuidor">Distribuidor</string>
+    <string name="customer_type_ips">IPS</string>
+    <string name="customer_type_eps">EPS</string>
+    
+    <!-- Customer List Screen -->
+    <string name="customer_consultation_title">Consulta de Clientes</string>
+    <string name="customer_consultation_subtitle">Fuerza de ventas - Medisupply</string>
+    <string name="customer_list_search_placeholder">Buscar cliente...</string>
+    <string name="customer_list_search_action">Buscar</string>
+    <string name="customer_list_filter_all">Todos</string>
+    <string name="customer_list_no_customers">No se encontraron clientes</string>
+    <string name="customer_list_no_customers_description">No se encontraron clientes con los filtros seleccionados</string>
+    
+    <!-- Customer Item -->
+    <string name="customer_item_profile_button">Perfil</string>
 
 </resources>

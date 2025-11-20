@@ -14,9 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.domain.model.route.RouteStatus
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.RouteCard
 import com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel.RouteListViewModel
+import com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel.RouteListScreenViewModel
 import com.misw.medisupply.ui.theme.ColorTextSecondary
 import com.misw.medisupply.ui.theme.ColorTextPrimary
 import java.time.LocalDate
@@ -28,7 +32,8 @@ fun RouteListScreen(
     onNavigateToGenerate: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
     onNavigateBack: () -> Unit,
-    viewModel: RouteListViewModel = hiltViewModel()
+    viewModel: RouteListViewModel = hiltViewModel(),
+    localeViewModel: RouteListScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
@@ -45,10 +50,10 @@ fun RouteListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Rutas de Visita") },
+                title = { Text(localizedStringResource(R.string.route_list_title, localeViewModel.localeManager)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = localizedStringResource(R.string.route_list_go_back, localeViewModel.localeManager))
                     }
                 },
                 actions = {
@@ -61,13 +66,13 @@ fun RouteListScreen(
                                 MaterialTheme.colorScheme.surfaceVariant
                             }
                         ) {
-                            Icon(Icons.Default.FilterList, contentDescription = "Filtros")
+                            Icon(Icons.Default.FilterList, contentDescription = localizedStringResource(R.string.route_list_filters, localeViewModel.localeManager))
                         }
                     }
                     
                     // Refresh
                     IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Actualizar")
+                        Icon(Icons.Default.Refresh, contentDescription = localizedStringResource(R.string.route_list_refresh, localeViewModel.localeManager))
                     }
                 }
             )
@@ -76,7 +81,7 @@ fun RouteListScreen(
             ExtendedFloatingActionButton(
                 onClick = onNavigateToGenerate,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Nueva Ruta") }
+                text = { Text(localizedStringResource(R.string.route_list_new_route, localeViewModel.localeManager)) }
             )
         }
     ) { paddingValues ->
@@ -97,7 +102,8 @@ fun RouteListScreen(
                     
                     uiState.error != null -> {
                         ErrorState(
-                            message = uiState.error ?: "Error desconocido",
+                            message = uiState.error ?: localizedStringResource(R.string.route_list_unknown_error, localeViewModel.localeManager),
+                            localeManager = localeViewModel.localeManager,
                             onRetry = { viewModel.loadRoutes() },
                             modifier = Modifier.align(Alignment.Center)
                         )
@@ -106,6 +112,7 @@ fun RouteListScreen(
                     uiState.filteredRoutes.isEmpty() -> {
                         EmptyState(
                             hasFilters = uiState.hasActiveFilters,
+                            localeManager = localeViewModel.localeManager,
                             onClearFilters = { viewModel.clearFilters() },
                             onCreateNew = onNavigateToGenerate,
                             modifier = Modifier.align(Alignment.Center)
@@ -125,6 +132,7 @@ fun RouteListScreen(
                                     ActiveFiltersChip(
                                         dateFilter = uiState.selectedDate,
                                         statusFilter = uiState.selectedStatus,
+                                        localeManager = localeViewModel.localeManager,
                                         onClearFilters = { viewModel.clearFilters() }
                                     )
                                 }
@@ -134,7 +142,8 @@ fun RouteListScreen(
                             item {
                                 RouteStatisticsCard(
                                     totalRoutes = uiState.totalRoutes,
-                                    displayedRoutes = uiState.filteredRoutes.size
+                                    displayedRoutes = uiState.filteredRoutes.size,
+                                    localeManager = localeViewModel.localeManager
                                 )
                             }
                             
@@ -179,6 +188,7 @@ fun RouteListScreen(
         FiltersDialog(
             selectedDate = uiState.selectedDate,
             selectedStatus = uiState.selectedStatus,
+            localeManager = localeViewModel.localeManager,
             onDateSelected = { viewModel.updateDateFilter(it) },
             onStatusSelected = { viewModel.updateStatusFilter(it) },
             onClearFilters = { viewModel.clearFilters() },
@@ -198,6 +208,7 @@ fun RouteListScreen(
 private fun ActiveFiltersChip(
     dateFilter: LocalDate?,
     statusFilter: RouteStatus?,
+    localeManager: LocaleManager,
     onClearFilters: () -> Unit
 ) {
     Card(
@@ -215,28 +226,34 @@ private fun ActiveFiltersChip(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Filtros activos:",
+                    text = localeManager.getLocalizedString(R.string.route_list_active_filters),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 
                 if (dateFilter != null) {
                     Text(
-                        text = "• Fecha: ${dateFilter.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}",
+                        text = String.format(
+                            localeManager.getLocalizedString(R.string.route_list_date_filter),
+                            dateFilter.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        ),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
                 
                 if (statusFilter != null) {
                     Text(
-                        text = "• Estado: ${getStatusDisplayName(statusFilter)}",
+                        text = String.format(
+                            localeManager.getLocalizedString(R.string.route_list_status_filter),
+                            getStatusDisplayName(statusFilter, localeManager)
+                        ),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
             
             TextButton(onClick = onClearFilters) {
-                Text("Limpiar")
+                Text(localeManager.getLocalizedString(R.string.route_list_clear))
             }
         }
     }
@@ -245,7 +262,8 @@ private fun ActiveFiltersChip(
 @Composable
 private fun RouteStatisticsCard(
     totalRoutes: Int,
-    displayedRoutes: Int
+    displayedRoutes: Int,
+    localeManager: LocaleManager
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -261,14 +279,14 @@ private fun RouteStatisticsCard(
         ) {
             StatItem(
                 icon = Icons.Default.Route,
-                label = "Total de rutas",
+                label = localeManager.getLocalizedString(R.string.route_list_total_routes),
                 value = totalRoutes.toString()
             )
             
             if (displayedRoutes != totalRoutes) {
                 StatItem(
                     icon = Icons.Default.FilterList,
-                    label = "Mostrando",
+                    label = localeManager.getLocalizedString(R.string.route_list_showing),
                     value = displayedRoutes.toString()
                 )
             }
@@ -309,6 +327,7 @@ private fun StatItem(
 @Composable
 private fun EmptyState(
     hasFilters: Boolean,
+    localeManager: LocaleManager,
     onClearFilters: () -> Unit,
     onCreateNew: () -> Unit,
     modifier: Modifier = Modifier
@@ -328,9 +347,9 @@ private fun EmptyState(
         
         Text(
             text = if (hasFilters) {
-                "No hay rutas con estos filtros"
+                localeManager.getLocalizedString(R.string.route_list_no_routes_with_filters)
             } else {
-                "No hay rutas creadas"
+                localeManager.getLocalizedString(R.string.route_list_no_routes_created)
             },
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
@@ -340,9 +359,9 @@ private fun EmptyState(
         
         Text(
             text = if (hasFilters) {
-                "Intenta ajustar los filtros"
+                localeManager.getLocalizedString(R.string.route_list_adjust_filters)
             } else {
-                "Crea tu primera ruta optimizada"
+                localeManager.getLocalizedString(R.string.route_list_create_first_route)
             },
             style = MaterialTheme.typography.bodyMedium,
             color = ColorTextSecondary
@@ -354,13 +373,13 @@ private fun EmptyState(
             OutlinedButton(onClick = onClearFilters) {
                 Icon(Icons.Default.Clear, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Limpiar filtros")
+                Text(localeManager.getLocalizedString(R.string.route_list_clear_filters))
             }
         } else {
             Button(onClick = onCreateNew) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Crear ruta")
+                Text(localeManager.getLocalizedString(R.string.route_list_create_route))
             }
         }
     }
@@ -369,6 +388,7 @@ private fun EmptyState(
 @Composable
 private fun ErrorState(
     message: String,
+    localeManager: LocaleManager,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -386,7 +406,7 @@ private fun ErrorState(
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Error al cargar rutas",
+            text = localeManager.getLocalizedString(R.string.route_list_error_loading),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
         )
@@ -404,7 +424,7 @@ private fun ErrorState(
         Button(onClick = onRetry) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Reintentar")
+            Text(localeManager.getLocalizedString(R.string.route_list_retry))
         }
     }
 }
@@ -413,6 +433,7 @@ private fun ErrorState(
 private fun FiltersDialog(
     selectedDate: LocalDate?,
     selectedStatus: RouteStatus?,
+    localeManager: LocaleManager,
     onDateSelected: (LocalDate?) -> Unit,
     onStatusSelected: (RouteStatus?) -> Unit,
     onClearFilters: () -> Unit,
@@ -420,7 +441,7 @@ private fun FiltersDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Filtros de Rutas") },
+        title = { Text(localeManager.getLocalizedString(R.string.route_list_filters_dialog_title)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -428,7 +449,7 @@ private fun FiltersDialog(
                 // Filtro de fecha
                 Column {
                     Text(
-                        text = "Fecha",
+                        text = localeManager.getLocalizedString(R.string.route_list_date_label),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -442,12 +463,12 @@ private fun FiltersDialog(
                         FilterChip(
                             selected = selectedDate == LocalDate.now(),
                             onClick = { onDateSelected(LocalDate.now()) },
-                            label = { Text("Hoy") }
+                            label = { Text(localeManager.getLocalizedString(R.string.route_list_today)) }
                         )
                         FilterChip(
                             selected = selectedDate == null,
                             onClick = { onDateSelected(null) },
-                            label = { Text("Todas") }
+                            label = { Text(localeManager.getLocalizedString(R.string.route_list_all_dates)) }
                         )
                     }
                 }
@@ -457,15 +478,15 @@ private fun FiltersDialog(
                 // Filtro de estado
                 Column {
                     Text(
-                        text = "Estado",
+                        text = localeManager.getLocalizedString(R.string.route_list_status_label),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        listOf(null to "Todos") + RouteStatus.values().map { 
-                            it to getStatusDisplayName(it) 
+                        listOf(null to localeManager.getLocalizedString(R.string.route_list_all_statuses)) + RouteStatus.values().map { 
+                            it to getStatusDisplayName(it, localeManager) 
                         }.forEach { (status, name) ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -485,7 +506,7 @@ private fun FiltersDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Aplicar")
+                Text(localeManager.getLocalizedString(R.string.route_list_apply))
             }
         },
         dismissButton = {
@@ -493,18 +514,19 @@ private fun FiltersDialog(
                 onClearFilters()
                 onDismiss()
             }) {
-                Text("Limpiar")
+                Text(localeManager.getLocalizedString(R.string.route_list_clear))
             }
         }
     )
 }
 
-private fun getStatusDisplayName(status: RouteStatus): String {
+// Agregamos el LocaleManager como parámetro desde el ViewModel
+private fun getStatusDisplayName(status: RouteStatus, localeManager: LocaleManager): String {
     return when (status) {
-        RouteStatus.DRAFT -> "Borrador"
-        RouteStatus.CONFIRMED -> "Confirmada"
-        RouteStatus.IN_PROGRESS -> "En Curso"
-        RouteStatus.COMPLETED -> "Completada"
-        RouteStatus.CANCELLED -> "Cancelada"
+        RouteStatus.DRAFT -> localeManager.getLocalizedString(R.string.route_status_draft)
+        RouteStatus.CONFIRMED -> localeManager.getLocalizedString(R.string.route_status_confirmed)
+        RouteStatus.IN_PROGRESS -> localeManager.getLocalizedString(R.string.route_status_in_progress)
+        RouteStatus.COMPLETED -> localeManager.getLocalizedString(R.string.route_status_completed)
+        RouteStatus.CANCELLED -> localeManager.getLocalizedString(R.string.route_status_cancelled)
     }
 }

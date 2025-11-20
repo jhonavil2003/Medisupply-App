@@ -375,7 +375,7 @@ private fun CustomerHeaderCard(customer: Customer, localeManager: com.misw.medis
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = customer.customerType.displayName,
+                    text = customer.customerType.getLocalizedDisplayName(localeManager),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Medium
