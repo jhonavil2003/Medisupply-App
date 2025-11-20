@@ -1,6 +1,7 @@
 package com.misw.medisupply.presentation.customermanagement.screens.orders
 
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,11 +59,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderTrackingViewModel
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderTrackingUiState
 import java.text.NumberFormat
@@ -82,6 +87,7 @@ fun CustomerOrdersScreen(
 ) {
     Log.d("CustomerOrdersScreen", "=== PANTALLA DE PEDIDOS INICIADA ===")
     val uiState by viewModel.uiState.collectAsState()
+    val localeManager = viewModel.localeManager
     val snackbarHostState = remember { SnackbarHostState() }
     
     // Show error message
@@ -97,7 +103,7 @@ fun CustomerOrdersScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "Seguimiento de entregas",
+                        localizedStringResource(R.string.order_tracking_title, localeManager),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -108,7 +114,7 @@ fun CustomerOrdersScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
-                            contentDescription = "Filtros",
+                            contentDescription = localizedStringResource(R.string.filters_description, localeManager),
                             tint = if (uiState.showFilters || uiState.hasActiveFilters) 
                                 MaterialTheme.colorScheme.primary 
                             else MaterialTheme.colorScheme.onSurface
@@ -119,7 +125,7 @@ fun CustomerOrdersScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Actualizar"
+                            contentDescription = localizedStringResource(R.string.refresh_description, localeManager)
                         )
                     }
                 },
@@ -141,6 +147,7 @@ fun CustomerOrdersScreen(
             AnimatedVisibility(visible = uiState.showFilters) {
                 FiltersSection(
                     uiState = uiState,
+                    localeManager = localeManager,
                     onStatusChange = viewModel::updateStatusFilter,
                     onDeliveryDateFromChange = viewModel::updateDeliveryDateFrom,
                     onDeliveryDateToChange = viewModel::updateDeliveryDateTo,
@@ -164,7 +171,7 @@ fun CustomerOrdersScreen(
                 }
                 
                 uiState.orders.isEmpty() -> {
-                    EmptyOrdersState()
+                    EmptyOrdersState(localeManager = localeManager)
                 }
                 
                 else -> {
@@ -176,6 +183,7 @@ fun CustomerOrdersScreen(
                         items(uiState.orders) { order ->
                             OrderCard(
                                 order = order,
+                                localeManager = localeManager,
                                 onOrderClick = { 
                                     Log.d("CustomerOrdersScreen", "Click en tarjeta: ${order.orderNumber}")
                                     order.id?.let { orderId ->
@@ -206,6 +214,7 @@ fun CustomerOrdersScreen(
 @Composable
 private fun FiltersSection(
     uiState: OrderTrackingUiState,
+    localeManager: LocaleManager,
     onStatusChange: (String) -> Unit,
     onDeliveryDateFromChange: (Date?) -> Unit,
     onDeliveryDateToChange: (Date?) -> Unit,
@@ -235,7 +244,7 @@ private fun FiltersSection(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Filtros",
+                text = localizedStringResource(R.string.filters_section_title, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -249,11 +258,10 @@ private fun FiltersSection(
                 onExpandedChange = { expandedStatus = !expandedStatus }
             ) {
                 OutlinedTextField(
-                    value = uiState.statusOptions.find { it.first == uiState.selectedStatus }?.second 
-                        ?: "Todos los estados",
+                    value = getLocalizedStatusLabel(uiState.selectedStatus, localeManager),
                     onValueChange = { },
                     readOnly = true,
-                    label = { Text("Estado") },
+                    label = { Text(localizedStringResource(R.string.status_filter_label, localeManager)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedStatus) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -264,9 +272,9 @@ private fun FiltersSection(
                     expanded = expandedStatus,
                     onDismissRequest = { expandedStatus = false }
                 ) {
-                    uiState.statusOptions.forEach { (value, label) ->
+                    uiState.statusOptions.forEach { (value, _) ->
                         DropdownMenuItem(
-                            text = { Text(label) },
+                            text = { Text(getLocalizedStatusLabel(value, localeManager)) },
                             onClick = {
                                 onStatusChange(if (value == "todos") "" else value)
                                 expandedStatus = false
@@ -280,7 +288,7 @@ private fun FiltersSection(
             
             // Date Filters
             Text(
-                text = "Fecha de entrega",
+                text = localizedStringResource(R.string.delivery_date_filter, localeManager),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -296,11 +304,11 @@ private fun FiltersSection(
                         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) 
                     } ?: "",
                     onValueChange = { },
-                    label = { Text("Desde") },
+                    label = { Text(localizedStringResource(R.string.date_from_label, localeManager)) },
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDateFromPicker = true }) {
-                            Icon(Icons.Default.CalendarToday, contentDescription = "Fecha desde")
+                            Icon(Icons.Default.CalendarToday, contentDescription = localizedStringResource(R.string.date_from_description, localeManager))
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -311,11 +319,11 @@ private fun FiltersSection(
                         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) 
                     } ?: "",
                     onValueChange = { },
-                    label = { Text("Hasta") },
+                    label = { Text(localizedStringResource(R.string.date_to_label, localeManager)) },
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDateToPicker = true }) {
-                            Icon(Icons.Default.CalendarToday, contentDescription = "Fecha hasta")
+                            Icon(Icons.Default.CalendarToday, contentDescription = localizedStringResource(R.string.date_to_description, localeManager))
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -333,7 +341,7 @@ private fun FiltersSection(
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Limpiar filtros")
+                    Text(localizedStringResource(R.string.clear_filters_button, localeManager))
                 }
             }
         }
@@ -353,12 +361,12 @@ private fun FiltersSection(
                         showDateFromPicker = false
                     }
                 ) {
-                    Text("Aceptar")
+                    Text(localizedStringResource(R.string.accept_button_dialog, localeManager))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDateFromPicker = false }) {
-                    Text("Cancelar")
+                    Text(localizedStringResource(R.string.cancel_button, localeManager))
                 }
             }
         ) {
@@ -366,7 +374,7 @@ private fun FiltersSection(
                 state = dateFromPickerState,
                 title = {
                     Text(
-                        text = "Fecha desde",
+                        text = localizedStringResource(R.string.date_picker_from_title, localeManager),
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -387,12 +395,12 @@ private fun FiltersSection(
                         showDateToPicker = false
                     }
                 ) {
-                    Text("Aceptar")
+                    Text(localizedStringResource(R.string.accept_button_dialog, localeManager))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDateToPicker = false }) {
-                    Text("Cancelar")
+                    Text(localizedStringResource(R.string.cancel_button, localeManager))
                 }
             }
         ) {
@@ -400,7 +408,7 @@ private fun FiltersSection(
                 state = dateToPickerState,
                 title = {
                     Text(
-                        text = "Fecha hasta",
+                        text = localizedStringResource(R.string.date_picker_to_title, localeManager),
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -410,11 +418,29 @@ private fun FiltersSection(
 }
 
 /**
+ * Helper function to get localized status labels
+ */
+@Composable
+private fun getLocalizedStatusLabel(statusValue: String?, localeManager: LocaleManager): String {
+    return when (statusValue) {
+        "todos", null, "" -> localizedStringResource(R.string.order_all_statuses, localeManager)
+        OrderStatus.PENDING.value -> OrderStatus.PENDING.displayName
+        OrderStatus.CONFIRMED.value -> OrderStatus.CONFIRMED.displayName
+        OrderStatus.PROCESSING.value -> OrderStatus.PROCESSING.displayName
+        OrderStatus.SHIPPED.value -> OrderStatus.SHIPPED.displayName
+        OrderStatus.DELIVERED.value -> OrderStatus.DELIVERED.displayName
+        OrderStatus.CANCELLED.value -> OrderStatus.CANCELLED.displayName
+        else -> localizedStringResource(R.string.order_all_statuses, localeManager)
+    }
+}
+
+/**
  * Order card component
  */
 @Composable
 private fun OrderCard(
     order: Order,
+    localeManager: LocaleManager,
     onOrderClick: () -> Unit = {},
     onDetailClick: () -> Unit = {}
 ) {
@@ -441,7 +467,7 @@ private fun OrderCard(
             ) {
                 Column {
                     Text(
-                        text = order.orderNumber ?: "Sin número",
+                        text = order.orderNumber ?: localizedStringResource(R.string.order_no_number, localeManager),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -449,7 +475,7 @@ private fun OrderCard(
                     Text(
                         text = order.orderDate?.let { 
                             SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) 
-                        } ?: "Sin fecha",
+                        } ?: localizedStringResource(R.string.order_no_date, localeManager),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -466,7 +492,7 @@ private fun OrderCard(
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Detalle")
+                    Text(localizedStringResource(R.string.order_detail_button, localeManager))
                 }
             }
             
@@ -502,7 +528,7 @@ private fun OrderCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Total:",
+                    text = localizedStringResource(R.string.order_total_label_tracking, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -524,7 +550,7 @@ private fun OrderCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Fecha pedido:",
+                        text = localizedStringResource(R.string.order_date_label_tracking, localeManager),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -546,7 +572,7 @@ private fun OrderCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Fecha entrega:",
+                        text = localizedStringResource(R.string.delivery_date_label_tracking, localeManager),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -570,7 +596,7 @@ private fun OrderCard(
  * Empty orders state component
  */
 @Composable
-private fun EmptyOrdersState() {
+private fun EmptyOrdersState(localeManager: LocaleManager) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -586,7 +612,7 @@ private fun EmptyOrdersState() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "No hay pedidos",
+            text = localizedStringResource(R.string.no_orders_title, localeManager),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface
@@ -595,7 +621,7 @@ private fun EmptyOrdersState() {
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "No se encontraron pedidos con los filtros seleccionados",
+            text = localizedStringResource(R.string.no_orders_message, localeManager),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

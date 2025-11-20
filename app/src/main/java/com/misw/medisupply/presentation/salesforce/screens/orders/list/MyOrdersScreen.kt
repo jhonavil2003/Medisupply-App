@@ -47,7 +47,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.orders.list.viewmodel.MyOrdersScreenViewModel
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.ErrorView
@@ -63,8 +68,13 @@ import com.misw.medisupply.presentation.salesforce.components.OrderCard
 fun MyOrdersScreen(
     viewModel: MyOrdersViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToEditOrder: (String) -> Unit = {}
+    onNavigateToEditOrder: (String) -> Unit = {},
+    screenViewModel: MyOrdersScreenViewModel = hiltViewModel()
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = screenViewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
+    
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
@@ -85,8 +95,8 @@ fun MyOrdersScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Mis pedidos",
-                subtitle = "Pedidos - Medisupply",
+                title = localizedStringResource(R.string.my_orders_title, localeManager),
+                subtitle = localizedStringResource(R.string.orders_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         },
@@ -108,7 +118,8 @@ fun MyOrdersScreen(
                 // Dropdown filter
                 StatusDropdown(
                     selectedStatus = state.selectedStatus,
-                    onStatusSelected = { viewModel.onEvent(MyOrdersEvent.FilterByStatus(it)) }
+                    onStatusSelected = { viewModel.onEvent(MyOrdersEvent.FilterByStatus(it)) },
+                    localeManager = localeManager
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -127,7 +138,7 @@ fun MyOrdersScreen(
                     state.hasOrders() -> {
                         val filteredOrders = state.getFilteredOrders()
                         if (filteredOrders.isEmpty()) {
-                            EmptyFilteredState()
+                            EmptyFilteredState(localeManager = localeManager)
                         } else {
                             OrdersList(
                                 orders = filteredOrders,
@@ -137,7 +148,8 @@ fun MyOrdersScreen(
                                 hasMore = state.hasMore && state.currentPage < state.totalPages,
                                 hasPrevious = state.currentPage > 1,
                                 isLoadingMore = state.isLoadingMore,
-                                selectedStatus = state.selectedStatus,  // Pass filter status
+                                selectedStatus = state.selectedStatus,
+                                localeManager = localeManager,
                                 onDetailClick = { order: Order ->
                                     // TODO: Navigate to detail
                                     viewModel.onEvent(MyOrdersEvent.SelectOrder(order))
@@ -157,7 +169,7 @@ fun MyOrdersScreen(
                         }
                     }
                     else -> {
-                        EmptyState()
+                        EmptyState(localeManager = localeManager)
                     }
                 }
             }
@@ -172,6 +184,7 @@ fun MyOrdersScreen(
 private fun StatusDropdown(
     selectedStatus: OrderStatus?,
     onStatusSelected: (OrderStatus?) -> Unit,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -194,13 +207,13 @@ private fun StatusDropdown(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = selectedStatus?.displayName ?: "Todos los estados",
+                text = selectedStatus?.displayName ?: localizedStringResource(R.string.orders_all_statuses, localeManager),
                 fontSize = 14.sp,
                 color = Color(0xFF212121)
             )
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = "Filtrar",
+                contentDescription = localizedStringResource(R.string.orders_filter_action, localeManager),
                 tint = Color(0xFF757575)
             )
         }
@@ -211,7 +224,7 @@ private fun StatusDropdown(
             modifier = Modifier.fillMaxWidth(0.9f)
         ) {
             DropdownMenuItem(
-                text = { Text("Todos los estados") },
+                text = { Text(localizedStringResource(R.string.orders_all_statuses, localeManager)) },
                 onClick = {
                     onStatusSelected(null)
                     expanded = false
@@ -250,6 +263,7 @@ private fun LoadingIndicator(
  */
 @Composable
 private fun EmptyFilteredState(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -261,13 +275,13 @@ private fun EmptyFilteredState(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "No se encontraron pedidos",
+                text = localizedStringResource(R.string.orders_no_orders_found, localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Intenta con otros filtros",
+                text = localizedStringResource(R.string.orders_try_other_filters, localeManager),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -288,6 +302,7 @@ private fun OrdersList(
     hasPrevious: Boolean,
     isLoadingMore: Boolean,
     selectedStatus: OrderStatus? = null,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onDetailClick: (Order) -> Unit,
     onEditClick: (Order) -> Unit,
     onLoadMore: () -> Unit,
@@ -295,14 +310,15 @@ private fun OrdersList(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Pagination info with filter status (like products)
+        // Pagination info with filter status
         val filterText = if (selectedStatus != null) {
             " (${selectedStatus.displayName})"
         } else {
             ""
         }
         Text(
-            text = "Página $currentPage de $totalPages - $totalOrders pedidos$filterText",
+            text = localizedStringResource(R.string.orders_pagination_info, localeManager)
+                .format(currentPage, totalPages, totalOrders) + filterText,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -331,6 +347,7 @@ private fun OrdersList(
                 isLoading = isLoadingMore,
                 currentPage = currentPage,
                 totalPages = totalPages,
+                localeManager = localeManager,
                 onPreviousClick = onLoadPrevious,
                 onNextClick = onLoadMore
             )
@@ -348,6 +365,7 @@ private fun PaginationButtons(
     isLoading: Boolean,
     currentPage: Int,
     totalPages: Int,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -362,7 +380,7 @@ private fun PaginationButtons(
             enabled = hasPrev && !isLoading,
             modifier = Modifier.weight(1f)
         ) {
-            Text("← Anterior")
+            Text(localizedStringResource(R.string.orders_previous_button, localeManager))
         }
         
         Spacer(modifier = Modifier.width(16.dp))
@@ -391,7 +409,7 @@ private fun PaginationButtons(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Siguiente →")
+                Text(localizedStringResource(R.string.orders_next_button, localeManager))
             }
         }
     }
@@ -402,6 +420,7 @@ private fun PaginationButtons(
  */
 @Composable
 private fun EmptyState(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -413,13 +432,13 @@ private fun EmptyState(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "No hay pedidos",
+                text = localizedStringResource(R.string.orders_no_orders_title, localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Aún no has registrado ningún pedido",
+                text = localizedStringResource(R.string.orders_no_orders_message, localeManager),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

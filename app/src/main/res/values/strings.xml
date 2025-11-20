@@ -129,7 +129,6 @@
     <string name="selected_customer_label">Cliente Seleccionado</string>
     <string name="customer_name_label">Nombre:</string>
     <string name="customer_nit_label">NIT:</string>
-    <string name="customer_code_label">Código:</string>
     <string name="customer_email_label">Correo:</string>
     <string name="search_products_hint">Buscar productos...</string>
     <string name="search_description">Buscar</string>
@@ -190,7 +189,6 @@
     <string name="customer_data_title">Datos del Cliente</string>
     <string name="customer_label">Cliente:</string>
     <string name="customer_id_label">Cliente ID: %d</string>
-    <string name="email_label">Email:</string>
     <string name="medisupply_data_title">Datos de Medisupply</string>
     <string name="delivery_date_detail_label">Fecha de entrega:</string>
     <string name="delivery_time_label">Hora de entrega:</string>
@@ -202,4 +200,186 @@
     <string name="delivery_time_default">8:50 am</string>
     <string name="partial_delivery_none">Ninguna</string>
     <string name="carrier_default">Camión 1</string>
+    
+    <!-- Order Tracking Screen -->
+    <string name="order_tracking_title">Seguimiento de entregas</string>
+    <string name="filters_description">Filtros</string>
+    <string name="refresh_description">Actualizar</string>
+    <string name="filters_section_title">Filtros</string>
+    <string name="status_filter_label">Estado</string>
+    <string name="order_all_statuses">Todos los estados</string>
+    <string name="delivery_date_filter">Fecha de entrega</string>
+    <string name="date_from_label">Desde</string>
+    <string name="date_to_label">Hasta</string>
+    <string name="date_from_description">Fecha desde</string>
+    <string name="date_to_description">Fecha hasta</string>
+    <string name="clear_filters_button">Limpiar filtros</string>
+    <string name="accept_button_dialog">Aceptar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="date_picker_from_title">Fecha desde</string>
+    <string name="date_picker_to_title">Fecha hasta</string>
+    <string name="order_detail_button">Detalle</string>
+    <string name="order_no_number">Sin número</string>
+    <string name="order_no_date">Sin fecha</string>
+    <string name="order_total_label_tracking">Total:</string>
+    <string name="order_date_label_tracking">Fecha pedido:</string>
+    <string name="delivery_date_label_tracking">Fecha entrega:</string>
+    <string name="no_orders_title">No hay pedidos</string>
+    <string name="no_orders_message">No se encontraron pedidos con los filtros seleccionados</string>
+    
+    <!-- Create Visit Screen -->
+    <string name="create_visit_title">Crear visita</string>
+    <string name="tab_data">Datos</string>
+    <string name="tab_location">Ubicación</string>
+    <string name="tab_files">Archivos</string>
+    <string name="saving_label">Guardando...</string>
+    <string name="save_visit_button">Guardar visita</string>
+    <string name="save_visit_description">Guardar visita</string>
+    <string name="visit_saved_success">✅ ¡Visita guardada exitosamente! Ahora puedes completar ubicación y archivos.</string>
+    <string name="visit_info_title">Información de la visita</string>
+    <string name="visit_saved_complete">✅ Visita guardada exitosamente. Ve a las pestañas \'Ubicación\' y \'Archivos\' para completar información adicional.</string>
+    <string name="select_customer_start">1️⃣ Selecciona un cliente para comenzar</string>
+    <string name="ready_to_save">3️⃣ ¡Listo para guardar! Cliente, fecha y hora confirmados.</string>
+    <string name="confirm_visit_date">2️⃣ Confirma la fecha de la visita (toca el campo de fecha)</string>
+    <string name="confirm_visit_time">2️⃣ Confirma la hora de la visita (toca el campo de hora)</string>
+    <string name="confirm_date_time">2️⃣ Confirma la fecha y hora de la visita</string>
+    <string name="saving_changes">Guardando cambios...</string>
+    <string name="visit_client_label">Cliente de la visita:</string>
+    <string name="contact_label">Contacto: %s</string>
+    <string name="customer_phone_label">Teléfono: %s</string>
+    <string name="customer_address_label">Dirección: %s</string>
+    <string name="select_customer_continue">Selecciona un cliente para continuar con los datos de la visita</string>
+    <string name="auto_save_info">💾 Los cambios en personas contactadas, hallazgos y notas se guardan automáticamente.</string>
+    <string name="visit_date_label">Fecha de la visita</string>
+    <string name="select_date_description">Seleccionar fecha</string>
+    <string name="visit_time_label">Hora de la visita</string>
+    <string name="select_time_description">Seleccionar hora</string>
+    <string name="contacted_persons_label">Personas contactadas</string>
+    <string name="contacted_persons_placeholder">Ej: Dr. García, Enf. López</string>
+    <string name="clinical_findings_label">Hallazgos clínicos</string>
+    <string name="clinical_findings_placeholder">Describe los hallazgos relevantes...</string>
+    <string name="additional_notes_label">Notas adicionales</string>
+    <string name="additional_notes_placeholder">Observaciones, comentarios...</string>
+    <string name="visit_location_title">Ubicación de la visita</string>
+    <string name="address_auto_save">💾 La dirección se guarda automáticamente en tu visita.</string>
+    <string name="save_visit_first">📍 Primero debes guardar la visita en el tab \'Datos\' para poder agregar ubicación.</string>
+    <string name="saving_location">Guardando ubicación...</string>
+    <string name="visit_address_label">Dirección de la visita</string>
+    <string name="address_placeholder">Ej: Cra 7 #123-45, Bogotá</string>
+    <string name="map_view">Vista del mapa</string>
+    <string name="integration_coming_soon">Integración próximamente</string>
+    <string name="select_location_button">Seleccionar ubicación</string>
+    <string name="ok_button">OK</string>
+    <string name="map_description">Mapa</string>
+    <string name="client_description">Cliente</string>
+    
+    <!-- VisitHome Screen -->
+    <string name="sales_force_subtitle">Fuerza de ventas - Medisupply</string>
+    <string name="register_visit_title">Registrar visita</string>
+    <string name="register_visit_subtitle">Registra una nueva visita a un cliente</string>
+    <string name="visit_route_title">Ruta de visitas</string>
+    <string name="visit_route_subtitle">Consulta y organiza tu ruta de visitas</string>
+    
+    <!-- VisitList Screen -->
+    <string name="visit_list_subtitle">Visitas - Medisupply</string>
+    <string name="create_visit_fab">Crear visita</string>
+    <string name="search_customer_placeholder">Buscar cliente...</string>
+    
+    <!-- ArchivosTabContent -->
+    <string name="files_attached_title">Archivos adjuntos</string>
+    <string name="files_info_message">📎 Adjunta fotos, documentos y otros archivos relacionados con tu visita. Formatos: PDF, DOC, TXT, JPG, PNG, etc. Máximo 10MB por archivo.</string>
+    <string name="close_button">Cerrar</string>
+    <string name="uploading_file">Subiendo...</string>
+    <string name="select_file_button">Seleccionar archivo</string>
+    <string name="finalize_visit_title">Finalizar visita</string>
+    <string name="finalize_visit_warning">⚠️ Al completar la visita, no podrás realizar más cambios. Asegúrate de haber completado toda la información necesaria.</string>
+    <string name="complete_visit_button">Completar Visita</string>
+    <string name="loading_files">Cargando archivos...</string>
+    <string name="no_files_attached">No hay archivos adjuntos</string>
+    <string name="use_button_add_files">Usa el botón de arriba para agregar archivos</string>
+
+    <!-- OrdersScreen strings -->
+    <string name="orders_title">Pedidos</string>
+    <string name="customer_consultation_title">Consulta de Clientes</string>
+    <string name="customer_consultation_subtitle">Busca tu cartera y abre el perfil de cada cliente</string>
+    <string name="create_order_title">Crear Pedido</string>
+    <string name="create_order_subtitle">Arma el pedido con disponibilidad en tiempo real</string>
+    <string name="my_orders_title">Mis Pedidos</string>
+    <string name="my_orders_subtitle">Estados, filtros, y detalle de órdenes</string>
+
+    <!-- CustomerDetailScreen strings -->
+    <string name="back_button">Volver</string>
+    <string name="customer_detail_title">Detalle del Cliente</string>
+    <string name="no_visits_title">Sin visitas realizadas</string>
+    <string name="no_visits_message">No se encontraron visitas completadas para este cliente</string>
+    <string name="visits_error_message">Error al cargar visitas</string>
+    <string name="active_status">Activo</string>
+    <string name="inactive_status">Inactivo</string>
+    <string name="business_information">Información Empresarial</string>
+    <string name="business_name_label">Razón Social:</string>
+    <string name="trade_name_label">Nombre Comercial:</string>
+    <string name="document_type_label">Tipo de Documento:</string>
+    <string name="document_number_label">Número de Documento:</string>
+    <string name="customer_code_label">Código de Cliente:</string>
+    <string name="contact_information">Información de Contacto</string>
+    <string name="contact_name_label">Contacto:</string>
+    <string name="email_label">Email:</string>
+    <string name="phone_label">Teléfono:</string>
+    <string name="location_information">Información de Ubicación</string>
+    <string name="address_label">Dirección:</string>
+    <string name="city_label">Ciudad:</string>
+    <string name="department_label">Departamento:</string>
+    <string name="country_label">País:</string>
+    <string name="assigned_salesperson">Vendedor Asignado</string>
+    <string name="gps_location">Ubicación GPS</string>
+    <string name="customer_location">Ubicación del cliente</string>
+    <string name="sales_statistics">Estadísticas de Ventas</string>
+    <string name="total_orders">Total Pedidos</string>
+    <string name="active_orders">Pedidos Activos</string>
+    <string name="total_revenue">Ingresos Totales</string>
+    <string name="average_order_value">Promedio por Pedido</string>
+    <string name="top_requested_products">Productos Más Solicitados</string>
+    <string name="units">unidades</string>
+    <string name="recent_orders">Pedidos Recientes</string>
+    <string name="no_recent_orders">No hay pedidos recientes</string>
+    <string name="view_more">Ver</string>
+    <string name="view_less">Ver menos</string>
+    <string name="order_singular">pedido más</string>
+    <string name="orders_plural">pedidos más</string>
+    <string name="visits">Visitas</string>
+    <string name="no_visits_registered">No hay visitas registradas</string>
+    <string name="visit_singular">visita más</string>
+    <string name="visits_plural">visitas más</string>
+    <string name="clinical_findings">Hallazgos:</string>
+
+    <!-- MyOrdersScreen strings -->
+    <string name="orders_subtitle">Pedidos - Medisupply</string>
+    <string name="orders_all_statuses">Todos los estados</string>
+    <string name="orders_filter_action">Filtrar</string>
+    <string name="orders_no_orders_found">No se encontraron pedidos</string>
+    <string name="orders_try_other_filters">Intenta con otros filtros</string>
+    <string name="orders_pagination_info">Página %1\$d de %2\$d - %3\$d pedidos</string>
+    <string name="orders_previous_button">← Anterior</string>
+    <string name="orders_next_button">Siguiente →</string>
+    <string name="orders_no_orders_title">No hay pedidos</string>
+    <string name="orders_no_orders_message">Aún no has registrado ningún pedido</string>
+    <!-- Create Order Screen -->
+    <string name="create_order_new_order_title">Nueva Orden</string>
+    <string name="create_order_screen_subtitle">Crea una orden de pedido</string>
+    <string name="create_order_select_customer">Seleccionar Cliente</string>
+    <string name="create_order_search_select_customer">Buscar o seleccionar cliente</string>
+    <string name="create_order_search_by_name_or_document">Buscar por nombre o documento...</string>
+    <string name="create_order_search_action">Buscar</string>
+    <string name="create_order_clear_action">Limpiar</string>
+    <string name="create_order_no_customers_found">No se encontraron clientes</string>
+    <string name="create_order_continue_to_products">Continuar a Productos</string>
+    <string name="create_order_selected_customer">Cliente Seleccionado</string>
+    <string name="create_order_error_loading_customers">Error al cargar clientes</string>
+    <string name="create_order_retry_action">Reintentar</string>
+    <string name="create_order_close_action">Cerrar</string>
+    <string name="create_order_no_customers_available">No hay clientes disponibles</string>
+    <string name="create_order_no_customers_available_description">No se pudieron cargar los clientes. Por favor, intenta de nuevo.</string>
+    <string name="create_order_load_customers">Cargar Clientes</string>
+    <string name="create_order_selected">Seleccionado</string>
+
 </resources>

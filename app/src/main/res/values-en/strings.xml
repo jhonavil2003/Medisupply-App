@@ -128,8 +128,7 @@
     <string name="salesforce_subtitle">Sales force - Medisupply</string>
     <string name="selected_customer_label">Selected Customer</string>
     <string name="customer_name_label">Name:</string>
-    <string name="customer_nit_label">Tax ID:</string>
-    <string name="customer_code_label">Code:</string>
+    <string name="customer_nit_label">NIT:</string>
     <string name="customer_email_label">Email:</string>
     <string name="search_products_hint">Search products...</string>
     <string name="search_description">Search</string>
@@ -190,7 +189,6 @@
     <string name="customer_data_title">Customer Data</string>
     <string name="customer_label">Customer:</string>
     <string name="customer_id_label">Customer ID: %d</string>
-    <string name="email_label">Email:</string>
     <string name="medisupply_data_title">Medisupply Data</string>
     <string name="delivery_date_detail_label">Delivery date:</string>
     <string name="delivery_time_label">Delivery time:</string>
@@ -202,4 +200,186 @@
     <string name="delivery_time_default">8:50 am</string>
     <string name="partial_delivery_none">None</string>
     <string name="carrier_default">Truck 1</string>
+    
+    <!-- Order Tracking Screen -->
+    <string name="order_tracking_title">Delivery Tracking</string>
+    <string name="filters_description">Filters</string>
+    <string name="refresh_description">Refresh</string>
+    <string name="filters_section_title">Filters</string>
+    <string name="status_filter_label">Status</string>
+    <string name="order_all_statuses">All statuses</string>
+    <string name="delivery_date_filter">Delivery date</string>
+    <string name="date_from_label">From</string>
+    <string name="date_to_label">To</string>
+    <string name="date_from_description">Date from</string>
+    <string name="date_to_description">Date to</string>
+    <string name="clear_filters_button">Clear filters</string>
+    <string name="accept_button_dialog">Accept</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="date_picker_from_title">Date from</string>
+    <string name="date_picker_to_title">Date to</string>
+    <string name="order_detail_button">Detail</string>
+    <string name="order_no_number">No number</string>
+    <string name="order_no_date">No date</string>
+    <string name="order_total_label_tracking">Total:</string>
+    <string name="order_date_label_tracking">Order date:</string>
+    <string name="delivery_date_label_tracking">Delivery date:</string>
+    <string name="no_orders_title">No orders</string>
+    <string name="no_orders_message">No orders found with the selected filters</string>
+    
+    <!-- Create Visit Screen -->
+    <string name="create_visit_title">Create Visit</string>
+    <string name="tab_data">Data</string>
+    <string name="tab_location">Location</string>
+    <string name="tab_files">Files</string>
+    <string name="saving_label">Saving...</string>
+    <string name="save_visit_button">Save visit</string>
+    <string name="save_visit_description">Save visit</string>
+    <string name="visit_saved_success">✅ Visit saved successfully! You can now complete location and files.</string>
+    <string name="visit_info_title">Visit Information</string>
+    <string name="visit_saved_complete">✅ Visit saved successfully. Go to \'Location\' and \'Files\' tabs to complete additional information.</string>
+    <string name="select_customer_start">1️⃣ Select a customer to start</string>
+    <string name="ready_to_save">3️⃣ Ready to save! Customer, date and time confirmed.</string>
+    <string name="confirm_visit_date">2️⃣ Confirm the visit date (tap the date field)</string>
+    <string name="confirm_visit_time">2️⃣ Confirm the visit time (tap the time field)</string>
+    <string name="confirm_date_time">2️⃣ Confirm the visit date and time</string>
+    <string name="saving_changes">Saving changes...</string>
+    <string name="visit_client_label">Visit client:</string>
+    <string name="contact_label">Contact: %s</string>
+    <string name="customer_phone_label">Phone: %s</string>
+    <string name="customer_address_label">Address: %s</string>
+    <string name="select_customer_continue">Select a customer to continue with the visit data</string>
+    <string name="auto_save_info">💾 Changes to contacted persons, findings, and notes are automatically saved.</string>
+    <string name="visit_date_label">Visit date</string>
+    <string name="select_date_description">Select date</string>
+    <string name="visit_time_label">Visit time</string>
+    <string name="select_time_description">Select time</string>
+    <string name="contacted_persons_label">Contacted persons</string>
+    <string name="contacted_persons_placeholder">E.g: Dr. Garcia, Nurse Lopez</string>
+    <string name="clinical_findings_label">Clinical findings</string>
+    <string name="clinical_findings_placeholder">Describe relevant findings...</string>
+    <string name="additional_notes_label">Additional notes</string>
+    <string name="additional_notes_placeholder">Observations, comments...</string>
+    <string name="visit_location_title">Visit Location</string>
+    <string name="address_auto_save">💾 The address is automatically saved to your visit.</string>
+    <string name="save_visit_first">📍 You must first save the visit in the \'Data\' tab to add location.</string>
+    <string name="saving_location">Saving location...</string>
+    <string name="visit_address_label">Visit address</string>
+    <string name="address_placeholder">E.g: 7th Ave #123-45, Bogota</string>
+    <string name="map_view">Map view</string>
+    <string name="integration_coming_soon">Integration coming soon</string>
+    <string name="select_location_button">Select location</string>
+    <string name="ok_button">OK</string>
+    <string name="map_description">Map</string>
+    <string name="client_description">Client</string>
+    
+    <!-- VisitHome Screen -->
+    <string name="sales_force_subtitle">Sales Force - Medisupply</string>
+    <string name="register_visit_title">Register Visit</string>
+    <string name="register_visit_subtitle">Register a new customer visit</string>
+    <string name="visit_route_title">Visit Route</string>
+    <string name="visit_route_subtitle">Check and organize your visit route</string>
+    
+    <!-- VisitList Screen -->
+    <string name="visit_list_subtitle">Visits - Medisupply</string>
+    <string name="create_visit_fab">Create visit</string>
+    <string name="search_customer_placeholder">Search customer...</string>
+    
+    <!-- ArchivosTabContent -->
+    <string name="files_attached_title">Attached files</string>
+    <string name="files_info_message">📎 Attach photos, documents and other files related to your visit. Formats: PDF, DOC, TXT, JPG, PNG, etc. Maximum 10MB per file.</string>
+    <string name="close_button">Close</string>
+    <string name="uploading_file">Uploading...</string>
+    <string name="select_file_button">Select file</string>
+    <string name="finalize_visit_title">Finalize visit</string>
+    <string name="finalize_visit_warning">⚠️ When completing the visit, you will not be able to make more changes. Make sure you have completed all necessary information.</string>
+    <string name="complete_visit_button">Complete Visit</string>
+    <string name="loading_files">Loading files...</string>
+    <string name="no_files_attached">No files attached</string>
+    <string name="use_button_add_files">Use the button above to add files</string>
+
+    <!-- OrdersScreen strings -->
+    <string name="orders_title">Orders</string>
+    <string name="customer_consultation_title">Customer Consultation</string>
+    <string name="customer_consultation_subtitle">Search your portfolio and open each customer profile</string>
+    <string name="create_order_title">Create Order</string>
+    <string name="create_order_subtitle">Build your order with real-time availability</string>
+    <string name="my_orders_title">My Orders</string>
+    <string name="my_orders_subtitle">Status, filters, and order details</string>
+
+    <!-- CustomerDetailScreen strings -->
+    <string name="back_button">Back</string>
+    <string name="customer_detail_title">Customer Detail</string>
+    <string name="no_visits_title">No visits made</string>
+    <string name="no_visits_message">No completed visits found for this customer</string>
+    <string name="visits_error_message">Error loading visits</string>
+    <string name="active_status">Active</string>
+    <string name="inactive_status">Inactive</string>
+    <string name="business_information">Business Information</string>
+    <string name="business_name_label">Business Name:</string>
+    <string name="trade_name_label">Trade Name:</string>
+    <string name="document_type_label">Document Type:</string>
+    <string name="document_number_label">Document Number:</string>
+    <string name="customer_code_label">Customer Code:</string>
+    <string name="contact_information">Contact Information</string>
+    <string name="contact_name_label">Contact:</string>
+    <string name="email_label">Email:</string>
+    <string name="phone_label">Phone:</string>
+    <string name="location_information">Location Information</string>
+    <string name="address_label">Address:</string>
+    <string name="city_label">City:</string>
+    <string name="department_label">Department:</string>
+    <string name="country_label">Country:</string>
+    <string name="assigned_salesperson">Assigned Salesperson</string>
+    <string name="gps_location">GPS Location</string>
+    <string name="customer_location">Customer location</string>
+    <string name="sales_statistics">Sales Statistics</string>
+    <string name="total_orders">Total Orders</string>
+    <string name="active_orders">Active Orders</string>
+    <string name="total_revenue">Total Revenue</string>
+    <string name="average_order_value">Average per Order</string>
+    <string name="top_requested_products">Top Requested Products</string>
+    <string name="units">units</string>
+    <string name="recent_orders">Recent Orders</string>
+    <string name="no_recent_orders">No recent orders</string>
+    <string name="view_more">View</string>
+    <string name="view_less">View less</string>
+    <string name="order_singular">more order</string>
+    <string name="orders_plural">more orders</string>
+    <string name="visits">Visits</string>
+    <string name="no_visits_registered">No visits registered</string>
+    <string name="visit_singular">more visit</string>
+    <string name="visits_plural">more visits</string>
+    <string name="clinical_findings">Findings:</string>
+
+    <!-- MyOrdersScreen strings -->
+    <string name="orders_subtitle">Orders - Medisupply</string>
+    <string name="orders_all_statuses">All statuses</string>
+    <string name="orders_filter_action">Filter</string>
+    <string name="orders_no_orders_found">No orders found</string>
+    <string name="orders_try_other_filters">Try other filters</string>
+    <string name="orders_pagination_info">Page %1\$d of %2\$d - %3\$d orders</string>
+    <string name="orders_previous_button">← Previous</string>
+    <string name="orders_next_button">Next →</string>
+    <string name="orders_no_orders_title">No orders</string>
+    <string name="orders_no_orders_message">You have not registered any orders yet</string>
+    <!-- Create Order Screen -->
+    <string name="create_order_new_order_title">New Order</string>
+    <string name="create_order_screen_subtitle">Create an order</string>
+    <string name="create_order_select_customer">Select Customer</string>
+    <string name="create_order_search_select_customer">Search or select customer</string>
+    <string name="create_order_search_by_name_or_document">Search by name or document...</string>
+    <string name="create_order_search_action">Search</string>
+    <string name="create_order_clear_action">Clear</string>
+    <string name="create_order_no_customers_found">No customers found</string>
+    <string name="create_order_continue_to_products">Continue to Products</string>
+    <string name="create_order_selected_customer">Selected Customer</string>
+    <string name="create_order_error_loading_customers">Error loading customers</string>
+    <string name="create_order_retry_action">Retry</string>
+    <string name="create_order_close_action">Close</string>
+    <string name="create_order_no_customers_available">No customers available</string>
+    <string name="create_order_no_customers_available_description">Could not load customers. Please try again.</string>
+    <string name="create_order_load_customers">Load Customers</string>
+    <string name="create_order_selected">Selected</string>
+
 </resources>

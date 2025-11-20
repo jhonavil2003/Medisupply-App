@@ -31,20 +31,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.orders.viewmodel.OrdersViewModel
 
 @Composable
 fun OrdersScreen(
     onNavigateToCustomerList: () -> Unit = {},
     onNavigateToCreateOrder: () -> Unit = {},
     onNavigateToMyOrders: () -> Unit = {},
-    onNavigateBack: (() -> Unit)? = null
+    onNavigateBack: (() -> Unit)? = null,
+    viewModel: OrdersViewModel = hiltViewModel()
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = viewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Pedidos",
-                subtitle = "Fuerza de ventas - Medisupply",
+                title = localizedStringResource(R.string.orders_title, localeManager),
+                subtitle = localizedStringResource(R.string.sales_force_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -62,8 +72,8 @@ fun OrdersScreen(
                 icon = Icons.Filled.Person,
                 avatarBackgroundColor = Color(0xFFB4FFF1),
                 iconTint = Color(0xFF008678),
-                title = "Consulta de Clientes",
-                subtitle = "Busca tu cartera y abre el perfil de cada cliente",
+                title = localizedStringResource(R.string.customer_consultation_title, localeManager),
+                subtitle = localizedStringResource(R.string.customer_consultation_subtitle, localeManager),
                 onClick = onNavigateToCustomerList
             )
             
@@ -71,8 +81,8 @@ fun OrdersScreen(
                 icon = Icons.Filled.ShoppingCart,
                 avatarBackgroundColor = Color(0xFFD6E3FF),
                 iconTint = Color(0xFF3C5BAA),
-                title = "Crear Pedido",
-                subtitle = "Arma el pedido con disponibilidad en tiempo real",
+                title = localizedStringResource(R.string.create_order_title, localeManager),
+                subtitle = localizedStringResource(R.string.create_order_subtitle, localeManager),
                 onClick = onNavigateToCreateOrder
             )
             
@@ -80,8 +90,8 @@ fun OrdersScreen(
                 icon = Icons.Filled.Assignment,
                 avatarBackgroundColor = Color(0xFFFFE5B4),
                 iconTint = Color(0xFFE67E00),
-                title = "Mis Pedidos",
-                subtitle = "Estados, filtros, y detalle de órdenes",
+                title = localizedStringResource(R.string.my_orders_title, localeManager),
+                subtitle = localizedStringResource(R.string.my_orders_subtitle, localeManager),
                 onClick = onNavigateToMyOrders
             )
         }

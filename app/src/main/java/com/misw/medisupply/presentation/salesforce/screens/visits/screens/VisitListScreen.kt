@@ -12,8 +12,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.visits.components.VisitCard
+import com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.VisitListViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -35,13 +41,17 @@ private val mockVisits = listOf(
 fun VisitListScreen(
     onEditVisit: (MockVisit) -> Unit = {},
     onNavigateBack: (() -> Unit)? = null,
-    onNavigateToCreateVisit: (() -> Unit)? = null
+    onNavigateToCreateVisit: (() -> Unit)? = null,
+    viewModel: VisitListViewModel = hiltViewModel()
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = viewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Registrar visita",
-                subtitle = "Visitas - Medisupply",
+                title = localizedStringResource(R.string.register_visit_title, localeManager),
+                subtitle = localizedStringResource(R.string.visit_list_subtitle, localeManager),
                 onNavigateBack = {
                     onNavigateBack?.invoke()
                 }
@@ -51,7 +61,7 @@ fun VisitListScreen(
             FloatingActionButton(onClick = { onNavigateToCreateVisit?.invoke() }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Crear visita"
+                    contentDescription = localizedStringResource(R.string.create_visit_fab, localeManager)
                 )
             }
         },
@@ -64,7 +74,7 @@ fun VisitListScreen(
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp)
         ) {
-            CustomerSearchBar()
+            CustomerSearchBar(localeManager = localeManager)
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -79,13 +89,18 @@ fun VisitListScreen(
 }
 
 @Composable
-private fun CustomerSearchBar(modifier: Modifier = Modifier) {
+private fun CustomerSearchBar(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
+    modifier: Modifier = Modifier
+) {
     OutlinedTextField(
         value = "",
         onValueChange = {},
         modifier = modifier
             .fillMaxWidth(),
-        placeholder = { Text("Buscar cliente...") },
+        placeholder = { 
+            Text(localizedStringResource(R.string.search_customer_placeholder, localeManager))
+        },
         enabled = false,
         singleLine = true
     )

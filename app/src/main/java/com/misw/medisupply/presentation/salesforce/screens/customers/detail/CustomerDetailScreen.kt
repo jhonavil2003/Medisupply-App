@@ -56,8 +56,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.customers.detail.viewmodel.CustomerDetailScreenViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
@@ -83,8 +88,13 @@ import java.util.Locale
 fun CustomerDetailScreen(
     customer: Customer,
     onNavigateBack: () -> Unit = {},
-    viewModel: CustomerDetailViewModel = hiltViewModel()
+    viewModel: CustomerDetailViewModel = hiltViewModel(),
+    screenViewModel: CustomerDetailScreenViewModel = hiltViewModel()
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = screenViewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
+    
     // Load customer orders and visits on screen launch
     DisposableEffect(customer.id) {
         viewModel.loadCustomerOrders(customer.id)
@@ -106,7 +116,7 @@ fun CustomerDetailScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        text = "Detalle del Cliente",
+                        text = localizedStringResource(R.string.customer_detail_title, localeManager),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -115,7 +125,7 @@ fun CustomerDetailScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = localizedStringResource(R.string.back_button, localeManager)
                         )
                     }
                 },
@@ -130,6 +140,7 @@ fun CustomerDetailScreen(
         CustomerDetailContent(
             customer = customer,
             state = state,
+            localeManager = localeManager,
             modifier = Modifier.padding(paddingValues)
         )
     }
@@ -142,6 +153,7 @@ fun CustomerDetailScreen(
 private fun CustomerDetailContent(
     customer: Customer,
     state: com.misw.medisupply.presentation.salesforce.viewmodel.customers.CustomerDetailState,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -152,29 +164,29 @@ private fun CustomerDetailContent(
     ) {
         // Customer Header Card
         item {
-            CustomerHeaderCard(customer = customer)
+            CustomerHeaderCard(customer = customer, localeManager = localeManager)
         }
         
         // Sales Statistics Card (if orders loaded)
         if (!state.isLoadingOrders && state.statistics.totalOrders > 0) {
             item {
-                SalesStatisticsCard(statistics = state.statistics)
+                SalesStatisticsCard(statistics = state.statistics, localeManager = localeManager)
             }
         }
         
         // Business Information Card
         item {
-            BusinessInformationCard(customer = customer)
+            BusinessInformationCard(customer = customer, localeManager = localeManager)
         }
         
         // Contact Information Card
         item {
-            ContactInformationCard(customer = customer)
+            ContactInformationCard(customer = customer, localeManager = localeManager)
         }
         
         // Address Information Card
         item {
-            AddressInformationCard(customer = customer)
+            AddressInformationCard(customer = customer, localeManager = localeManager)
         }
         
         // Location Map (if coordinates available)
@@ -183,7 +195,8 @@ private fun CustomerDetailContent(
                 LocationMapCard(
                     latitude = customer.latitude,
                     longitude = customer.longitude,
-                    businessName = customer.getDisplayName()
+                    businessName = customer.getDisplayName(),
+                    localeManager = localeManager
                 )
             }
         }
@@ -191,14 +204,14 @@ private fun CustomerDetailContent(
         // Recent Orders Card
         if (!state.isLoadingOrders && state.recentOrders.isNotEmpty()) {
             item {
-                RecentOrdersCard(orders = state.recentOrders)
+                RecentOrdersCard(orders = state.recentOrders, localeManager = localeManager)
             }
         }
         
         // Recent Visits Card
         if (!state.isLoadingVisits && state.visits.isNotEmpty()) {
             item {
-                RecentVisitsCard(visits = state.visits.take(5))
+                RecentVisitsCard(visits = state.visits.take(5), localeManager = localeManager)
             }
         }
         
@@ -225,12 +238,12 @@ private fun CustomerDetailContent(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Sin visitas realizadas",
+                            text = localizedStringResource(R.string.no_visits_title, localeManager),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "No se encontraron visitas completadas para este cliente",
+                            text = localizedStringResource(R.string.no_visits_message, localeManager),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -292,7 +305,7 @@ private fun CustomerDetailContent(
                     )
                 ) {
                     Text(
-                        text = "Error al cargar visitas: $error",
+                        text = localizedStringResource(R.string.visits_error_message, localeManager) + ": $error",
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
@@ -303,7 +316,7 @@ private fun CustomerDetailContent(
         // Salesperson Information Card (if assigned)
         customer.salesperson?.let { salesperson ->
             item {
-                SalespersonInformationCard(salesperson = salesperson)
+                SalespersonInformationCard(salesperson = salesperson, localeManager = localeManager)
             }
         }
     }
@@ -313,7 +326,7 @@ private fun CustomerDetailContent(
  * Customer header card with main identification
  */
 @Composable
-private fun CustomerHeaderCard(customer: Customer) {
+private fun CustomerHeaderCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -384,7 +397,10 @@ private fun CustomerHeaderCard(customer: Customer) {
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (customer.isActive) "Activo" else "Inactivo",
+                        text = if (customer.isActive) 
+                            localizedStringResource(R.string.active_status, localeManager) 
+                        else 
+                            localizedStringResource(R.string.inactive_status, localeManager),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -398,7 +414,7 @@ private fun CustomerHeaderCard(customer: Customer) {
  * Business information card
  */
 @Composable
-private fun BusinessInformationCard(customer: Customer) {
+private fun BusinessInformationCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -410,19 +426,19 @@ private fun BusinessInformationCard(customer: Customer) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            SectionHeader(title = "Información Empresarial")
+            SectionHeader(title = localizedStringResource(R.string.business_information, localeManager))
             
             Spacer(modifier = Modifier.height(12.dp))
             
             InfoRow(
-                label = "Razón Social:",
+                label = localizedStringResource(R.string.business_name_label, localeManager),
                 value = customer.businessName
             )
             
             customer.tradeName?.let { tradeName ->
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoRow(
-                    label = "Nombre Comercial:",
+                    label = localizedStringResource(R.string.trade_name_label, localeManager),
                     value = tradeName
                 )
             }
@@ -430,21 +446,21 @@ private fun BusinessInformationCard(customer: Customer) {
             Spacer(modifier = Modifier.height(8.dp))
             
             InfoRow(
-                label = "Tipo de Documento:",
+                label = localizedStringResource(R.string.document_type_label, localeManager),
                 value = customer.documentType.displayName
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             InfoRow(
-                label = "Número de Documento:",
+                label = localizedStringResource(R.string.document_number_label, localeManager),
                 value = customer.documentNumber
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             InfoRow(
-                label = "Código de Cliente:",
+                label = localizedStringResource(R.string.customer_code_label, localeManager),
                 value = customer.id.toString()
             )
         }
@@ -455,7 +471,7 @@ private fun BusinessInformationCard(customer: Customer) {
  * Contact information card
  */
 @Composable
-private fun ContactInformationCard(customer: Customer) {
+private fun ContactInformationCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     val context = LocalContext.current
     
     Card(
@@ -469,14 +485,14 @@ private fun ContactInformationCard(customer: Customer) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            SectionHeader(title = "Información de Contacto")
+            SectionHeader(title = localizedStringResource(R.string.contact_information, localeManager))
             
             Spacer(modifier = Modifier.height(12.dp))
             
             customer.contactName?.let { name ->
                 InfoRowWithIcon(
                     icon = Icons.Default.Person,
-                    label = "Contacto:",
+                    label = localizedStringResource(R.string.contact_name_label, localeManager),
                     value = name
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -485,7 +501,7 @@ private fun ContactInformationCard(customer: Customer) {
             customer.contactEmail?.let { email ->
                 InfoRowWithIcon(
                     icon = Icons.Default.Email,
-                    label = "Email:",
+                    label = localizedStringResource(R.string.email_label, localeManager),
                     value = email
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -494,7 +510,7 @@ private fun ContactInformationCard(customer: Customer) {
             customer.contactPhone?.let { phone ->
                 ClickablePhoneRow(
                     icon = Icons.Default.Phone,
-                    label = "Teléfono:",
+                    label = localizedStringResource(R.string.phone_label, localeManager),
                     value = phone,
                     onClick = {
                         val intent = Intent(Intent.ACTION_DIAL).apply {
@@ -512,7 +528,7 @@ private fun ContactInformationCard(customer: Customer) {
  * Address information card
  */
 @Composable
-private fun AddressInformationCard(customer: Customer) {
+private fun AddressInformationCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -524,14 +540,14 @@ private fun AddressInformationCard(customer: Customer) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            SectionHeader(title = "Información de Ubicación")
+            SectionHeader(title = localizedStringResource(R.string.location_information, localeManager))
             
             Spacer(modifier = Modifier.height(12.dp))
             
             customer.address?.let { address ->
                 InfoRowWithIcon(
                     icon = Icons.Default.LocationOn,
-                    label = "Dirección:",
+                    label = localizedStringResource(R.string.address_label, localeManager),
                     value = address
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -539,7 +555,7 @@ private fun AddressInformationCard(customer: Customer) {
             
             customer.city?.let { city ->
                 InfoRow(
-                    label = "Ciudad:",
+                    label = localizedStringResource(R.string.city_label, localeManager),
                     value = city
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -547,14 +563,14 @@ private fun AddressInformationCard(customer: Customer) {
             
             customer.department?.let { department ->
                 InfoRow(
-                    label = "Departamento:",
+                    label = localizedStringResource(R.string.department_label, localeManager),
                     value = department
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
             
             InfoRow(
-                label = "País:",
+                label = localizedStringResource(R.string.country_label, localeManager),
                 value = customer.country
             )
         }
@@ -566,7 +582,8 @@ private fun AddressInformationCard(customer: Customer) {
  */
 @Composable
 private fun SalespersonInformationCard(
-    salesperson: com.misw.medisupply.domain.model.salesperson.Salesperson
+    salesperson: com.misw.medisupply.domain.model.salesperson.Salesperson,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -579,7 +596,7 @@ private fun SalespersonInformationCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            SectionHeader(title = "Vendedor Asignado")
+            SectionHeader(title = localizedStringResource(R.string.assigned_salesperson, localeManager))
             
             Spacer(modifier = Modifier.height(12.dp))
             
@@ -760,7 +777,8 @@ private fun ClickablePhoneRow(
 private fun LocationMapCard(
     latitude: Double,
     longitude: Double,
-    businessName: String
+    businessName: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -784,7 +802,7 @@ private fun LocationMapCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Ubicación GPS",
+                    text = localizedStringResource(R.string.gps_location, localeManager),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -824,7 +842,7 @@ private fun LocationMapCard(
                     Marker(
                         state = MarkerState(position = position),
                         title = businessName,
-                        snippet = "Ubicación del cliente"
+                        snippet = localizedStringResource(R.string.customer_location, localeManager)
                     )
                 }
             }
@@ -835,6 +853,7 @@ private fun LocationMapCard(
 @Composable
 private fun SalesStatisticsCard(
     statistics: CustomerStatistics,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -859,7 +878,7 @@ private fun SalesStatisticsCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Estadísticas de Ventas",
+                    text = localizedStringResource(R.string.sales_statistics, localeManager),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -873,12 +892,12 @@ private fun SalesStatisticsCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 StatisticItem(
-                    label = "Total Pedidos",
+                    label = localizedStringResource(R.string.total_orders, localeManager),
                     value = statistics.totalOrders.toString(),
                     modifier = Modifier.weight(1f)
                 )
                 StatisticItem(
-                    label = "Pedidos Activos",
+                    label = localizedStringResource(R.string.active_orders, localeManager),
                     value = statistics.activeOrdersCount.toString(),
                     modifier = Modifier.weight(1f)
                 )
@@ -891,12 +910,12 @@ private fun SalesStatisticsCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 StatisticItem(
-                    label = "Ingresos Totales",
+                    label = localizedStringResource(R.string.total_revenue, localeManager),
                     value = "$${String.format("%,.2f", statistics.totalRevenue)}",
                     modifier = Modifier.weight(1f)
                 )
                 StatisticItem(
-                    label = "Promedio por Pedido",
+                    label = localizedStringResource(R.string.average_order_value, localeManager),
                     value = "$${String.format("%,.2f", statistics.averageOrderValue)}",
                     modifier = Modifier.weight(1f)
                 )
@@ -907,7 +926,7 @@ private fun SalesStatisticsCard(
                 Spacer(modifier = Modifier.height(16.dp))
                 Divider(modifier = Modifier.padding(bottom = 8.dp))
                 Text(
-                    text = "Productos Más Solicitados",
+                    text = localizedStringResource(R.string.top_requested_products, localeManager),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -925,7 +944,7 @@ private fun SalesStatisticsCard(
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = "${product.totalQuantity} unidades",
+                            text = "${product.totalQuantity} " + localizedStringResource(R.string.units, localeManager),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -964,6 +983,7 @@ private fun StatisticItem(
 @Composable
 private fun RecentOrdersCard(
     orders: List<Order>,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     var showAllOrders by remember { mutableStateOf(false) }
@@ -993,7 +1013,7 @@ private fun RecentOrdersCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Pedidos Recientes",
+                    text = localizedStringResource(R.string.recent_orders, localeManager),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -1003,7 +1023,7 @@ private fun RecentOrdersCard(
 
             if (orders.isEmpty()) {
                 Text(
-                    text = "No hay pedidos recientes",
+                    text = localizedStringResource(R.string.no_recent_orders, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)
@@ -1026,7 +1046,7 @@ private fun RecentOrdersCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "+ Ver ${orders.size - maxOrdersToShow} pedido${if (orders.size - maxOrdersToShow > 1) "s" else ""} más",
+                            text = "+ " + localizedStringResource(R.string.view_more, localeManager) + " ${orders.size - maxOrdersToShow} " + if (orders.size - maxOrdersToShow > 1) localizedStringResource(R.string.orders_plural, localeManager) else localizedStringResource(R.string.order_singular, localeManager),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -1044,7 +1064,7 @@ private fun RecentOrdersCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "- Ver menos",
+                            text = "- " + localizedStringResource(R.string.view_less, localeManager),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -1140,6 +1160,7 @@ private fun OrderListItem(
 @Composable
 private fun RecentVisitsCard(
     visits: List<Visit>,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     var showAllVisits by remember { mutableStateOf(false) }
@@ -1169,7 +1190,7 @@ private fun RecentVisitsCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Visitas",
+                    text = localizedStringResource(R.string.visits, localeManager),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -1179,14 +1200,14 @@ private fun RecentVisitsCard(
 
             if (visits.isEmpty()) {
                 Text(
-                    text = "No hay visitas registradas",
+                    text = localizedStringResource(R.string.no_visits_registered, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
             } else {
                 visitsToDisplay.forEach { visit ->
-                    VisitListItem(visit = visit)
+                    VisitListItem(visit = visit, localeManager = localeManager)
                     if (visit != visitsToDisplay.last()) {
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
                     }
@@ -1202,7 +1223,7 @@ private fun RecentVisitsCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "+ Ver ${visits.size - maxVisitsToShow} visita${if (visits.size - maxVisitsToShow > 1) "s" else ""} más",
+                            text = "+ " + localizedStringResource(R.string.view_more, localeManager) + " ${visits.size - maxVisitsToShow} " + if (visits.size - maxVisitsToShow > 1) localizedStringResource(R.string.visits_plural, localeManager) else localizedStringResource(R.string.visit_singular, localeManager),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -1220,7 +1241,7 @@ private fun RecentVisitsCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "- Ver menos",
+                            text = "- " + localizedStringResource(R.string.view_less, localeManager),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -1235,6 +1256,7 @@ private fun RecentVisitsCard(
 @Composable
 private fun VisitListItem(
     visit: Visit,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -1323,7 +1345,7 @@ private fun VisitListItem(
         visit.clinicalFindings?.let { findings ->
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Hallazgos:",
+                text = localizedStringResource(R.string.clinical_findings, localeManager),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface

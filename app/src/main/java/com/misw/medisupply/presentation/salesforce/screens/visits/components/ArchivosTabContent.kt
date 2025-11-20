@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.domain.model.visit.AllowedFileExtensions
 import com.misw.medisupply.domain.model.visit.FileValidation
 import com.misw.medisupply.domain.model.visit.VisitFile
@@ -28,7 +30,8 @@ import java.io.FileOutputStream
 @Composable
 fun ArchivosTabContent(
     uiState: CreateVisitUiState,
-    viewModel: CreateVisitViewModel
+    viewModel: CreateVisitViewModel,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
 ) {
     val context = LocalContext.current
     
@@ -53,7 +56,7 @@ fun ArchivosTabContent(
         ) {
             Column(Modifier.padding(16.dp)) {
             Text(
-                "Archivos adjuntos", 
+                localizedStringResource(R.string.files_attached_title, localeManager), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -66,7 +69,7 @@ fun ArchivosTabContent(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
             ) {
                 Text(
-                    text = "📎 Adjunta fotos, documentos y otros archivos relacionados con tu visita. Formatos: PDF, DOC, TXT, JPG, PNG, etc. Máximo 10MB por archivo.",
+                    text = localizedStringResource(R.string.files_info_message, localeManager),
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF2E7D32)
@@ -101,7 +104,7 @@ fun ArchivosTabContent(
                         IconButton(onClick = { viewModel.clearFileError() }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Cerrar",
+                                contentDescription = localizedStringResource(R.string.close_button, localeManager),
                                 tint = Color(0xFFD32F2F),
                                 modifier = Modifier.size(16.dp)
                             )
@@ -127,7 +130,7 @@ fun ArchivosTabContent(
                         strokeWidth = 2.dp
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Subiendo...")
+                    Text(localizedStringResource(R.string.uploading_file, localeManager))
                 } else {
                     Icon(
                         imageVector = Icons.Default.AttachFile,
@@ -135,7 +138,7 @@ fun ArchivosTabContent(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Seleccionar archivo")
+                    Text(localizedStringResource(R.string.select_file_button, localeManager))
                 }
             }
             
@@ -143,9 +146,9 @@ fun ArchivosTabContent(
             
             // Lista de archivos
             if (uiState.isLoadingFiles) {
-                LoadingFilesCard()
+                LoadingFilesCard(localeManager)
             } else if (uiState.visitFiles.isEmpty()) {
-                EmptyFilesCard()
+                EmptyFilesCard(localeManager)
             } else {
                 FilesListCard(
                     files = uiState.visitFiles,
@@ -165,7 +168,7 @@ fun ArchivosTabContent(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        "Finalizar visita", 
+                        localizedStringResource(R.string.finalize_visit_title, localeManager), 
                         style = MaterialTheme.typography.titleMedium, 
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF4CAF50)
@@ -189,7 +192,7 @@ fun ArchivosTabContent(
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "⚠️ Al completar la visita, no podrás realizar más cambios. Asegúrate de haber completado toda la información necesaria.",
+                                text = localizedStringResource(R.string.finalize_visit_warning, localeManager),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF2E7D32)
                             )
@@ -220,7 +223,7 @@ fun ArchivosTabContent(
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text("Completar Visita")
+                            Text(localizedStringResource(R.string.complete_visit_button, localeManager))
                         }
                     }
                 }
@@ -230,7 +233,9 @@ fun ArchivosTabContent(
 }
 
 @Composable
-private fun LoadingFilesCard() {
+private fun LoadingFilesCard(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
@@ -250,7 +255,7 @@ private fun LoadingFilesCard() {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Cargando archivos...",
+                    text = localizedStringResource(R.string.loading_files, localeManager),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF757575)
                 )
@@ -260,7 +265,9 @@ private fun LoadingFilesCard() {
 }
 
 @Composable
-private fun EmptyFilesCard() {
+private fun EmptyFilesCard(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9))
@@ -282,12 +289,12 @@ private fun EmptyFilesCard() {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "No hay archivos adjuntos",
+                    text = localizedStringResource(R.string.no_files_attached, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF757575)
                 )
                 Text(
-                    text = "Usa el botón de arriba para agregar archivos",
+                    text = localizedStringResource(R.string.use_button_add_files, localeManager),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF9E9E9E)
                 )

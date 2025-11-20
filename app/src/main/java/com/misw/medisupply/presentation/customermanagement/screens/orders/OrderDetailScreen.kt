@@ -53,23 +53,12 @@ import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderItem
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.ErrorView
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderDetailViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-/**
- * Reactive localized string resource function
- */
-@Composable
-fun localizedStringResource(@StringRes id: Int, localeManager: LocaleManager): String {
-    val currentLanguage by localeManager.currentLanguage.collectAsState()
-    val context = LocalContext.current
-    return remember(currentLanguage) {
-        context.getString(id)
-    }
-}
 
 /**
  * Order Detail Screen

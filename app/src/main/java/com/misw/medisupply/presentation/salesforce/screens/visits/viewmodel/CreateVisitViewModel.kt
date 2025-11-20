@@ -2,6 +2,7 @@ package com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +26,8 @@ class CreateVisitViewModel @Inject constructor(
     private val userSessionManager: com.misw.medisupply.core.session.UserSessionManager,
     private val uploadFileUseCase: com.misw.medisupply.domain.usecase.visit.UploadFileUseCase,
     private val getVisitFilesUseCase: com.misw.medisupply.domain.usecase.visit.GetVisitFilesUseCase,
-    private val deleteFileUseCase: com.misw.medisupply.domain.usecase.visit.DeleteFileUseCase
+    private val deleteFileUseCase: com.misw.medisupply.domain.usecase.visit.DeleteFileUseCase,
+    val localeManager: LocaleManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateVisitUiState())
