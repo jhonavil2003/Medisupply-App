@@ -3,9 +3,8 @@ package com.misw.medisupply.core.i18n
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.annotation.StringRes
+import androidx.compose.runtime.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -146,9 +145,13 @@ class LocaleManager @Inject constructor(
      * Get a localized string for the current language
      * This method creates a localized context and retrieves the string
      */
-    fun getLocalizedString(stringId: Int): String {
+    fun getLocalizedString(stringId: Int, vararg formatArgs: Any): String {
         val localizedContext = createLocalizedContext(_currentLanguage.value)
-        return localizedContext.getString(stringId)
+        return if (formatArgs.isNotEmpty()) {
+            localizedContext.getString(stringId, *formatArgs)
+        } else {
+            localizedContext.getString(stringId)
+        }
     }
 }
 
@@ -160,3 +163,20 @@ data class LanguageOption(
     val displayName: String,
     val flag: String
 )
+
+/**
+ * Composable function that provides reactive localized strings
+ * Automatically recomposes when language changes
+ * 
+ * @param id String resource identifier
+ * @param localeManager LocaleManager instance for language state
+ * @param formatArgs Optional arguments for string formatting
+ * @return Localized string for current language
+ */
+@Composable
+fun localizedStringResource(@StringRes id: Int, localeManager: LocaleManager, vararg formatArgs: Any): String {
+    val currentLanguage by localeManager.currentLanguage.collectAsState()
+    return remember(currentLanguage, *formatArgs) {
+        localeManager.getLocalizedString(id, *formatArgs)
+    }
+}

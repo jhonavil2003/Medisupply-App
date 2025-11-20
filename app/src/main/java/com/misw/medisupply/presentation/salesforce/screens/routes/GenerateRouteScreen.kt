@@ -160,7 +160,6 @@ fun GenerateRouteScreen(
                                 } else {
                                     localizedStringResource(R.string.generate_route_no_customers_gps, localeManager)
                                 }
-                                }
                             )
                         }
                     }
@@ -805,12 +804,13 @@ private fun DatePickerDialog(
 @Composable
 private fun OptimizationStrategyDialog(
     selectedStrategy: OptimizationStrategy,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onStrategySelected: (OptimizationStrategy) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Estrategia de Optimización") },
+        title = { Text(localizedStringResource(R.string.generate_route_optimization_dialog_title, localeManager)) },
         text = {
             Column {
                 OptimizationStrategy.values().forEach { strategy ->
@@ -827,19 +827,11 @@ private fun OptimizationStrategyDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
-                                text = when (strategy) {
-                                    OptimizationStrategy.MINIMIZE_DISTANCE -> "Distancia más corta"
-                                    OptimizationStrategy.MINIMIZE_TIME -> "Tiempo más corto"
-                                    OptimizationStrategy.BALANCED -> "Balanceado"
-                                },
+                                text = strategy.getLocalizedDisplayName(localeManager),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
-                                text = when (strategy) {
-                                    OptimizationStrategy.MINIMIZE_DISTANCE -> "Minimiza la distancia total"
-                                    OptimizationStrategy.MINIMIZE_TIME -> "Minimiza el tiempo de viaje"
-                                    OptimizationStrategy.BALANCED -> "Equilibrio entre distancia y tiempo"
-                                },
+                                text = strategy.getLocalizedDescription(localeManager),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -850,7 +842,7 @@ private fun OptimizationStrategyDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cerrar")
+                Text(localizedStringResource(R.string.generate_route_dialog_close, localeManager))
             }
         }
     )
@@ -861,6 +853,7 @@ private fun OptimizationStrategyDialog(
 private fun TimePickerDialog(
     selectedTime: LocalTime,
     title: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onTimeSelected: (LocalTime) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -896,12 +889,12 @@ private fun TimePickerDialog(
                     onTimeSelected(time)
                 }
             ) {
-                Text("Aceptar")
+                Text(localizedStringResource(R.string.generate_route_dialog_accept, localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.generate_route_dialog_cancel, localeManager))
             }
         }
     )

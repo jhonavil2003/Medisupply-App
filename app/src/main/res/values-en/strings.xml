@@ -498,12 +498,12 @@
     <string name="generate_route_select_customers">Select Customers</string>
     <string name="generate_route_select_all">Select all</string>
     <string name="generate_route_search_customers">Search customers...</string>
-    <string name="generate_route_customers_selected">%d customers selected out of %d</string>
+    <string name="generate_route_customers_selected">%1$d customers selected out of %2$d</string>
     
     <!-- Loading and States -->
     <string name="generate_route_loading_customers">Loading customers...</string>
     <string name="generate_route_error_loading_customers">Error loading customers</string>
-    <string name="generate_route_no_customers_search">No customers found with '%s'</string>
+    <string name="generate_route_no_customers_search">No customers found with \'%s\'</string>
     <string name="generate_route_no_customers_gps">No customers with GPS location configured</string>
     <string name="generate_route_generating">Generating optimized route...</string>
     <string name="generate_route_generating_subtitle">This may take a few seconds</string>
