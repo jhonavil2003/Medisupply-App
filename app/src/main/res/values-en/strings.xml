@@ -472,5 +472,62 @@
     
     <!-- Customer Item -->
     <string name="customer_item_profile_button">Profile</string>
+    
+    <!-- Generate Route Screen -->
+    <string name="generate_route_title">Generate Route</string>
+    <string name="generate_route_back">Back</string>
+    <string name="generate_route_clear_selection">Clear (%d)</string>
+    <string name="generate_route_fab">Generate Route</string>
+    <string name="generate_route_configuration">Route Configuration</string>
+    <string name="generate_route_date_label">Route date</string>
+    <string name="generate_route_optimization_label">Optimization strategy</string>
+    <string name="generate_route_start_time">Start</string>
+    <string name="generate_route_end_time">End</string>
+    <string name="generate_route_service_time">Service time per visit</string>
+    <string name="generate_route_service_time_minutes">%d minutes</string>
+    <string name="generate_route_custom_location">Custom start location</string>
+    
+    <!-- Start Location Section -->
+    <string name="generate_route_start_location_title">Start Location</string>
+    <string name="generate_route_open_map">Open map</string>
+    <string name="generate_route_custom_location_default">Custom location</string>
+    <string name="generate_route_select_on_map">Select on map</string>
+    <string name="generate_route_change_location">Change location</string>
+    
+    <!-- Customer Selection -->
+    <string name="generate_route_select_customers">Select Customers</string>
+    <string name="generate_route_select_all">Select all</string>
+    <string name="generate_route_search_customers">Search customers...</string>
+    <string name="generate_route_customers_selected">%d customers selected out of %d</string>
+    
+    <!-- Loading and States -->
+    <string name="generate_route_loading_customers">Loading customers...</string>
+    <string name="generate_route_error_loading_customers">Error loading customers</string>
+    <string name="generate_route_no_customers_search">No customers found with '%s'</string>
+    <string name="generate_route_no_customers_gps">No customers with GPS location configured</string>
+    <string name="generate_route_generating">Generating optimized route...</string>
+    <string name="generate_route_generating_subtitle">This may take a few seconds</string>
+    <string name="generate_route_retry">Retry</string>
+    
+    <!-- Optimization Strategies -->
+    <string name="optimization_strategy_distance">Shortest distance</string>
+    <string name="optimization_strategy_time">Shortest time</string>
+    <string name="optimization_strategy_balanced">Balanced</string>
+    <string name="optimization_strategy_distance_desc">Minimizes total distance</string>
+    <string name="optimization_strategy_time_desc">Minimizes travel time</string>
+    <string name="optimization_strategy_balanced_desc">Balance between distance and time</string>
+    
+    <!-- Dialogs -->
+    <string name="generate_route_optimization_dialog_title">Optimization Strategy</string>
+    <string name="generate_route_dialog_close">Close</string>
+    <string name="generate_route_dialog_accept">Accept</string>
+    <string name="generate_route_dialog_cancel">Cancel</string>
+    <string name="generate_route_date_picker_title">Select route date</string>
+    <string name="generate_route_time_picker_start_title">Start time</string>
+    <string name="generate_route_time_picker_end_title">End time</string>
+    
+    <!-- Route Components -->
+    <string name="route_customer_no_address">No address</string>
+    <string name="route_customer_gps_coordinates">GPS coordinates</string>
 
 </resources>

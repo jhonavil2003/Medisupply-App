@@ -2,6 +2,7 @@ package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.domain.model.route.Location
 import com.misw.medisupply.domain.model.route.OptimizationStrategy
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class GenerateRouteViewModel @Inject constructor(
     private val generateRouteUseCase: GenerateRouteUseCase,
     private val getCustomersUseCase: GetCustomersUseCase,
-    private val userSessionManager: UserSessionManager
+    private val userSessionManager: UserSessionManager,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(GenerateRouteUiState())

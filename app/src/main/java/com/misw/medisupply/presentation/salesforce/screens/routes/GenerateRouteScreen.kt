@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.localizedStringResource
 import com.misw.medisupply.domain.model.route.OptimizationStrategy
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.CustomerCheckboxItem
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.LocationPickerDialog
@@ -29,6 +31,7 @@ fun GenerateRouteScreen(
     viewModel: GenerateRouteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val localeManager = viewModel.localeManager
     
     var showDatePicker by remember { mutableStateOf(false) }
     var showStartTimePicker by remember { mutableStateOf(false) }
@@ -39,16 +42,16 @@ fun GenerateRouteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Generar Ruta") },
+                title = { Text(localizedStringResource(R.string.generate_route_title, localeManager)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = localizedStringResource(R.string.generate_route_back, localeManager))
                     }
                 },
                 actions = {
                     if (uiState.selectedCustomerIds.isNotEmpty()) {
                         TextButton(onClick = { viewModel.clearSelection() }) {
-                            Text("Limpiar (${uiState.selectedCustomerIds.size})")
+                            Text(localizedStringResource(R.string.generate_route_clear_selection, localeManager, uiState.selectedCustomerIds.size))
                         }
                     }
                 }
@@ -59,7 +62,7 @@ fun GenerateRouteScreen(
                 ExtendedFloatingActionButton(
                     onClick = { viewModel.generateRoute(onRouteGenerated) },
                     icon = { Icon(Icons.Default.Route, contentDescription = null) },
-                    text = { Text("Generar Ruta") }
+                    text = { Text(localizedStringResource(R.string.generate_route_fab, localeManager)) }
                 )
             }
         }
@@ -83,6 +86,7 @@ fun GenerateRouteScreen(
                         workHoursEnd = uiState.workHoursEnd,
                         serviceTimeMinutes = uiState.serviceTimeMinutes,
                         useCustomStartLocation = uiState.useCustomStartLocation,
+                        localeManager = localeManager,
                         onDateClick = { showDatePicker = true },
                         onStrategyClick = { showStrategyDialog = true },
                         onStartTimeClick = { showStartTimePicker = true },
@@ -105,6 +109,7 @@ fun GenerateRouteScreen(
                             name = uiState.startLocationName,
                             latitude = uiState.startLocationLatitude,
                             longitude = uiState.startLocationLongitude,
+                            localeManager = localeManager,
                             onOpenMapPicker = { showLocationPicker = true }
                         )
                     }
@@ -116,6 +121,7 @@ fun GenerateRouteScreen(
                         selectedCount = uiState.selectedCustomerIds.size,
                         totalCount = uiState.filteredCustomers.size,
                         searchQuery = uiState.searchQuery,
+                        localeManager = localeManager,
                         onSearchChange = { viewModel.updateSearchQuery(it) },
                         onSelectAll = { viewModel.selectAllFiltered() }
                     )
@@ -139,7 +145,8 @@ fun GenerateRouteScreen(
                     uiState.customerError != null -> {
                         item {
                             ErrorCard(
-                                message = uiState.customerError ?: "Error al cargar clientes",
+                                message = uiState.customerError ?: localizedStringResource(R.string.generate_route_error_loading_customers, localeManager),
+                                localeManager = localeManager,
                                 onRetry = { viewModel.loadCustomers() }
                             )
                         }
@@ -149,9 +156,10 @@ fun GenerateRouteScreen(
                         item {
                             EmptyStateCard(
                                 message = if (uiState.searchQuery.isNotEmpty()) {
-                                    "No se encontraron clientes con '${uiState.searchQuery}'"
+                                    localizedStringResource(R.string.generate_route_no_customers_search, localeManager, uiState.searchQuery)
                                 } else {
-                                    "No hay clientes con ubicación GPS configurada"
+                                    localizedStringResource(R.string.generate_route_no_customers_gps, localeManager)
+                                }
                                 }
                             )
                         }
@@ -165,6 +173,7 @@ fun GenerateRouteScreen(
                             CustomerCheckboxItem(
                                 customer = customer,
                                 isSelected = customer.id in uiState.selectedCustomerIds,
+                                localeManager = localeManager,
                                 onSelectionChanged = { _ ->
                                     viewModel.toggleCustomerSelection(customer.id)
                                 }
@@ -193,11 +202,11 @@ fun GenerateRouteScreen(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Generando ruta optimizada...",
+                            text = localizedStringResource(R.string.generate_route_generating, localeManager),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "Esto puede tomar unos segundos",
+                            text = localizedStringResource(R.string.generate_route_generating_subtitle, localeManager),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -226,6 +235,7 @@ fun GenerateRouteScreen(
     if (showDatePicker) {
         DatePickerDialog(
             selectedDate = uiState.selectedDate,
+            localeManager = localeManager,
             onDateSelected = { date ->
                 viewModel.updateSelectedDate(date)
                 showDatePicker = false
@@ -238,6 +248,7 @@ fun GenerateRouteScreen(
     if (showStrategyDialog) {
         OptimizationStrategyDialog(
             selectedStrategy = uiState.optimizationStrategy,
+            localeManager = localeManager,
             onStrategySelected = { strategy ->
                 viewModel.updateOptimizationStrategy(strategy)
                 showStrategyDialog = false
@@ -277,7 +288,8 @@ fun GenerateRouteScreen(
     if (showStartTimePicker) {
         TimePickerDialog(
             selectedTime = uiState.workHoursStart,
-            title = "Hora de inicio",
+            title = localizedStringResource(R.string.generate_route_time_picker_start_title, localeManager),
+            localeManager = localeManager,
             onTimeSelected = { time ->
                 viewModel.updateWorkHoursStart(time)
                 showStartTimePicker = false
@@ -289,7 +301,8 @@ fun GenerateRouteScreen(
     if (showEndTimePicker) {
         TimePickerDialog(
             selectedTime = uiState.workHoursEnd,
-            title = "Hora de fin",
+            title = localizedStringResource(R.string.generate_route_time_picker_end_title, localeManager),
+            localeManager = localeManager,
             onTimeSelected = { time ->
                 viewModel.updateWorkHoursEnd(time)
                 showEndTimePicker = false
@@ -308,6 +321,7 @@ private fun ConfigurationSection(
     workHoursEnd: LocalTime,
     serviceTimeMinutes: Int,
     useCustomStartLocation: Boolean,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onDateClick: () -> Unit,
     onStrategyClick: () -> Unit,
     onStartTimeClick: () -> Unit,
@@ -327,7 +341,7 @@ private fun ConfigurationSection(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Configuración de Ruta",
+                text = localizedStringResource(R.string.generate_route_configuration, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -348,7 +362,7 @@ private fun ConfigurationSection(
                 ) {
                     Column {
                         Text(
-                            text = "Fecha de ruta",
+                            text = localizedStringResource(R.string.generate_route_date_label, localeManager),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -377,16 +391,12 @@ private fun ConfigurationSection(
                 ) {
                     Column {
                         Text(
-                            text = "Estrategia de optimización",
+                            text = localizedStringResource(R.string.generate_route_optimization_label, localeManager),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = when (optimizationStrategy) {
-                                OptimizationStrategy.MINIMIZE_DISTANCE -> "Distancia más corta"
-                                OptimizationStrategy.MINIMIZE_TIME -> "Tiempo más corto"
-                                OptimizationStrategy.BALANCED -> "Balanceado"
-                            },
+                            text = optimizationStrategy.getLocalizedDisplayName(localeManager),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -411,7 +421,7 @@ private fun ConfigurationSection(
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = "Inicio",
+                            text = localizedStringResource(R.string.generate_route_start_time, localeManager),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -433,7 +443,7 @@ private fun ConfigurationSection(
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = "Fin",
+                            text = localizedStringResource(R.string.generate_route_end_time, localeManager),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -451,12 +461,12 @@ private fun ConfigurationSection(
             // Tiempo de servicio
             Column {
                 Text(
-                    text = "Tiempo de servicio por visita",
+                    text = localizedStringResource(R.string.generate_route_service_time, localeManager),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "$serviceTimeMinutes minutos",
+                    text = localizedStringResource(R.string.generate_route_service_time_minutes, localeManager, serviceTimeMinutes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -477,7 +487,7 @@ private fun ConfigurationSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Ubicación de inicio personalizada",
+                    text = localizedStringResource(R.string.generate_route_custom_location, localeManager),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Switch(
@@ -501,6 +511,7 @@ private fun StartLocationSection(
     name: String,
     latitude: String,
     longitude: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onOpenMapPicker: () -> Unit
 ) {
     Card(
@@ -521,7 +532,7 @@ private fun StartLocationSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Ubicación de Inicio",
+                    text = localizedStringResource(R.string.generate_route_start_location_title, localeManager),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -529,7 +540,7 @@ private fun StartLocationSection(
                 IconButton(onClick = onOpenMapPicker) {
                     Icon(
                         Icons.Default.Map,
-                        contentDescription = "Abrir mapa",
+                        contentDescription = localizedStringResource(R.string.generate_route_open_map, localeManager),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -558,7 +569,7 @@ private fun StartLocationSection(
                                 tint = MaterialTheme.colorScheme.onTertiaryContainer
                             )
                             Text(
-                                text = name.ifEmpty { "Ubicación personalizada" },
+                                text = name.ifEmpty { localizedStringResource(R.string.generate_route_custom_location_default, localeManager) },
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -601,9 +612,9 @@ private fun StartLocationSection(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     if (latitude.isEmpty() || longitude.isEmpty()) {
-                        "Seleccionar en el mapa"
+                        localizedStringResource(R.string.generate_route_select_on_map, localeManager)
                     } else {
-                        "Cambiar ubicación"
+                        localizedStringResource(R.string.generate_route_change_location, localeManager)
                     }
                 )
             }
@@ -616,6 +627,7 @@ private fun CustomerSelectionHeader(
     selectedCount: Int,
     totalCount: Int,
     searchQuery: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onSearchChange: (String) -> Unit,
     onSelectAll: () -> Unit
 ) {
@@ -629,14 +641,14 @@ private fun CustomerSelectionHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Seleccionar Clientes",
+                text = localizedStringResource(R.string.generate_route_select_customers, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             
             if (totalCount > 0) {
                 TextButton(onClick = onSelectAll) {
-                    Text("Seleccionar todos")
+                    Text(localizedStringResource(R.string.generate_route_select_all, localeManager))
                 }
             }
         }
@@ -644,7 +656,7 @@ private fun CustomerSelectionHeader(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = onSearchChange,
-            placeholder = { Text("Buscar clientes...") },
+            placeholder = { Text(localizedStringResource(R.string.generate_route_search_customers, localeManager)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -656,7 +668,7 @@ private fun CustomerSelectionHeader(
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(
-                    text = "$selectedCount clientes seleccionados de $totalCount",
+                    text = localizedStringResource(R.string.generate_route_customers_selected, localeManager, selectedCount, totalCount),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
@@ -670,6 +682,7 @@ private fun CustomerSelectionHeader(
 @Composable
 private fun ErrorCard(
     message: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onRetry: () -> Unit
 ) {
     Card(
@@ -697,7 +710,7 @@ private fun ErrorCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = onRetry) {
-                Text("Reintentar")
+                Text(localizedStringResource(R.string.generate_route_retry, localeManager))
             }
         }
     }
@@ -737,6 +750,7 @@ private fun EmptyStateCard(message: String) {
 @Composable
 private fun DatePickerDialog(
     selectedDate: LocalDate,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onDateSelected: (LocalDate) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -756,12 +770,12 @@ private fun DatePickerDialog(
                     }
                 }
             ) {
-                Text("Aceptar")
+                Text(localizedStringResource(R.string.generate_route_dialog_accept, localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.generate_route_dialog_cancel, localeManager))
             }
         }
     ) {
@@ -769,7 +783,7 @@ private fun DatePickerDialog(
             state = datePickerState,
             title = {
                 Text(
-                    text = "Seleccionar fecha de ruta",
+                    text = localizedStringResource(R.string.generate_route_date_picker_title, localeManager),
                     modifier = Modifier.padding(start = 24.dp, top = 16.dp)
                 )
             },

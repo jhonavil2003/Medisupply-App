@@ -39,6 +39,7 @@ fun CustomerCheckboxItem(
     customer: Customer,
     isSelected: Boolean,
     onSelectionChanged: (Boolean) -> Unit,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -76,7 +77,7 @@ fun CustomerCheckboxItem(
                 )
                 
                 Text(
-                    text = customer.address ?: "Sin dirección",
+                    text = customer.address ?: localeManager.getLocalizedString(com.misw.medisupply.R.string.route_customer_no_address),
                     style = MaterialTheme.typography.bodySmall,
                     color = ColorTextSecondary,
                     maxLines = 1,
@@ -96,7 +97,7 @@ fun CustomerCheckboxItem(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "GPS: ${customer.latitude}, ${customer.longitude}",
+                            text = localeManager.getLocalizedString(com.misw.medisupply.R.string.route_customer_gps_coordinates) + ": ${customer.latitude}, ${customer.longitude}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
