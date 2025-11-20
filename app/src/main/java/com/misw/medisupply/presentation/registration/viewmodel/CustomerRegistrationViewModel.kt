@@ -46,6 +46,16 @@ class CustomerRegistrationViewModel @Inject constructor(
     }
     
     /**
+     * Update trade name
+     */
+    fun updateTradeName(tradeName: String) {
+        _uiState.value = _uiState.value.copy(
+            tradeName = tradeName,
+            generalError = null
+        )
+    }
+    
+    /**
      * Update document number and validate
      */
     fun updateDocumentNumber(documentNumber: String) {
@@ -56,6 +66,16 @@ class CustomerRegistrationViewModel @Inject constructor(
             generalError = null
         )
         validateDocumentNumber(documentNumber)
+    }
+    
+    /**
+     * Update contact name
+     */
+    fun updateContactName(contactName: String) {
+        _uiState.value = _uiState.value.copy(
+            contactName = contactName,
+            generalError = null
+        )
     }
     
     /**
@@ -110,6 +130,50 @@ class CustomerRegistrationViewModel @Inject constructor(
     fun updateDepartment(department: String) {
         _uiState.value = _uiState.value.copy(
             department = department,
+            generalError = null
+        )
+    }
+    
+    /**
+     * Update neighborhood
+     */
+    fun updateNeighborhood(neighborhood: String) {
+        _uiState.value = _uiState.value.copy(
+            neighborhood = neighborhood,
+            generalError = null
+        )
+    }
+    
+    /**
+     * Update country
+     */
+    fun updateCountry(country: String) {
+        _uiState.value = _uiState.value.copy(
+            country = country,
+            generalError = null
+        )
+    }
+    
+    /**
+     * Update latitude
+     */
+    fun updateLatitude(latitude: String) {
+        val latValue = latitude.toDoubleOrNull()
+        _uiState.value = _uiState.value.copy(
+            latitude = latitude,
+            latitudeValue = latValue,
+            generalError = null
+        )
+    }
+    
+    /**
+     * Update longitude
+     */
+    fun updateLongitude(longitude: String) {
+        val lonValue = longitude.toDoubleOrNull()
+        _uiState.value = _uiState.value.copy(
+            longitude = longitude,
+            longitudeValue = lonValue,
             generalError = null
         )
     }
@@ -190,12 +254,18 @@ class CustomerRegistrationViewModel @Inject constructor(
             
             val registrationData = CreateCustomerRequest(
                 businessName = updatedState.businessName,
+                tradeName = updatedState.tradeName.takeIf { it.isNotBlank() },
                 documentNumber = updatedState.documentNumber,
+                contactName = updatedState.contactName.takeIf { it.isNotBlank() },
                 contactEmail = updatedState.contactEmail,
                 contactPhone = updatedState.contactPhone,
                 address = updatedState.address,
+                neighborhood = updatedState.neighborhood.takeIf { it.isNotBlank() },
                 city = updatedState.city.takeIf { it.isNotBlank() },
-                department = updatedState.department.takeIf { it.isNotBlank() }
+                department = updatedState.department.takeIf { it.isNotBlank() },
+                country = updatedState.country.takeIf { it.isNotBlank() } ?: "Colombia",
+                latitude = updatedState.latitudeValue,
+                longitude = updatedState.longitudeValue
             )
             
             Log.d(TAG, "Datos a enviar al UseCase:")
@@ -209,12 +279,18 @@ class CustomerRegistrationViewModel @Inject constructor(
             
             registerCustomerUseCase(
                 businessName = updatedState.businessName,
+                tradeName = updatedState.tradeName.takeIf { it.isNotBlank() },
                 documentNumber = updatedState.documentNumber,
+                contactName = updatedState.contactName.takeIf { it.isNotBlank() },
                 contactEmail = updatedState.contactEmail,
                 contactPhone = updatedState.contactPhone,
                 address = updatedState.address,
+                neighborhood = updatedState.neighborhood.takeIf { it.isNotBlank() },
                 city = updatedState.city.takeIf { it.isNotBlank() },
-                department = updatedState.department.takeIf { it.isNotBlank() }
+                department = updatedState.department.takeIf { it.isNotBlank() },
+                country = updatedState.country.takeIf { it.isNotBlank() } ?: "Colombia",
+                latitude = updatedState.latitudeValue,
+                longitude = updatedState.longitudeValue
             ).collect { resource ->
                 Log.d(TAG, "Respuesta del UseCase: ${resource.javaClass.simpleName}")
                 when (resource) {
@@ -459,12 +535,20 @@ class CustomerRegistrationViewModel @Inject constructor(
 data class CustomerRegistrationUiState(
     // Form fields
     val businessName: String = "",
+    val tradeName: String = "",
     val documentNumber: String = "",
+    val contactName: String = "",
     val contactEmail: String = "",
     val contactPhone: String = "",
     val address: String = "",
+    val neighborhood: String = "",
     val city: String = "",
     val department: String = "",
+    val country: String = "Colombia",
+    val latitude: String = "",
+    val longitude: String = "",
+    val latitudeValue: Double? = null,
+    val longitudeValue: Double? = null,
     val internalCode: String = "",
     val username: String = "",
     val password: String = "",

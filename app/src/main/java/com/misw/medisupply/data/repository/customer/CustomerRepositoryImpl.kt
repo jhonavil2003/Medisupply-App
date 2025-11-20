@@ -183,38 +183,56 @@ class CustomerRepositoryImpl @Inject constructor(
     
     override fun registerCustomer(
         businessName: String,
+        tradeName: String?,
         documentNumber: String,
         documentType: String,
+        contactName: String?,
         contactEmail: String,
         contactPhone: String,
         address: String,
+        neighborhood: String?,
         city: String?,
         department: String?,
+        country: String,
+        latitude: Double?,
+        longitude: Double?,
         customerType: String
     ): Flow<Resource<Customer>> = flow {
         try {
             Log.d(TAG, "=== REPOSITORY RECIBIÓ DATOS ===")
             Log.d(TAG, "businessName: '$businessName'")
+            Log.d(TAG, "tradeName: '$tradeName'")
             Log.d(TAG, "documentNumber: '$documentNumber'")
             Log.d(TAG, "documentType: '$documentType'")
+            Log.d(TAG, "contactName: '$contactName'")
             Log.d(TAG, "contactEmail: '$contactEmail'")
             Log.d(TAG, "contactPhone: '$contactPhone'")
             Log.d(TAG, "address: '$address'")
+            Log.d(TAG, "neighborhood: '$neighborhood'")
             Log.d(TAG, "city: '$city'")
             Log.d(TAG, "department: '$department'")
+            Log.d(TAG, "country: '$country'")
+            Log.d(TAG, "latitude: $latitude")
+            Log.d(TAG, "longitude: $longitude")
             Log.d(TAG, "customerType: '$customerType'")
             
             emit(Resource.Loading())
             
             val request = CreateCustomerRequest(
                 businessName = businessName,
+                tradeName = tradeName,
                 documentNumber = documentNumber,
                 documentType = documentType,
+                contactName = contactName,
                 contactEmail = contactEmail,
                 contactPhone = contactPhone,
                 address = address,
+                neighborhood = neighborhood,
                 city = city,
                 department = department,
+                country = country,
+                latitude = latitude,
+                longitude = longitude,
                 customerType = customerType
             )
             
@@ -245,7 +263,7 @@ class CustomerRepositoryImpl @Inject constructor(
                     address = address,
                     city = city,
                     department = department,
-                    country = "Colombia",
+                    country = country,
                     creditLimit = 0.0,
                     creditDays = 0,
                     isActive = true,
@@ -253,19 +271,34 @@ class CustomerRepositoryImpl @Inject constructor(
                     updatedAt = null,
                     salespersonId = null,
                     salesperson = null,
-                    latitude = null,
-                    longitude = null
+                    latitude = latitude,
+                    longitude = longitude
                 )
                 
                 Log.d(TAG, "✅ Cliente objeto creado exitosamente: $registeredCustomer")
                 emit(Resource.Success(registeredCustomer))
             } else {
                 Log.e(TAG, "API respondió con error: ${response.code()}")
-                Log.e(TAG, "Error body: ${response.errorBody()?.string()}")
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "Error body: $errorBody")
+                
+                // Intentar extraer el mensaje de error del JSON
+                val detailedError = try {
+                    errorBody?.let { body ->
+                        // Buscar el mensaje de error en el JSON
+                        val errorPattern = """"error":\s*"([^"]+)"""".toRegex()
+                        val messagePattern = """"message":\s*"([^"]+)"""".toRegex()
+                        errorPattern.find(body)?.groupValues?.get(1)
+                            ?: messagePattern.find(body)?.groupValues?.get(1)
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+                
                 val errorMessage = when (response.code()) {
-                    400 -> "Datos inválidos. Verifique la información ingresada"
+                    400 -> detailedError ?: "Datos inválidos. Verifique la información ingresada"
                     409 -> "El NIT/RUC ya está registrado en el sistema"
-                    422 -> "Email inválido o datos incompletos"
+                    422 -> detailedError ?: "Email inválido o datos incompletos"
                     500 -> Constants.ErrorMessages.SERVER_ERROR
                     else -> "${Constants.ErrorMessages.SERVER_ERROR} (${response.code()})"
                 }
