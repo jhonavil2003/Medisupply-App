@@ -13,6 +13,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.i18n.localizedStringResource
+import javax.inject.Inject
 import com.misw.medisupply.domain.model.route.RouteStatus
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.*
 import com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel.RouteDetailViewModel
@@ -24,6 +28,7 @@ fun RouteDetailScreen(
     routeId: Int,
     onNavigateBack: () -> Unit,
     onNavigateToExecution: (Int) -> Unit,
+    localeManager: LocaleManager,
     viewModel: RouteDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -35,22 +40,22 @@ fun RouteDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle de Ruta #$routeId") },
+                title = { Text(localizedStringResource(R.string.route_detail_title, localeManager, routeId)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = localizedStringResource(R.string.route_detail_back, localeManager))
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Actualizar")
+                        Icon(Icons.Default.Refresh, contentDescription = localizedStringResource(R.string.route_detail_refresh, localeManager))
                     }
                     
                     if (uiState.route?.status == RouteStatus.DRAFT) {
                         IconButton(onClick = { viewModel.showCancelDialog(true) }) {
                             Icon(
                                 Icons.Default.Cancel,
-                                contentDescription = "Cancelar ruta",
+                                contentDescription = localizedStringResource(R.string.route_detail_cancel_route, localeManager),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -87,7 +92,7 @@ fun RouteDetailScreen(
                 
                 uiState.error != null -> {
                     ErrorMessage(
-                        message = uiState.error ?: "Error al cargar ruta",
+                        message = uiState.error ?: localizedStringResource(R.string.route_detail_error_loading, localeManager),
                         onRetry = { viewModel.refresh() },
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -101,7 +106,8 @@ fun RouteDetailScreen(
                         onNavigateToStop = { stopId ->
                             viewModel.selectStop(stopId)
                             // Aquí se podría abrir Google Maps
-                        }
+                        },
+                        localeManager = localeManager
                     )
                 }
             }
@@ -111,9 +117,9 @@ fun RouteDetailScreen(
     // Confirm dialog
     if (uiState.showConfirmDialog) {
         ConfirmActionDialog(
-            title = "Confirmar Ruta",
-            message = "¿Estás seguro de confirmar esta ruta? Una vez confirmada, podrás iniciarla en la fecha planificada.",
-            confirmText = "Confirmar",
+            title = localizedStringResource(R.string.route_dialog_confirm_title, localeManager),
+            message = localizedStringResource(R.string.route_dialog_confirm_message, localeManager),
+            confirmText = localizedStringResource(R.string.route_action_confirm, localeManager),
             onConfirm = {
                 viewModel.confirmRoute {
                     // Success callback
@@ -127,9 +133,9 @@ fun RouteDetailScreen(
     // Start dialog
     if (uiState.showStartDialog) {
         ConfirmActionDialog(
-            title = "Iniciar Ruta",
-            message = "¿Estás listo para iniciar la ejecución de esta ruta? Se activará el seguimiento GPS.",
-            confirmText = "Iniciar",
+            title = localizedStringResource(R.string.route_dialog_start_title, localeManager),
+            message = localizedStringResource(R.string.route_dialog_start_message, localeManager),
+            confirmText = localizedStringResource(R.string.route_action_start, localeManager),
             onConfirm = {
                 viewModel.startRoute { routeId ->
                     onNavigateToExecution(routeId)
@@ -143,9 +149,9 @@ fun RouteDetailScreen(
     // Complete dialog
     if (uiState.showCompleteDialog) {
         ConfirmActionDialog(
-            title = "Completar Ruta",
-            message = "¿Confirmas que has completado todas las paradas de la ruta? Esta acción no se puede deshacer.",
-            confirmText = "Completar",
+            title = localizedStringResource(R.string.route_dialog_complete_title, localeManager),
+            message = localizedStringResource(R.string.route_dialog_complete_message, localeManager),
+            confirmText = localizedStringResource(R.string.route_action_complete, localeManager),
             onConfirm = {
                 viewModel.completeRoute {
                     // Success callback
@@ -159,9 +165,9 @@ fun RouteDetailScreen(
     // Cancel dialog
     if (uiState.showCancelDialog) {
         ConfirmActionDialog(
-            title = "Cancelar Ruta",
-            message = "¿Estás seguro de cancelar esta ruta? Esta acción no se puede deshacer.",
-            confirmText = "Cancelar Ruta",
+            title = localizedStringResource(R.string.route_dialog_cancel_title, localeManager),
+            message = localizedStringResource(R.string.route_dialog_cancel_message, localeManager),
+            confirmText = localizedStringResource(R.string.route_dialog_cancel_action, localeManager),
             confirmColor = MaterialTheme.colorScheme.error,
             onConfirm = {
                 viewModel.cancelRoute {
@@ -187,7 +193,8 @@ private fun RouteDetailContent(
     route: com.misw.medisupply.domain.model.route.Route,
     expandedStopIds: Set<Int>,
     onStopClick: (Int) -> Unit,
-    onNavigateToStop: (Int) -> Unit
+    onNavigateToStop: (Int) -> Unit,
+    localeManager: LocaleManager
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -196,7 +203,7 @@ private fun RouteDetailContent(
     ) {
         // Header con info básica
         item {
-            RouteHeaderCard(route = route)
+            RouteHeaderCard(route = route, localeManager = localeManager)
         }
         
         // Métricas
@@ -217,7 +224,7 @@ private fun RouteDetailContent(
         // Paradas header
         item {
             Text(
-                text = "Paradas (${route.stops.size})",
+                text = localizedStringResource(R.string.route_info_stops, localeManager, route.stops.size),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -243,7 +250,8 @@ private fun RouteDetailContent(
 
 @Composable
 private fun RouteHeaderCard(
-    route: com.misw.medisupply.domain.model.route.Route
+    route: com.misw.medisupply.domain.model.route.Route,
+    localeManager: LocaleManager
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -263,7 +271,7 @@ private fun RouteHeaderCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Ruta #${route.id}",
+                        text = localizedStringResource(R.string.route_info_route_number, localeManager, route.id),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -274,7 +282,7 @@ private fun RouteHeaderCard(
                     )
                 }
                 
-                RouteStatusChip(status = route.status)
+                RouteStatusChip(status = route.status, localeManager = localeManager)
             }
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -284,7 +292,7 @@ private fun RouteHeaderCard(
             // Información de fechas
             InfoRow(
                 icon = Icons.Default.CalendarToday,
-                label = "Fecha planificada",
+                label = localizedStringResource(R.string.route_info_planned_date, localeManager),
                 value = route.plannedDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
             )
             
@@ -292,7 +300,7 @@ private fun RouteHeaderCard(
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoRow(
                     icon = Icons.Default.PlayArrow,
-                    label = "Iniciada",
+                    label = localizedStringResource(R.string.route_info_started, localeManager),
                     value = route.startedAt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 )
             }

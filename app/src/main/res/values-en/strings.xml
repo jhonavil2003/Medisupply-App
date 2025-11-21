@@ -528,6 +528,48 @@
     
     <!-- Route Components -->
     <string name="route_customer_no_address">No address</string>
-    <string name="route_customer_gps_coordinates">GPS coordinates</string>
+    <string name="route_customer_gps_coordinates">GPS Coordinates</string>
+
+    <!-- Route Detail Screen -->
+    <string name="route_detail_title">Route Details #%1$d</string>
+    <string name="route_detail_back">Back</string>
+    <string name="route_detail_refresh">Refresh</string>
+    <string name="route_detail_cancel_route">Cancel route</string>
+    <string name="route_detail_error_loading">Error loading route</string>
+    
+    <!-- Route Info -->
+    <string name="route_info_route_number">Route #%1$d</string>
+    <string name="route_info_planned_date">Planned date</string>
+    <string name="route_info_started">Started</string>
+    <string name="route_info_completed">Completed</string>
+    <string name="route_info_stops">Stops (%1$d)</string>
+    
+    <!-- Route Status -->
+    <string name="route_status_draft">Draft</string>
+    <string name="route_status_confirmed">Confirmed</string>
+    <string name="route_status_in_progress">In progress</string>
+    <string name="route_status_completed">Completed</string>
+    <string name="route_status_cancelled">Cancelled</string>
+    
+    <!-- Route Actions and Dialogs -->
+    <string name="route_action_confirm">Confirm</string>
+    <string name="route_action_start">Start</string>
+    <string name="route_action_execute">Execute</string>
+    <string name="route_action_complete">Complete</string>
+    
+    <string name="route_dialog_confirm_title">Confirm Route</string>
+    <string name="route_dialog_confirm_message">Are you sure you want to confirm this route? Once confirmed, you can start it on the planned date.</string>
+    <string name="route_dialog_start_title">Start Route</string>
+    <string name="route_dialog_start_message">Are you ready to start executing this route? GPS tracking will be activated.</string>
+    <string name="route_dialog_complete_title">Complete Route</string>
+    <string name="route_dialog_complete_message">Do you confirm that you have completed all stops on the route? This action cannot be undone.</string>
+    <string name="route_dialog_cancel_title">Cancel Route</string>
+    <string name="route_dialog_cancel_message">Are you sure you want to cancel this route? This action cannot be undone.</string>
+    <string name="route_dialog_cancel_action">Cancel Route</string>
+    
+    <!-- Route Components -->
+    <string name="route_stop_completed_mark">✓ Completed</string>
+    <string name="route_stop_complete_action">Complete</string>
+    <string name="route_metrics_completed">Completed</string>
 
 </resources>

@@ -239,33 +239,34 @@ fun RouteCard(
 @Composable
 fun RouteStatusChip(
     status: RouteStatus,
+    localeManager: LocaleManager,
     modifier: Modifier = Modifier
 ) {
-    val (backgroundColor, textColor, text) = when (status) {
+    val (backgroundColor, textColor, stringRes) = when (status) {
         RouteStatus.DRAFT -> Triple(
             MaterialTheme.colorScheme.surfaceVariant,
             ColorTextPrimary,
-            "Borrador"
+            R.string.route_status_draft
         )
         RouteStatus.CONFIRMED -> Triple(
             ColorPrimaryDark.copy(alpha = 0.2f),
             ColorPrimaryDark,
-            "Confirmada"
+            R.string.route_status_confirmed
         )
         RouteStatus.IN_PROGRESS -> Triple(
             ColorWarning.copy(alpha = 0.2f),
             ColorWarning,
-            "En Curso"
+            R.string.route_status_in_progress
         )
         RouteStatus.COMPLETED -> Triple(
             ColorSuccess.copy(alpha = 0.2f),
             ColorSuccess,
-            "Completada"
+            R.string.route_status_completed
         )
         RouteStatus.CANCELLED -> Triple(
             ButtonDangerBg.copy(alpha = 0.2f),
             ButtonDangerBg,
-            "Cancelada"
+            R.string.route_status_cancelled
         )
     }
     
@@ -275,7 +276,7 @@ fun RouteStatusChip(
         color = backgroundColor
     ) {
         Text(
-            text = text,
+            text = localizedStringResource(stringRes, localeManager),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,

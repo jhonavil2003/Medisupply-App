@@ -530,4 +530,46 @@
     <string name="route_customer_no_address">Sin dirección</string>
     <string name="route_customer_gps_coordinates">Coordenadas GPS</string>
 
+    <!-- Route Detail Screen -->
+    <string name="route_detail_title">Detalle de Ruta #%1$d</string>
+    <string name="route_detail_back">Volver</string>
+    <string name="route_detail_refresh">Actualizar</string>
+    <string name="route_detail_cancel_route">Cancelar ruta</string>
+    <string name="route_detail_error_loading">Error al cargar ruta</string>
+    
+    <!-- Route Info -->
+    <string name="route_info_route_number">Ruta #%1$d</string>
+    <string name="route_info_planned_date">Fecha planificada</string>
+    <string name="route_info_started">Iniciada</string>
+    <string name="route_info_completed">Completada</string>
+    <string name="route_info_stops">Paradas (%1$d)</string>
+    
+    <!-- Route Status -->
+    <string name="route_status_draft">Borrador</string>
+    <string name="route_status_confirmed">Confirmada</string>
+    <string name="route_status_in_progress">En progreso</string>
+    <string name="route_status_completed">Completada</string>
+    <string name="route_status_cancelled">Cancelada</string>
+    
+    <!-- Route Actions and Dialogs -->
+    <string name="route_action_confirm">Confirmar</string>
+    <string name="route_action_start">Iniciar</string>
+    <string name="route_action_execute">Ejecutar</string>
+    <string name="route_action_complete">Completar</string>
+    
+    <string name="route_dialog_confirm_title">Confirmar Ruta</string>
+    <string name="route_dialog_confirm_message">¿Estás seguro de confirmar esta ruta? Una vez confirmada, podrás iniciarla en la fecha planificada.</string>
+    <string name="route_dialog_start_title">Iniciar Ruta</string>
+    <string name="route_dialog_start_message">¿Estás listo para iniciar la ejecución de esta ruta? Se activará el seguimiento GPS.</string>
+    <string name="route_dialog_complete_title">Completar Ruta</string>
+    <string name="route_dialog_complete_message">¿Confirmas que has completado todas las paradas de la ruta? Esta acción no se puede deshacer.</string>
+    <string name="route_dialog_cancel_title">Cancelar Ruta</string>
+    <string name="route_dialog_cancel_message">¿Estás seguro de cancelar esta ruta? Esta acción no se puede deshacer.</string>
+    <string name="route_dialog_cancel_action">Cancelar Ruta</string>
+    
+    <!-- Route Components -->
+    <string name="route_stop_completed_mark">✓ Completada</string>
+    <string name="route_stop_complete_action">Completar</string>
+    <string name="route_metrics_completed">Completadas</string>
+
 </resources>
