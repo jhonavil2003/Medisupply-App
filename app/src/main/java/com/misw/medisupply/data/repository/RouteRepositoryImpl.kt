@@ -30,7 +30,7 @@ class RouteRepositoryImpl @Inject constructor(
         endLocation: Location?,
         workHours: WorkHours?,
         serviceTimePerVisitMinutes: Int
-    ): Result<Pair<Route, Double?>> {
+    ): Result<RouteGenerationResult> {
         return try {
             val request = GenerateRouteRequest(
                 salespersonId = salespersonId,
@@ -50,14 +50,37 @@ class RouteRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    val route = responseBody.route.toRoute()
-                    val computationTime = responseBody.computationTimeSeconds
-                    Result.success(Pair(route, computationTime))
+                    try {
+                        val route = responseBody.route.toRoute()
+                        val computationTime = responseBody.computationTimeSeconds
+                        val warnings = responseBody.warnings
+                        Result.success(RouteGenerationResult(
+                            route = route,
+                            computationTime = computationTime,
+                            warnings = warnings
+                        ))
+                    } catch (e: Exception) {
+                        // Log parsing error for debugging
+                        android.util.Log.e("RouteRepository", "Error parsing route response", e)
+                        Result.failure(Exception("Error parsing response: ${e.message}"))
+                    }
                 } else {
                     Result.failure(Exception("Response body is null"))
                 }
             } else {
-                Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = if (errorBody?.isNotEmpty() == true) {
+                    try {
+                        // Intenta extraer el mensaje de error del JSON
+                        val errorJson = com.google.gson.JsonParser.parseString(errorBody).asJsonObject
+                        errorJson.get("error")?.asString ?: "Error ${response.code()}: ${response.message()}"
+                    } catch (e: Exception) {
+                        "Error ${response.code()}: ${response.message()}"
+                    }
+                } else {
+                    "Error ${response.code()}: ${response.message()}"
+                }
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)

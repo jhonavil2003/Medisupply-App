@@ -11,6 +11,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +22,7 @@ import com.misw.medisupply.domain.model.route.RouteStatus
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.RouteCard
 import com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel.RouteListViewModel
 import com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel.RouteListScreenViewModel
+import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.ui.theme.ColorTextSecondary
 import com.misw.medisupply.ui.theme.ColorTextPrimary
 import java.time.LocalDate
@@ -50,10 +52,28 @@ fun RouteListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedStringResource(R.string.route_list_title, localeViewModel.localeManager)) },
+                title = {
+                    Column {
+                        Text(
+                            text = localizedStringResource(R.string.route_list_title, localeViewModel.localeManager),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                        Text(
+                            text = localizedStringResource(R.string.sales_force_subtitle, localeViewModel.localeManager),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1565C0).copy(alpha = 0.7f)
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = localizedStringResource(R.string.route_list_go_back, localeViewModel.localeManager))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = localizedStringResource(R.string.route_list_go_back, localeViewModel.localeManager),
+                            tint = Color(0xFF1565C0)
+                        )
                     }
                 },
                 actions = {
@@ -74,14 +94,19 @@ fun RouteListScreen(
                     IconButton(onClick = { viewModel.refresh() }) {
                         Icon(Icons.Default.Refresh, contentDescription = localizedStringResource(R.string.route_list_refresh, localeViewModel.localeManager))
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFDAE5FF)
+                )
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNavigateToGenerate,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text(localizedStringResource(R.string.route_list_new_route, localeViewModel.localeManager)) }
+                text = { Text(localizedStringResource(R.string.route_list_new_route, localeViewModel.localeManager)) },
+                containerColor = Color(0xFF3C5BAA),
+                contentColor = Color.White
             )
         }
     ) { paddingValues ->
@@ -269,8 +294,9 @@ private fun RouteStatisticsCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+            containerColor = Color(0xFFE3F2FD)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier

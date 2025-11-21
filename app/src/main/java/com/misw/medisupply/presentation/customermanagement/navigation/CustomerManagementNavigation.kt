@@ -119,9 +119,43 @@ private fun CustomerManagementBottomNavigationBar(
         tonalElevation = 8.dp
     ) {
         navigationItems.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { 
-                it.route == item.route 
-            } == true
+            // Enhanced selection logic to handle sub-routes
+            val isSelected = when (item.route) {
+                CustomerManagementRoutes.SHOP -> {
+                    // Select Shop tab when in any shop-related screen (including order creation from shop)
+                    currentDestination?.hierarchy?.any { destination ->
+                        val route = destination.route
+                        route == CustomerManagementRoutes.SHOP ||
+                        route == CustomerManagementRoutes.CREATE_ORDER_PRODUCTS ||
+                        route == CustomerManagementRoutes.CREATE_ORDER_REVIEW ||
+                        route == CustomerManagementRoutes.PRODUCT_DETAIL ||
+                        route?.startsWith("${CustomerManagementRoutes.PRODUCT_DETAIL}/") == true ||
+                        route?.startsWith("customer_create_order") == true ||
+                        route?.contains("shop") == true
+                    } == true
+                }
+                CustomerManagementRoutes.ORDERS -> {
+                    // Select Orders tab when in any order-related screen (excluding creation flow from shop)
+                    currentDestination?.hierarchy?.any { destination ->
+                        val route = destination.route
+                        (route == CustomerManagementRoutes.ORDERS ||
+                        route == CustomerManagementRoutes.ORDER_DETAIL ||
+                        route?.startsWith("${CustomerManagementRoutes.ORDER_DETAIL}/") == true ||
+                        route == CustomerManagementRoutes.ORDER_TRACKING ||
+                        route?.startsWith("customer_order") == true) &&
+                        // Exclude order creation flow which belongs to Shop
+                        route != CustomerManagementRoutes.CREATE_ORDER_PRODUCTS &&
+                        route != CustomerManagementRoutes.CREATE_ORDER_REVIEW &&
+                        !route?.startsWith("customer_create_order")!!
+                    } == true
+                }
+                else -> {
+                    // Default behavior for other tabs
+                    currentDestination?.hierarchy?.any { 
+                        it.route == item.route 
+                    } == true
+                }
+            }
             
             NavigationBarItem(
                 icon = {

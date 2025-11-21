@@ -9,11 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
-import com.misw.medisupply.core.i18n.localizedStringResource
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.domain.model.route.OptimizationStrategy
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.CustomerCheckboxItem
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.LocationPickerDialog
@@ -42,19 +43,33 @@ fun GenerateRouteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedStringResource(R.string.generate_route_title, localeManager)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = localizedStringResource(R.string.generate_route_back, localeManager))
+                title = {
+                    Column {
+                        Text(
+                            text = localizedStringResource(R.string.generate_route_title, localeManager),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                        Text(
+                            text = localizedStringResource(R.string.sales_force_subtitle, localeManager),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1565C0).copy(alpha = 0.7f)
+                        )
                     }
                 },
-                actions = {
-                    if (uiState.selectedCustomerIds.isNotEmpty()) {
-                        TextButton(onClick = { viewModel.clearSelection() }) {
-                            Text(localizedStringResource(R.string.generate_route_clear_selection, localeManager, uiState.selectedCustomerIds.size))
-                        }
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            Icons.Default.ArrowBack, 
+                            contentDescription = localizedStringResource(R.string.generate_route_back, localeManager),
+                            tint = Color(0xFF1565C0)
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFDAE5FF)
+                )
             )
         },
         floatingActionButton = {
@@ -62,7 +77,9 @@ fun GenerateRouteScreen(
                 ExtendedFloatingActionButton(
                     onClick = { viewModel.generateRoute(onRouteGenerated) },
                     icon = { Icon(Icons.Default.Route, contentDescription = null) },
-                    text = { Text(localizedStringResource(R.string.generate_route_fab, localeManager)) }
+                    text = { Text(localizedStringResource(R.string.generate_route_fab, localeManager)) },
+                    containerColor = Color(0xFF3C5BAA),
+                    contentColor = Color.White
                 )
             }
         }
@@ -77,6 +94,17 @@ fun GenerateRouteScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Título de Configuración de ruta
+                item {
+                    Text(
+                        text = localizedStringResource(R.string.generate_route_configuration, localeManager),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1565C0),
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+                
                 // Sección de configuración
                 item {
                     ConfigurationSection(
@@ -115,6 +143,17 @@ fun GenerateRouteScreen(
                     }
                 }
                 
+                // Título de Seleccionar clientes
+                item {
+                    Text(
+                        text = localizedStringResource(R.string.generate_route_select_customers, localeManager),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1565C0),
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+                
                 // Sección de selección de clientes
                 item {
                     CustomerSelectionHeader(
@@ -123,7 +162,8 @@ fun GenerateRouteScreen(
                         searchQuery = uiState.searchQuery,
                         localeManager = localeManager,
                         onSearchChange = { viewModel.updateSearchQuery(it) },
-                        onSelectAll = { viewModel.selectAllFiltered() }
+                        onSelectAll = { viewModel.selectAllFiltered() },
+                        onClearSelection = { viewModel.clearSelection() }
                     )
                 }
                 
@@ -156,7 +196,7 @@ fun GenerateRouteScreen(
                         item {
                             EmptyStateCard(
                                 message = if (uiState.searchQuery.isNotEmpty()) {
-                                    localizedStringResource(R.string.generate_route_no_customers_search, localeManager, uiState.searchQuery)
+                                    localeManager.getLocalizedString(R.string.generate_route_no_customers_search, uiState.searchQuery)
                                 } else {
                                     localizedStringResource(R.string.generate_route_no_customers_gps, localeManager)
                                 }
@@ -227,6 +267,14 @@ fun GenerateRouteScreen(
         LaunchedEffect(error) {
             // Mostrar snackbar
             viewModel.clearValidationError()
+        }
+    }
+    
+    // Warnings snackbar - se muestran como información, no como errores
+    uiState.warnings.takeIf { it.isNotEmpty() }?.let { warnings ->
+        LaunchedEffect(warnings) {
+            // Mostrar warnings como información
+            viewModel.clearWarnings()
         }
     }
     
@@ -332,20 +380,14 @@ private fun ConfigurationSection(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(20.dp)
         ) {
-            Text(
-                text = localizedStringResource(R.string.generate_route_configuration, localeManager),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
             
             // Fecha
             OutlinedCard(
@@ -465,7 +507,7 @@ private fun ConfigurationSection(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = localizedStringResource(R.string.generate_route_service_time_minutes, localeManager, serviceTimeMinutes),
+                    text = localeManager.getLocalizedString(R.string.generate_route_service_time_minutes, serviceTimeMinutes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -628,26 +670,40 @@ private fun CustomerSelectionHeader(
     searchQuery: String,
     localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onSearchChange: (String) -> Unit,
-    onSelectAll: () -> Unit
+    onSelectAll: () -> Unit,
+    onClearSelection: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Botones de acción
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = localizedStringResource(R.string.generate_route_select_customers, localeManager),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            
             if (totalCount > 0) {
-                TextButton(onClick = onSelectAll) {
+                Button(
+                    onClick = onSelectAll,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF3C5BAA),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(localizedStringResource(R.string.generate_route_select_all, localeManager))
+                }
+            }
+            
+            if (selectedCount > 0) {
+                OutlinedButton(
+                    onClick = onClearSelection,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFF3C5BAA)
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(localeManager.getLocalizedString(R.string.generate_route_clear_selection, selectedCount))
                 }
             }
         }
@@ -667,7 +723,7 @@ private fun CustomerSelectionHeader(
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(
-                    text = localizedStringResource(R.string.generate_route_customers_selected, localeManager, selectedCount, totalCount),
+                    text = localeManager.getLocalizedString(R.string.generate_route_customers_selected, selectedCount, totalCount),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,

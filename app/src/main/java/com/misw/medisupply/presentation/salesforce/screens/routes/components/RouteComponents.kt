@@ -133,7 +133,7 @@ fun RouteCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(20.dp)
         ) {
             // Header con estado
             Row(
@@ -144,12 +144,14 @@ fun RouteCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Ruta #${route.id}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = route.salespersonName,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -160,28 +162,39 @@ fun RouteCard(
                 )
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            // Fecha
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            // Fecha con mejor diseño
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = route.plannedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = route.plannedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            // Métricas
+            // Métricas con mejor espaciado y diseño
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -189,19 +202,22 @@ fun RouteCard(
                 RouteMetricItem(
                     icon = Icons.Default.Store,
                     label = "Paradas",
-                    value = "${route.stops.size}"
+                    value = "${route.stops.size}",
+                    modifier = Modifier.weight(1f)
                 )
                 
                 RouteMetricItem(
                     icon = Icons.Default.Route,
                     label = "Distancia",
-                    value = String.format("%.1f km", route.metrics.totalDistanceKm)
+                    value = String.format("%.1f km", route.metrics.totalDistanceKm),
+                    modifier = Modifier.weight(1f)
                 )
                 
                 RouteMetricItem(
                     icon = Icons.Default.AccessTime,
                     label = "Tiempo",
-                    value = "${route.metrics.estimatedDurationMinutes} min"
+                    value = "${route.metrics.estimatedDurationMinutes} min",
+                    modifier = Modifier.weight(1f)
                 )
             }
             
@@ -302,29 +318,34 @@ fun RouteMetricItem(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Column(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = ColorTextSecondary
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

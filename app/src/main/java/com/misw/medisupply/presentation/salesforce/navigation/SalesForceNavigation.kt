@@ -121,9 +121,56 @@ private fun SalesForceBottomNavigationBar(
         tonalElevation = 8.dp
     ) {
         navigationItems.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { 
-                it.route == item.route 
-            } == true
+            // Enhanced selection logic to handle sub-routes
+            val isSelected = when (item.route) {
+                SalesForceRoutes.ORDERS -> {
+                    // Select Orders tab when in any order-related screen
+                    currentDestination?.hierarchy?.any { destination ->
+                        val route = destination.route
+                        route == SalesForceRoutes.ORDERS ||
+                        route == SalesForceRoutes.CUSTOMER_LIST ||
+                        route == SalesForceRoutes.CREATE_ORDER ||
+                        route == SalesForceRoutes.MY_ORDERS ||
+                        route == SalesForceRoutes.PRODUCT_SELECTION ||
+                        route?.startsWith("${SalesForceRoutes.PRODUCT_SELECTION}/") == true ||
+                        route == SalesForceRoutes.ORDER_REVIEW ||
+                        route?.startsWith("${SalesForceRoutes.ORDER_REVIEW}/") == true ||
+                        route == SalesForceRoutes.ORDER_DETAIL ||
+                        route?.startsWith("${SalesForceRoutes.ORDER_DETAIL}/") == true ||
+                        route == SalesForceRoutes.EDIT_ORDER_SELECT_PRODUCTS ||
+                        route?.startsWith("${SalesForceRoutes.EDIT_ORDER_SELECT_PRODUCTS}/") == true ||
+                        route == SalesForceRoutes.EDIT_ORDER_REVIEW ||
+                        route?.startsWith("${SalesForceRoutes.EDIT_ORDER_REVIEW}/") == true ||
+                        route?.contains("order") == true
+                    } == true
+                }
+                SalesForceRoutes.VISITS -> {
+                    // Select Visits tab when in any visit-related screen
+                    currentDestination?.hierarchy?.any { destination ->
+                        val route = destination.route
+                        route == SalesForceRoutes.VISITS ||
+                        route == SalesForceRoutes.VISIT_LIST ||
+                        route == SalesForceRoutes.CREATE_VISIT ||
+                        route == SalesForceRoutes.VISIT_DETAIL ||
+                        route?.startsWith("${SalesForceRoutes.VISIT_DETAIL}/") == true ||
+                        route == SalesForceRoutes.ROUTES ||
+                        route == SalesForceRoutes.ROUTE_LIST ||
+                        route == SalesForceRoutes.GENERATE_ROUTE ||
+                        route == SalesForceRoutes.ROUTE_DETAIL ||
+                        route?.startsWith("${SalesForceRoutes.ROUTE_DETAIL}/") == true ||
+                        route == SalesForceRoutes.ROUTE_EXECUTION ||
+                        route?.startsWith("${SalesForceRoutes.ROUTE_EXECUTION}/") == true ||
+                        route?.contains("visit") == true ||
+                        route?.contains("route") == true
+                    } == true
+                }
+                else -> {
+                    // Default behavior for other tabs
+                    currentDestination?.hierarchy?.any { 
+                        it.route == item.route 
+                    } == true
+                }
+            }
             
             NavigationBarItem(
                 icon = {
