@@ -572,4 +572,12 @@
     <string name="route_stop_complete_action">Completar</string>
     <string name="route_metrics_completed">Completadas</string>
 
+    <!-- Order Status Names -->
+    <string name="order_status_pending">Pendiente</string>
+    <string name="order_status_confirmed">Confirmada</string>
+    <string name="order_status_processing">En Procesamiento</string>
+    <string name="order_status_shipped">Despachada</string>
+    <string name="order_status_delivered">Entregada</string>
+    <string name="order_status_cancelled">Cancelada</string>
+
 </resources>

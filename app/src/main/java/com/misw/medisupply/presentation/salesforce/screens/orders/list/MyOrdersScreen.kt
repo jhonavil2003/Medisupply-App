@@ -207,7 +207,8 @@ private fun StatusDropdown(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = selectedStatus?.displayName ?: localizedStringResource(R.string.orders_all_statuses, localeManager),
+                text = selectedStatus?.let { getStatusDisplayName(it, localeManager) } 
+                    ?: localizedStringResource(R.string.orders_all_statuses, localeManager),
                 fontSize = 14.sp,
                 color = Color(0xFF212121)
             )
@@ -232,7 +233,7 @@ private fun StatusDropdown(
             )
             OrderStatus.entries.forEach { status ->
                 DropdownMenuItem(
-                    text = { Text(status.displayName) },
+                    text = { Text(getStatusDisplayName(status, localeManager)) },
                     onClick = {
                         onStatusSelected(status)
                         expanded = false
@@ -312,7 +313,7 @@ private fun OrdersList(
     Column(modifier = Modifier.fillMaxSize()) {
         // Pagination info with filter status
         val filterText = if (selectedStatus != null) {
-            " (${selectedStatus.displayName})"
+            " (${getStatusDisplayName(selectedStatus, localeManager)})"
         } else {
             ""
         }
@@ -332,6 +333,7 @@ private fun OrdersList(
             items(orders, key = { it.id ?: 0 }) { order ->
                 OrderCard(
                     order = order,
+                    localeManager = localeManager,
                     onDetailClick = { onDetailClick(order) },
                     onEditClick = { onEditClick(order) }
                 )
@@ -443,5 +445,20 @@ private fun EmptyState(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+/**
+ * Get localized display name for order status
+ */
+@Composable
+private fun getStatusDisplayName(status: OrderStatus, localeManager: com.misw.medisupply.core.i18n.LocaleManager): String {
+    return when (status) {
+        OrderStatus.PENDING -> localizedStringResource(R.string.order_status_pending, localeManager)
+        OrderStatus.CONFIRMED -> localizedStringResource(R.string.order_status_confirmed, localeManager)
+        OrderStatus.PROCESSING -> localizedStringResource(R.string.order_status_processing, localeManager)
+        OrderStatus.SHIPPED -> localizedStringResource(R.string.order_status_shipped, localeManager)
+        OrderStatus.DELIVERED -> localizedStringResource(R.string.order_status_delivered, localeManager)
+        OrderStatus.CANCELLED -> localizedStringResource(R.string.order_status_cancelled, localeManager)
     }
 }

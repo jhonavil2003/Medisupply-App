@@ -28,8 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
+import com.misw.medisupply.presentation.components.localizedStringResource
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -40,6 +43,7 @@ import java.util.Locale
 @Composable
 fun OrderCard(
     order: Order,
+    localeManager: LocaleManager,
     onDetailClick: () -> Unit,
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -229,10 +233,25 @@ fun OrderStatusBadge(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = status.displayName,
+            text = getStatusDisplayName(status, localeManager),
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = textColor
         )
+    }
+}
+
+/**
+ * Get localized display name for order status
+ */
+@Composable
+private fun getStatusDisplayName(status: OrderStatus, localeManager: LocaleManager): String {
+    return when (status) {
+        OrderStatus.PENDING -> localizedStringResource(R.string.order_status_pending, localeManager)
+        OrderStatus.CONFIRMED -> localizedStringResource(R.string.order_status_confirmed, localeManager)
+        OrderStatus.PROCESSING -> localizedStringResource(R.string.order_status_processing, localeManager)
+        OrderStatus.SHIPPED -> localizedStringResource(R.string.order_status_shipped, localeManager)
+        OrderStatus.DELIVERED -> localizedStringResource(R.string.order_status_delivered, localeManager)
+        OrderStatus.CANCELLED -> localizedStringResource(R.string.order_status_cancelled, localeManager)
     }
 }

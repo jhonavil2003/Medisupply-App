@@ -424,12 +424,12 @@ private fun FiltersSection(
 private fun getLocalizedStatusLabel(statusValue: String?, localeManager: LocaleManager): String {
     return when (statusValue) {
         "todos", null, "" -> localizedStringResource(R.string.order_all_statuses, localeManager)
-        OrderStatus.PENDING.value -> OrderStatus.PENDING.displayName
-        OrderStatus.CONFIRMED.value -> OrderStatus.CONFIRMED.displayName
-        OrderStatus.PROCESSING.value -> OrderStatus.PROCESSING.displayName
-        OrderStatus.SHIPPED.value -> OrderStatus.SHIPPED.displayName
-        OrderStatus.DELIVERED.value -> OrderStatus.DELIVERED.displayName
-        OrderStatus.CANCELLED.value -> OrderStatus.CANCELLED.displayName
+        OrderStatus.PENDING.value -> localizedStringResource(R.string.order_status_pending, localeManager)
+        OrderStatus.CONFIRMED.value -> localizedStringResource(R.string.order_status_confirmed, localeManager)
+        OrderStatus.PROCESSING.value -> localizedStringResource(R.string.order_status_processing, localeManager)
+        OrderStatus.SHIPPED.value -> localizedStringResource(R.string.order_status_shipped, localeManager)
+        OrderStatus.DELIVERED.value -> localizedStringResource(R.string.order_status_delivered, localeManager)
+        OrderStatus.CANCELLED.value -> localizedStringResource(R.string.order_status_cancelled, localeManager)
         else -> localizedStringResource(R.string.order_all_statuses, localeManager)
     }
 }
@@ -514,7 +514,7 @@ private fun OrderCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 
                 Text(
-                    text = getStatusDisplayName(order.status),
+                    text = getStatusDisplayName(order.status, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -643,8 +643,16 @@ private fun getStatusColor(status: OrderStatus): Color {
 }
 
 /**
- * Get display name for order status
+ * Get localized display name for order status
  */
-private fun getStatusDisplayName(status: OrderStatus): String {
-    return status.displayName
+@Composable
+private fun getStatusDisplayName(status: OrderStatus, localeManager: LocaleManager): String {
+    return when (status) {
+        OrderStatus.PENDING -> localizedStringResource(R.string.order_status_pending, localeManager)
+        OrderStatus.CONFIRMED -> localizedStringResource(R.string.order_status_confirmed, localeManager)
+        OrderStatus.PROCESSING -> localizedStringResource(R.string.order_status_processing, localeManager)
+        OrderStatus.SHIPPED -> localizedStringResource(R.string.order_status_shipped, localeManager)
+        OrderStatus.DELIVERED -> localizedStringResource(R.string.order_status_delivered, localeManager)
+        OrderStatus.CANCELLED -> localizedStringResource(R.string.order_status_cancelled, localeManager)
+    }
 }

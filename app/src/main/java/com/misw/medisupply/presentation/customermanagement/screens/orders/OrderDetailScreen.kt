@@ -236,7 +236,7 @@ private fun OrderHeaderCard(order: Order, localeManager: LocaleManager) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = order.status.displayName,
+                    text = getStatusDisplayName(order.status, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = getStatusColor(order.status)
@@ -495,4 +495,19 @@ private fun formatDate(date: Date?): String {
 private fun formatCurrency(amount: Double): String {
     val format = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
     return format.format(amount)
+}
+
+/**
+ * Get localized display name for order status
+ */
+@Composable
+private fun getStatusDisplayName(status: OrderStatus, localeManager: LocaleManager): String {
+    return when (status) {
+        OrderStatus.PENDING -> localizedStringResource(R.string.order_status_pending, localeManager)
+        OrderStatus.CONFIRMED -> localizedStringResource(R.string.order_status_confirmed, localeManager)
+        OrderStatus.PROCESSING -> localizedStringResource(R.string.order_status_processing, localeManager)
+        OrderStatus.SHIPPED -> localizedStringResource(R.string.order_status_shipped, localeManager)
+        OrderStatus.DELIVERED -> localizedStringResource(R.string.order_status_delivered, localeManager)
+        OrderStatus.CANCELLED -> localizedStringResource(R.string.order_status_cancelled, localeManager)
+    }
 }
