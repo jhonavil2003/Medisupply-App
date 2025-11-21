@@ -90,7 +90,10 @@ fun OrderCard(
                 }
                 
                 // Status badge
-                OrderStatusBadge(status = order.status)
+                OrderStatusBadge(
+                    status = order.status,
+                    localeManager = localeManager
+                )
             }
             
             Spacer(modifier = Modifier.height(10.dp))
@@ -212,6 +215,7 @@ fun OrderCard(
 @Composable
 fun OrderStatusBadge(
     status: OrderStatus,
+    localeManager: LocaleManager,
     modifier: Modifier = Modifier
 ) {
     val (backgroundColor, textColor) = when (status) {

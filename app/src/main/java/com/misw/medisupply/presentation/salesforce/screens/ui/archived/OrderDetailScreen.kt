@@ -301,7 +301,7 @@ private fun OrderHeaderCard(
                     )
                 }
                 
-                OrderStatusBadge(status = order.status)
+                // OrderStatusBadge(status = order.status) // Temporarily commented for localization
             }
             
             Spacer(modifier = Modifier.height(12.dp))

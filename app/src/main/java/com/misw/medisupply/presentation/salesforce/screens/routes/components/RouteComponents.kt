@@ -18,11 +18,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.route.Route
 import com.misw.medisupply.domain.model.route.RouteMetrics
 import com.misw.medisupply.domain.model.route.RouteStatus
 import com.misw.medisupply.domain.model.route.RouteStop
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.ui.theme.ColorPrimaryDark
 import com.misw.medisupply.ui.theme.ColorSuccess
 import com.misw.medisupply.ui.theme.ColorWarning
@@ -114,6 +117,7 @@ fun CustomerCheckboxItem(
 @Composable
 fun RouteCard(
     route: Route,
+    localeManager: LocaleManager,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -150,7 +154,10 @@ fun RouteCard(
                     )
                 }
                 
-                RouteStatusChip(status = route.status)
+                RouteStatusChip(
+                    status = route.status,
+                    localeManager = localeManager
+                )
             }
             
             Spacer(modifier = Modifier.height(12.dp))

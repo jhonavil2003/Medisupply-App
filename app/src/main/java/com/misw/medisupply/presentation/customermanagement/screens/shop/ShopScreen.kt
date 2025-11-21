@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.core.utils.FormatUtils
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.presentation.common.components.ErrorView
+import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.customermanagement.viewmodel.CustomerShopViewModel
 import com.misw.medisupply.R
@@ -65,6 +66,13 @@ fun ShopScreen(
     val uiState by viewModel.uiState.collectAsState()
     
     Scaffold(
+        topBar = {
+            MedisupplyAppBar(
+                title = localizedStringResource(R.string.nav_shop, viewModel.localeManager),
+                subtitle = localizedStringResource(R.string.customer_home_subtitle, viewModel.localeManager),
+                onNavigateBack = null // No back button for main tabs
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToCreateOrder) {
                 Icon(

@@ -19,6 +19,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +31,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.customermanagement.viewmodel.CustomerShopViewModel
 import com.misw.medisupply.ui.theme.NavBarBackground
 import com.misw.medisupply.ui.theme.NavBarIconBlue
 import com.misw.medisupply.ui.theme.NavBarIconGreen
@@ -44,11 +49,17 @@ fun CustomerManagementNavigation(
     onNavigateToRoleSelection: () -> Unit = {}
 ) {
     val navController = rememberNavController()
+    // Get LocaleManager from a ViewModel for navigation
+    val viewModel: CustomerShopViewModel = hiltViewModel()
+    val localeManager = viewModel.localeManager
     
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            CustomerManagementBottomNavigationBar(navController = navController)
+            CustomerManagementBottomNavigationBar(
+                navController = navController,
+                localeManager = localeManager
+            )
         }
     ) { paddingValues ->
         CustomerManagementNavGraph(
@@ -64,34 +75,38 @@ fun CustomerManagementNavigation(
  * Shows navigation items specific to self-service clients
  */
 @Composable
-private fun CustomerManagementBottomNavigationBar(navController: NavHostController) {
+private fun CustomerManagementBottomNavigationBar(
+    navController: NavHostController,
+    localeManager: LocaleManager
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
     
     val navigationItems = listOf(
         NavigationItem(
-            title = stringResource(R.string.nav_home),
+            title = localizedStringResource(R.string.nav_home, localeManager),
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = CustomerManagementRoutes.HOME,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = stringResource(R.string.nav_shop),
+            title = localizedStringResource(R.string.nav_shop, localeManager),
             selectedIcon = Icons.Filled.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
             route = CustomerManagementRoutes.SHOP,
             iconColor = NavBarIconGreen
         ),
         NavigationItem(
-            title = stringResource(R.string.nav_orders),
+            title = localizedStringResource(R.string.nav_orders, localeManager),
             selectedIcon = Icons.Filled.Receipt,
             unselectedIcon = Icons.Outlined.Receipt,
             route = CustomerManagementRoutes.ORDERS,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = stringResource(R.string.nav_account),
+            title = localizedStringResource(R.string.nav_account, localeManager),
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
             route = CustomerManagementRoutes.ACCOUNT,

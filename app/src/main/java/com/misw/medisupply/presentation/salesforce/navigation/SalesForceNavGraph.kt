@@ -442,7 +442,9 @@ fun SalesForceNavGraph(
             )
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getInt("routeId") ?: 0
-            RouteDetailScreen(
+            // RouteDetailScreen temporarily commented for localization
+            // TODO: Fix this after resolving LocaleManager architecture
+            /*RouteDetailScreen(
                 routeId = routeId,
                 onNavigateBack = {
                     navController.popBackStack()
@@ -450,7 +452,7 @@ fun SalesForceNavGraph(
                 onNavigateToExecution = { routeIdToExecute ->
                     navController.navigate(VisitRouteNavigation.execution(routeIdToExecute))
                 }
-            )
+            )*/
         }
         
         // Route Execution Screen - Ejecución de ruta en tiempo real

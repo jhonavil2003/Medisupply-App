@@ -544,13 +544,6 @@
     <string name="route_info_completed">Completed</string>
     <string name="route_info_stops">Stops (%1$d)</string>
     
-    <!-- Route Status -->
-    <string name="route_status_draft">Draft</string>
-    <string name="route_status_confirmed">Confirmed</string>
-    <string name="route_status_in_progress">In progress</string>
-    <string name="route_status_completed">Completed</string>
-    <string name="route_status_cancelled">Cancelled</string>
-    
     <!-- Route Actions and Dialogs -->
     <string name="route_action_confirm">Confirm</string>
     <string name="route_action_start">Start</string>

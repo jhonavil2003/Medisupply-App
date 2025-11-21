@@ -544,13 +544,6 @@
     <string name="route_info_completed">Completada</string>
     <string name="route_info_stops">Paradas (%1$d)</string>
     
-    <!-- Route Status -->
-    <string name="route_status_draft">Borrador</string>
-    <string name="route_status_confirmed">Confirmada</string>
-    <string name="route_status_in_progress">En progreso</string>
-    <string name="route_status_completed">Completada</string>
-    <string name="route_status_cancelled">Cancelada</string>
-    
     <!-- Route Actions and Dialogs -->
     <string name="route_action_confirm">Confirmar</string>
     <string name="route_action_start">Iniciar</string>

@@ -21,6 +21,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +33,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.VisitHomeViewModel
 import com.misw.medisupply.ui.theme.NavBarBackground
 import com.misw.medisupply.ui.theme.NavBarIconBlue
 import com.misw.medisupply.ui.theme.NavBarIconGreen
@@ -46,11 +51,17 @@ fun SalesForceNavigation(
     onNavigateToRoleSelection: () -> Unit = {}
 ) {
     val navController = rememberNavController()
+    // Get LocaleManager from a ViewModel for navigation
+    val viewModel: VisitHomeViewModel = hiltViewModel()
+    val localeManager = viewModel.localeManager
     
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            SalesForceBottomNavigationBar(navController = navController)
+            SalesForceBottomNavigationBar(
+                navController = navController,
+                localeManager = localeManager
+            )
         }
     ) { paddingValues ->
         SalesForceNavGraph(
@@ -66,34 +77,38 @@ fun SalesForceNavigation(
  * Shows navigation items specific to internal staff
  */
 @Composable
-private fun SalesForceBottomNavigationBar(navController: NavHostController) {
+private fun SalesForceBottomNavigationBar(
+    navController: NavHostController,
+    localeManager: LocaleManager
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
     
     val navigationItems = listOf(
         NavigationItem(
-            title = stringResource(R.string.nav_home),
+            title = localizedStringResource(R.string.nav_home, localeManager),
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = SalesForceRoutes.HOME,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = stringResource(R.string.nav_visits),
+            title = localizedStringResource(R.string.nav_visits, localeManager),
             selectedIcon = Icons.Filled.Route,
             unselectedIcon = Icons.Outlined.Route,
             route = SalesForceRoutes.VISITS,
             iconColor = NavBarIconGreen
         ),
         NavigationItem(
-            title = stringResource(R.string.nav_orders),
+            title = localizedStringResource(R.string.nav_orders, localeManager),
             selectedIcon = Icons.Filled.Archive,
             unselectedIcon = Icons.Outlined.Archive,
             route = SalesForceRoutes.ORDERS,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = stringResource(R.string.nav_performance),
+            title = localizedStringResource(R.string.nav_performance, localeManager),
             selectedIcon = Icons.Filled.BarChart,
             unselectedIcon = Icons.Outlined.BarChart,
             route = SalesForceRoutes.PERFORMANCE,

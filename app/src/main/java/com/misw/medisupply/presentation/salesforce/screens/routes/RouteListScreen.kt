@@ -154,6 +154,7 @@ fun RouteListScreen(
                             ) { route ->
                                 RouteCard(
                                     route = route,
+                                    localeManager = localeViewModel.localeManager,
                                     onClick = { onNavigateToDetail(route.id) }
                                 )
                             }
