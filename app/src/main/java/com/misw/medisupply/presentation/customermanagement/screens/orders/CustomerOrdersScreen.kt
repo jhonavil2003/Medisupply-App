@@ -42,8 +42,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
@@ -68,6 +66,7 @@ import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderTrackingViewModel
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderTrackingUiState
 import java.text.NumberFormat
@@ -100,39 +99,10 @@ fun CustomerOrdersScreen(
     
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        localizedStringResource(R.string.order_tracking_title, localeManager),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = { viewModel.toggleFiltersVisibility() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = localizedStringResource(R.string.filters_description, localeManager),
-                            tint = if (uiState.showFilters || uiState.hasActiveFilters) 
-                                MaterialTheme.colorScheme.primary 
-                            else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    IconButton(
-                        onClick = { viewModel.loadOrders() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = localizedStringResource(R.string.refresh_description, localeManager)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
+            MedisupplyAppBar(
+                title = localizedStringResource(R.string.order_tracking_title, localeManager),
+                subtitle = localizedStringResource(R.string.order_tracking_subtitle, localeManager),
+                onNavigateBack = null // No back button for main tabs
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -143,6 +113,33 @@ fun CustomerOrdersScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Action buttons row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = { viewModel.toggleFiltersVisibility() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = localizedStringResource(R.string.filters_description, localeManager),
+                        tint = if (uiState.showFilters || uiState.hasActiveFilters) 
+                            MaterialTheme.colorScheme.primary 
+                        else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                IconButton(
+                    onClick = { viewModel.loadOrders() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = localizedStringResource(R.string.refresh_description, localeManager)
+                    )
+                }
+            }
             // Filters Section
             AnimatedVisibility(visible = uiState.showFilters) {
                 FiltersSection(
@@ -177,8 +174,8 @@ fun CustomerOrdersScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(uiState.orders) { order ->
                             OrderCard(
@@ -232,7 +229,7 @@ private fun FiltersSection(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 24.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
@@ -452,12 +449,12 @@ private fun OrderCard(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(20.dp)
         ) {
             // Order Header
             Row(
@@ -481,14 +478,14 @@ private fun OrderCard(
                     )
                 }
                 
-                Button(
+                OutlinedButton(
                     onClick = {
                         Log.d("CustomerOrdersScreen", "Click en botón Detalle para pedido: ${order.orderNumber}")
                         onDetailClick()
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Color.Transparent
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {

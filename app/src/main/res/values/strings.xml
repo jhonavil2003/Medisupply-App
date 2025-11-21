@@ -203,6 +203,7 @@
     
     <!-- Order Tracking Screen -->
     <string name="order_tracking_title">Seguimiento de entregas</string>
+    <string name="order_tracking_subtitle">Gestiona y revisa el estado de tus pedidos</string>
     <string name="filters_description">Filtros</string>
     <string name="refresh_description">Actualizar</string>
     <string name="filters_section_title">Filtros</string>
