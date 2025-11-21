@@ -18,18 +18,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -47,16 +51,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.material3.ButtonDefaults
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
+import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.orders.list.components.FilterModal
+import com.misw.medisupply.presentation.salesforce.screens.orders.list.DateRange
 import com.misw.medisupply.presentation.salesforce.screens.orders.list.viewmodel.MyOrdersScreenViewModel
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.ErrorView
-import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.salesforce.components.OrderCard
 
 /**
@@ -79,6 +84,9 @@ fun MyOrdersScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
     
+    // Filter modal state
+    var showFilterModal by remember { mutableStateOf(false) }
+    
     // Reload orders when screen is displayed
     LaunchedEffect(Unit) {
         viewModel.onEvent(MyOrdersEvent.LoadOrders)
@@ -94,10 +102,50 @@ fun MyOrdersScreen(
     
     Scaffold(
         topBar = {
-            MedisupplyAppBar(
-                title = localizedStringResource(R.string.my_orders_title, localeManager),
-                subtitle = localizedStringResource(R.string.orders_subtitle, localeManager),
-                onNavigateBack = onNavigateBack
+            TopAppBar(
+                title = { 
+                    Column {
+                        Text(
+                            text = localizedStringResource(R.string.my_orders_title, localeManager),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                        Text(
+                            text = localizedStringResource(R.string.orders_subtitle, localeManager),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1565C0).copy(alpha = 0.7f)
+                        )
+                    }
+                },
+                navigationIcon = {
+                    onNavigateBack?.let { callback ->
+                        IconButton(onClick = callback) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Volver",
+                                tint = Color(0xFF1565C0)
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { showFilterModal = true }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Filtros",
+                            tint = if (state.hasActiveFilters()) Color(0xFF4CAF50) else Color(0xFF1565C0)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFDAE5FF),
+                    titleContentColor = Color(0xFF1565C0),
+                    navigationIconContentColor = Color(0xFF1565C0),
+                    actionIconContentColor = Color(0xFF1565C0)
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -113,20 +161,24 @@ fun MyOrdersScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp)
+                    .padding(top = 12.dp)
             ) {
-                // Dropdown filter
-                StatusDropdown(
-                    selectedStatus = state.selectedStatus,
-                    onStatusSelected = { viewModel.onEvent(MyOrdersEvent.FilterByStatus(it)) },
-                    localeManager = localeManager
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
+                // Active filters indicator
+                if (state.hasActiveFilters()) {
+                    ActiveFiltersCard(
+                        selectedStatus = state.selectedStatus,
+                        selectedCustomerId = state.selectedCustomerId,
+                        selectedDateRange = state.selectedDateRange,
+                        customers = state.customers,
+                        localeManager = localeManager,
+                        onClearFilters = { viewModel.onEvent(MyOrdersEvent.ClearFilters) }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
                 
                 // Content
                 when {
-                    state.isLoading && !state.isRefreshing -> {
+                    state.isLoading -> {
                         LoadingIndicator()
                     }
                     state.error != null && !state.hasOrders() -> {
@@ -142,28 +194,15 @@ fun MyOrdersScreen(
                         } else {
                             OrdersList(
                                 orders = filteredOrders,
-                                currentPage = state.currentPage,
-                                totalPages = state.totalPages,
-                                totalOrders = state.totalOrders,
-                                hasMore = state.hasMore && state.currentPage < state.totalPages,
-                                hasPrevious = state.currentPage > 1,
-                                isLoadingMore = state.isLoadingMore,
-                                selectedStatus = state.selectedStatus,
+                                totalOrders = state.getTotalFilteredOrderCount(),
                                 localeManager = localeManager,
                                 onDetailClick = { order: Order ->
-                                    // TODO: Navigate to detail
                                     viewModel.onEvent(MyOrdersEvent.SelectOrder(order))
                                 },
                                 onEditClick = { order: Order ->
                                     order.id?.let { orderId ->
                                         onNavigateToEditOrder(orderId.toString())
                                     }
-                                },
-                                onLoadMore = {
-                                    viewModel.onEvent(MyOrdersEvent.LoadNextPage)
-                                },
-                                onLoadPrevious = {
-                                    viewModel.onEvent(MyOrdersEvent.LoadPreviousPage)
                                 }
                             )
                         }
@@ -174,70 +213,94 @@ fun MyOrdersScreen(
                 }
             }
         }
+        
+        // Filter Modal
+        if (showFilterModal) {
+            FilterModal(
+                selectedStatus = state.selectedStatus,
+                selectedCustomerId = state.selectedCustomerId,
+                selectedDateRange = state.selectedDateRange,
+                customers = state.customers,
+                localeManager = localeManager,
+                onStatusSelected = { viewModel.onEvent(MyOrdersEvent.FilterByStatus(it)) },
+                onCustomerSelected = { viewModel.onEvent(MyOrdersEvent.FilterByCustomer(it)) },
+                onDateRangeSelected = { viewModel.onEvent(MyOrdersEvent.FilterByDateRange(it)) },
+                onApplyFilters = { /* Filters are applied immediately */ },
+                onClearFilters = { viewModel.onEvent(MyOrdersEvent.ClearFilters) },
+                onDismiss = { showFilterModal = false }
+            )
+        }
     }
 }
 
 /**
- * Dropdown for status filter
+ * Active filters indicator card
  */
 @Composable
-private fun StatusDropdown(
+private fun ActiveFiltersCard(
     selectedStatus: OrderStatus?,
-    onStatusSelected: (OrderStatus?) -> Unit,
+    selectedCustomerId: Int?,
+    selectedDateRange: DateRange?,
+    customers: List<Customer>,
     localeManager: com.misw.medisupply.core.i18n.LocaleManager,
-    modifier: Modifier = Modifier
+    onClearFilters: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { expanded = true },
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Color(0xFFE8F5E9)
         ),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = selectedStatus?.let { getStatusDisplayName(it, localeManager) } 
-                    ?: localizedStringResource(R.string.orders_all_statuses, localeManager),
-                fontSize = 14.sp,
-                color = Color(0xFF212121)
-            )
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = localizedStringResource(R.string.orders_filter_action, localeManager),
-                tint = Color(0xFF757575)
-            )
-        }
-        
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-            DropdownMenuItem(
-                text = { Text(localizedStringResource(R.string.orders_all_statuses, localeManager)) },
-                onClick = {
-                    onStatusSelected(null)
-                    expanded = false
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Filtros activos",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF2E7D32)
+                )
+                
+                val filterTexts = mutableListOf<String>()
+                
+                selectedStatus?.let {
+                    filterTexts.add(getStatusDisplayName(it, localeManager))
                 }
-            )
-            OrderStatus.entries.forEach { status ->
-                DropdownMenuItem(
-                    text = { Text(getStatusDisplayName(status, localeManager)) },
-                    onClick = {
-                        onStatusSelected(status)
-                        expanded = false
+                
+                selectedCustomerId?.let { customerId ->
+                    customers.find { it.id == customerId }?.let { customer ->
+                        filterTexts.add(customer.getDisplayName())
                     }
+                }
+                
+                selectedDateRange?.let {
+                    filterTexts.add("Rango de fechas")
+                }
+                
+                Text(
+                    text = filterTexts.joinToString(", "),
+                    fontSize = 11.sp,
+                    color = Color(0xFF388E3C)
+                )
+            }
+            
+            Button(
+                onClick = onClearFilters,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                ),
+                modifier = Modifier.height(32.dp)
+            ) {
+                Text(
+                    text = "Limpiar",
+                    fontSize = 11.sp
                 )
             }
         }
@@ -291,35 +354,21 @@ private fun EmptyFilteredState(
 }
 
 /**
- * Orders list component with pagination buttons (like product catalog)
+ * Orders list component without pagination
  */
 @Composable
 private fun OrdersList(
     orders: List<Order>,
-    currentPage: Int,
-    totalPages: Int,
     totalOrders: Int,
-    hasMore: Boolean,
-    hasPrevious: Boolean,
-    isLoadingMore: Boolean,
-    selectedStatus: OrderStatus? = null,
     localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onDetailClick: (Order) -> Unit,
     onEditClick: (Order) -> Unit,
-    onLoadMore: () -> Unit,
-    onLoadPrevious: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Pagination info with filter status
-        val filterText = if (selectedStatus != null) {
-            " (${getStatusDisplayName(selectedStatus, localeManager)})"
-        } else {
-            ""
-        }
+        // Orders count info
         Text(
-            text = localizedStringResource(R.string.orders_pagination_info, localeManager)
-                .format(currentPage, totalPages, totalOrders) + filterText,
+            text = "$totalOrders pedidos encontrados",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -328,7 +377,8 @@ private fun OrdersList(
         // Orders list
         LazyColumn(
             modifier = modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 8.dp)
         ) {
             items(orders, key = { it.id ?: 0 }) { order ->
                 OrderCard(
@@ -339,83 +389,10 @@ private fun OrdersList(
                 )
             }
         }
-        
-        // Pagination buttons (like products)
-        if (totalPages > 1) {
-            Spacer(modifier = Modifier.height(16.dp))
-            PaginationButtons(
-                hasPrev = hasPrevious,
-                hasNext = hasMore,
-                isLoading = isLoadingMore,
-                currentPage = currentPage,
-                totalPages = totalPages,
-                localeManager = localeManager,
-                onPreviousClick = onLoadPrevious,
-                onNextClick = onLoadMore
-            )
-        }
     }
 }
 
-/**
- * Pagination buttons component (same style as product catalog)
- */
-@Composable
-private fun PaginationButtons(
-    hasPrev: Boolean,
-    hasNext: Boolean,
-    isLoading: Boolean,
-    currentPage: Int,
-    totalPages: Int,
-    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
-    onPreviousClick: () -> Unit,
-    onNextClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Previous button
-        Button(
-            onClick = onPreviousClick,
-            enabled = hasPrev && !isLoading,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(localizedStringResource(R.string.orders_previous_button, localeManager))
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // Page indicator
-        Text(
-            text = "$currentPage / $totalPages",
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // Next button
-        Button(
-            onClick = onNextClick,
-            enabled = hasNext && !isLoading,
-            modifier = Modifier.weight(1f)
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text(localizedStringResource(R.string.orders_next_button, localeManager))
-            }
-        }
-    }
-}
+
 
 /**
  * Empty state when no orders exist
