@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +53,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CartItemCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
@@ -119,37 +121,206 @@ fun CustomerOrderReviewScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Sección específica para clientes: Selección de fecha de entrega
-            CustomerDeliveryDateSection(
-                selectedDate = selectedDeliveryDate,
-                onDateSelected = { selectedDeliveryDate = it },
-                viewModel = viewModel
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // SOLUCIÓN TEMPORAL: Extraer el contenido de OrderReviewScreen sin su Scaffold
-            // Para evitar el AppBar duplicado, creamos el contenido directamente aquí
-            OrderReviewContent(
-                customer = staticCustomer,
-                cartItems = cartItems,
-                onOrderSuccess = { orderNumber ->
-                    println("DEBUG: Orden $orderNumber creada con fecha de entrega preferida: $selectedDeliveryDate")
-                    // TODO: En versiones futuras, enviar la fecha al backend
-                    onOrderSuccess(orderNumber)
-                },
-                viewModel = viewModel
-            )
-        }
+        CustomerOrderReviewContent(
+            customer = staticCustomer,
+            cartItems = cartItems,
+            selectedDeliveryDate = selectedDeliveryDate,
+            onDateSelected = { selectedDeliveryDate = it },
+            onOrderSuccess = { orderNumber ->
+                println("DEBUG: Orden $orderNumber creada con fecha de entrega preferida: $selectedDeliveryDate")
+                onOrderSuccess(orderNumber)
+            },
+            viewModel = viewModel,
+            paddingValues = paddingValues
+        )
     }
 }
 
+/**
+ * Contenido combinado del review del pedido con selección de fecha de entrega
+ */
+@Composable
+private fun CustomerOrderReviewContent(
+    customer: Customer,
+    cartItems: Map<String, CartItem>,
+    selectedDeliveryDate: String,
+    onDateSelected: (String) -> Unit,
+    onOrderSuccess: (String) -> Unit,
+    viewModel: OrderViewModel,
+    paddingValues: PaddingValues
+) {
+    val state by viewModel.state.collectAsState()
+    
+    // Pre-calculate localized strings for dialogs
+    val localeManager = viewModel.localeManager
+    val notAvailableText = localizedStringResource(R.string.label_not_available, localeManager)
+    val orderSuccessText = localizedStringResource(R.string.order_created_success, localeManager)
+    val unknownErrorText = localizedStringResource(R.string.error_unknown, localeManager)
+    
+    // Dialog states
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
+    // Calculate totals
+    val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
+    val itemCount = cartItems.values.sumOf { it.quantity }
+
+    // Handle order success result
+    LaunchedEffect(state.createdOrder) {
+        if (state.createdOrder != null && !showSuccessDialog) {
+            showSuccessDialog = true
+        }
+    }
+
+    // Handle error result
+    LaunchedEffect(state.error) {
+        if (state.error != null && !showErrorDialog) {
+            showErrorDialog = true
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp)
+    ) {
+        // Customer Delivery Date Section
+        item {
+            SectionTitle(text = localizedStringResource(R.string.delivery_date_title, viewModel.localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomerDeliveryDateSection(
+                selectedDate = selectedDeliveryDate,
+                onDateSelected = onDateSelected,
+                viewModel = viewModel
+            )
+        }
+        
+        // Customer Information Section
+        item {
+            SectionTitle(text = localizedStringResource(R.string.customer_info_section, viewModel.localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomerSummaryCard(customer = customer)
+        }
+
+        // Order Items Section
+        item {
+            val itemText = if (itemCount == 1) {
+                localizedStringResource(R.string.product_item, viewModel.localeManager)
+            } else {
+                localizedStringResource(R.string.product_items, viewModel.localeManager)
+            }
+            SectionTitle(
+                text = String.format(
+                    localizedStringResource(R.string.products_section, viewModel.localeManager),
+                    itemCount,
+                    itemText
+                )
+            )
+        }
+
+        items(cartItems.values.toList()) { cartItem ->
+            CartItemCard(cartItem = cartItem)
+        }
+
+        // Order Summary Section
+        item {
+            SectionTitle(text = localizedStringResource(R.string.order_summary_section, viewModel.localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            OrderSummaryCard(
+                subtotal = subtotal,
+                tax = 0f,
+                total = subtotal
+            )
+        }
+
+        // Create Order Button
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Button(
+                onClick = {
+                    showConfirmDialog = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                enabled = !state.isLoading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                )
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(localizedStringResource(R.string.creating_order, viewModel.localeManager))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = localizedStringResource(R.string.button_confirm_order, viewModel.localeManager),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+    
+    // Dialogs
+    if (showConfirmDialog) {
+        ConfirmOrderDialog(
+            isEditMode = false,
+            localeManager = localeManager,
+            onConfirm = {
+                showConfirmDialog = false
+                viewModel.createOrder(
+                    customer = customer,
+                    cartItems = cartItems
+                )
+            },
+            onDismiss = { showConfirmDialog = false }
+        )
+    }
+    
+    if (showSuccessDialog) {
+        state.createdOrder?.let { order ->
+            SuccessDialog(
+                orderNumber = order.orderNumber ?: notAvailableText,
+                message = orderSuccessText,
+                localeManager = localeManager,
+                onDismiss = { 
+                    showSuccessDialog = false
+                    order.orderNumber?.let { orderNumber ->
+                        onOrderSuccess(orderNumber)
+                    }
+                }
+            )
+        }
+    }
+    
+    if (showErrorDialog) {
+        ErrorDialog(
+            errorMessage = state.error ?: unknownErrorText,
+            onDismiss = { 
+                showErrorDialog = false 
+                viewModel.clearError()
+            }
+        )
+    }
+}
 
 /**
  * Sección específica para clientes para seleccionar fecha de entrega
@@ -201,24 +372,13 @@ private fun CustomerDeliveryDateSection(
     )
     
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = localizedStringResource(R.string.delivery_date_title, viewModel.localeManager),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = androidx.compose.ui.graphics.Color(0xFF1565C0)
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
             // Mensaje informativo con el mismo estilo que CreateVisitScreen
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -327,173 +487,6 @@ private fun CustomDatePickerDialog(
         }
     ) {
         DatePicker(state = datePickerState)
-    }
-}
-
-/**
- * Contenido de OrderReview sin el Scaffold para evitar AppBar duplicado
- */
-@Composable
-private fun OrderReviewContent(
-    customer: Customer,
-    cartItems: Map<String, CartItem>,
-    onOrderSuccess: (String) -> Unit,
-    viewModel: OrderViewModel
-) {
-    val state by viewModel.state.collectAsState()
-    
-    // Pre-calculate localized strings for dialogs
-    val localeManager = viewModel.localeManager
-    val notAvailableText = localizedStringResource(R.string.label_not_available, localeManager)
-    val orderSuccessText = localizedStringResource(R.string.order_created_success, localeManager)
-    val unknownErrorText = localizedStringResource(R.string.error_unknown, localeManager)
-    
-    // Dialog states
-    var showConfirmDialog by remember { mutableStateOf(false) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-
-    // Calculate totals
-    val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
-    val itemCount = cartItems.values.sumOf { it.quantity }
-
-    // Handle order success result
-    LaunchedEffect(state.createdOrder) {
-        if (state.createdOrder != null && !showSuccessDialog) {
-            showSuccessDialog = true
-        }
-    }
-
-    // Handle error result
-    LaunchedEffect(state.error) {
-        if (state.error != null && !showErrorDialog) {
-            showErrorDialog = true
-        }
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Customer Information Section
-        item {
-            SectionTitle(text = localizedStringResource(R.string.customer_info_section, viewModel.localeManager))
-            CustomerSummaryCard(customer = customer)
-        }
-
-        // Order Items Section
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            val itemText = if (itemCount == 1) {
-                localizedStringResource(R.string.product_item, viewModel.localeManager)
-            } else {
-                localizedStringResource(R.string.product_items, viewModel.localeManager)
-            }
-            SectionTitle(
-                text = String.format(
-                    localizedStringResource(R.string.products_section, viewModel.localeManager),
-                    itemCount,
-                    itemText
-                )
-            )
-        }
-
-        items(cartItems.values.toList()) { cartItem ->
-            CartItemCard(cartItem = cartItem)
-        }
-
-        // Order Summary Section
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionTitle(text = localizedStringResource(R.string.order_summary_section, viewModel.localeManager))
-            OrderSummaryCard(
-                subtotal = subtotal,
-                tax = 0f,
-                total = subtotal
-            )
-        }
-
-        // Create Order Button
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Button(
-                onClick = {
-                    showConfirmDialog = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                enabled = !state.isLoading
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(localizedStringResource(R.string.creating_order, viewModel.localeManager))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = localizedStringResource(R.string.button_confirm_order, viewModel.localeManager),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(80.dp))
-        }
-    }
-    
-    // Dialogs
-    if (showConfirmDialog) {
-        ConfirmOrderDialog(
-            isEditMode = false,
-            localeManager = localeManager,
-            onConfirm = {
-                showConfirmDialog = false
-                viewModel.createOrder(
-                    customer = customer,
-                    cartItems = cartItems
-                )
-            },
-            onDismiss = { showConfirmDialog = false }
-        )
-    }
-    
-    if (showSuccessDialog) {
-        state.createdOrder?.let { order ->
-            SuccessDialog(
-                orderNumber = order.orderNumber ?: notAvailableText,
-                message = orderSuccessText,
-                localeManager = localeManager,
-                onDismiss = { 
-                    showSuccessDialog = false
-                    order.orderNumber?.let { orderNumber ->
-                        onOrderSuccess(orderNumber)
-                    }
-                }
-            )
-        }
-    }
-    
-    if (showErrorDialog) {
-        ErrorDialog(
-            errorMessage = state.error ?: unknownErrorText,
-            onDismiss = { 
-                showErrorDialog = false 
-                viewModel.clearError()
-            }
-        )
     }
 }
 

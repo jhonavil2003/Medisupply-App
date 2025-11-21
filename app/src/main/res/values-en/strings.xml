@@ -182,6 +182,10 @@
     
     <!-- Order Detail Screen -->
     <string name="order_detail_title">Order Detail</string>
+    <string name="order_detail_main_title">Purchase Order</string>
+    <string name="order_data_section_title">Order Data</string>
+    <string name="customer_data_section_title">Customer Data</string>
+    <string name="medisupply_data_section_title">Medisupply Data</string>
     <string name="back_button_description">Back</string>
     <string name="unknown_error">Unknown error</string>
     <string name="order_header_date_label">Order date:</string>
@@ -203,6 +207,7 @@
     
     <!-- Order Tracking Screen -->
     <string name="order_tracking_title">Delivery Tracking</string>
+    <string name="order_tracking_subtitle">Check your order status</string>
     <string name="filters_description">Filters</string>
     <string name="refresh_description">Refresh</string>
     <string name="filters_section_title">Filters</string>

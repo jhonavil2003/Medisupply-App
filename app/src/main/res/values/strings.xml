@@ -182,6 +182,10 @@
     
     <!-- Order Detail Screen -->
     <string name="order_detail_title">Detalle del Pedido</string>
+    <string name="order_detail_main_title">Órden de compra</string>
+    <string name="order_data_section_title">Datos de la órden</string>
+    <string name="customer_data_section_title">Datos del cliente</string>
+    <string name="medisupply_data_section_title">Datos de Medisupply</string>
     <string name="back_button_description">Volver</string>
     <string name="unknown_error">Error desconocido</string>
     <string name="order_header_date_label">Fecha de la orden:</string>
@@ -203,7 +207,7 @@
     
     <!-- Order Tracking Screen -->
     <string name="order_tracking_title">Seguimiento de entregas</string>
-    <string name="order_tracking_subtitle">Gestiona y revisa el estado de tus pedidos</string>
+    <string name="order_tracking_subtitle">Revisa el estado de tus pedidos</string>
     <string name="filters_description">Filtros</string>
     <string name="refresh_description">Actualizar</string>
     <string name="filters_section_title">Filtros</string>

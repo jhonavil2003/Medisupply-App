@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -246,23 +247,25 @@ fun ProductSelectionScreen(
 @Composable
 private fun CustomerInfoCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(140.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Color(0xFFD6E3FF)
         )
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
             Text(
                 text = localizedStringResource(R.string.selected_customer_label, localeManager),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF1565C0)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -932,7 +935,11 @@ private fun CartBottomBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                )
             ) {
                 Text(
                     text = if (mode == Mode.EDIT) localizedStringResource(R.string.update_order_button, localeManager) else localizedStringResource(R.string.confirm_order_button, localeManager),

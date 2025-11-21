@@ -42,6 +42,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
@@ -66,7 +68,6 @@ import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.components.localizedStringResource
-import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderTrackingViewModel
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderTrackingUiState
 import java.text.NumberFormat
@@ -99,10 +100,49 @@ fun CustomerOrdersScreen(
     
     Scaffold(
         topBar = {
-            MedisupplyAppBar(
-                title = localizedStringResource(R.string.order_tracking_title, localeManager),
-                subtitle = localizedStringResource(R.string.order_tracking_subtitle, localeManager),
-                onNavigateBack = null // No back button for main tabs
+            TopAppBar(
+                title = { 
+                    Column {
+                        Text(
+                            text = localizedStringResource(R.string.order_tracking_title, localeManager),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                        Text(
+                            text = localizedStringResource(R.string.order_tracking_subtitle, localeManager),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1565C0).copy(alpha = 0.7f)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.toggleFiltersVisibility() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = localizedStringResource(R.string.filters_description, localeManager),
+                            tint = if (uiState.showFilters || uiState.hasActiveFilters) 
+                                Color(0xFF1565C0) 
+                            else Color(0xFF1565C0).copy(alpha = 0.7f)
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.loadOrders() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = localizedStringResource(R.string.refresh_description, localeManager),
+                            tint = Color(0xFF1565C0)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFDAE5FF),
+                    titleContentColor = Color(0xFF1565C0),
+                    actionIconContentColor = Color(0xFF1565C0)
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -112,34 +152,8 @@ fun CustomerOrdersScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(24.dp)
         ) {
-            // Action buttons row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = { viewModel.toggleFiltersVisibility() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = localizedStringResource(R.string.filters_description, localeManager),
-                        tint = if (uiState.showFilters || uiState.hasActiveFilters) 
-                            MaterialTheme.colorScheme.primary 
-                        else MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                IconButton(
-                    onClick = { viewModel.loadOrders() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = localizedStringResource(R.string.refresh_description, localeManager)
-                    )
-                }
-            }
             // Filters Section
             AnimatedVisibility(visible = uiState.showFilters) {
                 FiltersSection(
@@ -174,7 +188,7 @@ fun CustomerOrdersScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(24.dp),
+                        contentPadding = PaddingValues(0.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(uiState.orders) { order ->
@@ -229,7 +243,7 @@ private fun FiltersSection(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 8.dp),
+            .padding(horizontal = 0.dp, vertical = 0.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
@@ -238,7 +252,7 @@ private fun FiltersSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(20.dp)
         ) {
             Text(
                 text = localizedStringResource(R.string.filters_section_title, localeManager),
@@ -449,12 +463,12 @@ private fun OrderCard(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
             // Order Header
             Row(
@@ -478,18 +492,21 @@ private fun OrderCard(
                     )
                 }
                 
-                OutlinedButton(
+                Button(
                     onClick = {
                         Log.d("CustomerOrdersScreen", "Click en botón Detalle para pedido: ${order.orderNumber}")
                         onDetailClick()
                     },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary,
-                        containerColor = Color.Transparent
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF3C5BAA),
+                        contentColor = Color.White
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(localizedStringResource(R.string.order_detail_button, localeManager))
+                    Text(
+                        text = localizedStringResource(R.string.order_detail_button, localeManager),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
             
