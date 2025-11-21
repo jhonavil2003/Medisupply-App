@@ -99,7 +99,8 @@ fun RouteDetailScreen(
                     onComplete = { viewModel.showCompleteDialog(true) },
                     isConfirming = uiState.isConfirming,
                     isStarting = uiState.isStarting,
-                    isCompleting = uiState.isCompleting
+                    isCompleting = uiState.isCompleting,
+                    localeManager = localeManager
                 )
             }
         }
@@ -237,7 +238,7 @@ private fun RouteDetailContent(
         // Métricas header
         item {
             Text(
-                text = "Métricas de Ruta",
+                text = localizedStringResource(R.string.route_detail_metrics_title, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -404,7 +405,8 @@ private fun RouteActions(
     onComplete: () -> Unit,
     isConfirming: Boolean,
     isStarting: Boolean,
-    isCompleting: Boolean
+    isCompleting: Boolean,
+    localeManager: LocaleManager
 ) {
     Surface(
         tonalElevation = 3.dp,
@@ -434,7 +436,7 @@ private fun RouteActions(
                         } else {
                             Icon(Icons.Default.Check, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Confirmar Ruta")
+                            Text(localizedStringResource(R.string.route_detail_confirm_route_button, localeManager))
                         }
                     }
                 }
@@ -456,7 +458,7 @@ private fun RouteActions(
                         } else {
                             Icon(Icons.Default.PlayArrow, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Iniciar Ruta")
+                            Text(localizedStringResource(R.string.route_detail_start_route_button, localeManager))
                         }
                     }
                 }

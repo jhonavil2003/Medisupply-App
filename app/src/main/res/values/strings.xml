@@ -578,4 +578,69 @@
     <string name="order_status_delivered">Entregada</string>
     <string name="order_status_cancelled">Cancelada</string>
 
+    <!-- Route Card Labels -->
+    <string name="route_card_title">Ruta</string>
+    <string name="route_card_stops_label">Paradas</string>
+    <string name="route_card_distance_label">Distancia</string>
+    <string name="route_card_time_label">Tiempo</string>
+    <string name="route_card_progress_label">Progreso</string>
+    <string name="route_card_progress_format" formatted="false">%d / %d paradas</string>
+    
+    <!-- Route Detail Screen -->
+    <string name="route_detail_metrics_title">Métricas de ruta</string>
+    <string name="route_detail_total_distance_label">Distancia total</string>
+    <string name="route_detail_estimated_duration_label">Duración est.</string>
+    <string name="route_detail_stops_label">Paradas</string>
+    <string name="route_detail_confirm_route_button">Confirmar ruta</string>
+    <string name="route_detail_start_route_button">Iniciar ruta</string>
+    
+    <!-- Route Execution Screen -->
+    <string name="route_execution_title">Ejecución de Ruta</string>
+    <string name="route_execution_next_stop_title">Próxima parada</string>
+    <string name="route_execution_progress_title">Progreso de Ejecución</string>
+    <string name="route_execution_all_stops_title">Todas las Paradas</string>
+    <string name="route_execution_total_stops_title">Total de paradas</string>
+    <string name="route_execution_complete_message">Completa todas las paradas para finalizar la ruta</string>
+    <string name="route_execution_progress_percentage">Progreso: %d%%</string>
+    <string name="route_execution_completed_stops">%d paradas completadas</string>
+    <string name="route_execution_skipped_stops">%d paradas omitidas</string>
+    
+    <!-- Route Execution Buttons -->
+    <string name="route_execution_navigate_button">Navegar</string>
+    <string name="route_execution_complete_button">Completar</string>
+    <string name="route_execution_skip_button">Omitir</string>
+    
+    <!-- Complete Stop Modal -->
+    <string name="complete_stop_modal_title">Completar parada</string>
+    <string name="complete_stop_modal_customer_label">Cliente:</string>
+    <string name="complete_stop_modal_address_label">Dirección:</string>
+    <string name="complete_stop_modal_notes_label">Notas de visita (opcional)</string>
+    <string name="complete_stop_modal_notes_hint">Agrega notas sobre la visita...</string>
+    <string name="complete_stop_modal_cancel_button">Cancelar</string>
+    <string name="complete_stop_modal_confirm_button">Confirmar</string>
+    <string name="complete_stop_modal_confirmation_message">¿Confirmas que completaste la visita a %1$s?</string>
+    <string name="complete_stop_modal_notes_optional">Notas (opcional)</string>
+    
+    <!-- Skip Stop Modal -->
+    <string name="skip_stop_modal_title">Omitir Parada</string>
+    <string name="skip_stop_modal_message">¿Estás seguro de que quieres omitir esta parada?</string>
+    <string name="skip_stop_modal_cancel_button">Cancelar</string>
+    <string name="skip_stop_modal_confirm_button">Omitir</string>
+    <string name="skip_stop_modal_confirmation_message">¿Por qué omites la visita a %1$s?</string>
+    <string name="skip_stop_modal_reason_label">Razón *</string>
+    <string name="skip_stop_modal_reason_required">La razón es obligatoria</string>
+    
+    <!-- Complete Route Modal -->
+    <string name="complete_route_modal_title">Completar Ruta</string>
+    <string name="complete_route_modal_message">¿Estás seguro de que quieres completar esta ruta?</string>
+    <string name="complete_route_modal_cancel_button">Cancelar</string>
+    <string name="complete_route_modal_confirm_button">Completar Ruta</string>
+    <string name="complete_route_modal_confirmation_message">¿Confirmas que has finalizado la ejecución de la ruta?</string>
+    
+    <!-- System messages -->
+    <string name="navigation_opening_message">Abriendo navegación a %1$s</string>
+    <string name="navigation_error_message">Error al abrir navegación: %1$s</string>
+    <string name="action_cannot_be_undone">Esta acción no se puede deshacer.</string>
+    <string name="navigation_opening_browser">Abriendo Google Maps en navegador</string>
+
 </resources>

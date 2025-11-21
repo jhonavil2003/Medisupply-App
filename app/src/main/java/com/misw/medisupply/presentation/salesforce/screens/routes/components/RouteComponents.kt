@@ -143,7 +143,7 @@ fun RouteCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Ruta #${route.id}",
+                        text = localizedStringResource(R.string.route_card_title, localeManager) + " #${route.id}",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -200,21 +200,21 @@ fun RouteCard(
             ) {
                 RouteMetricItem(
                     icon = Icons.Default.Store,
-                    label = "Paradas",
-                    value = "${route.stops.size}",
+                    label = localizedStringResource(R.string.route_card_stops_label, localeManager),
+                    value = "${route.metrics.pendingStops}",
                     modifier = Modifier.weight(1f)
                 )
                 
                 RouteMetricItem(
                     icon = Icons.Default.Route,
-                    label = "Distancia",
+                    label = localizedStringResource(R.string.route_card_distance_label, localeManager),
                     value = String.format("%.1f km", route.metrics.totalDistanceKm),
                     modifier = Modifier.weight(1f)
                 )
                 
                 RouteMetricItem(
                     icon = Icons.Default.AccessTime,
-                    label = "Tiempo",
+                    label = localizedStringResource(R.string.route_card_time_label, localeManager),
                     value = "${route.metrics.estimatedDurationMinutes} min",
                     modifier = Modifier.weight(1f)
                 )

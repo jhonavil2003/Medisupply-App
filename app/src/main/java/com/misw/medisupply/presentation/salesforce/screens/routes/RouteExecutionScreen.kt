@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.RouteExecutionMapCard
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.RouteMetricsCard
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.StopItem
@@ -60,18 +62,36 @@ fun RouteExecutionScreen(
                     // Intentar abrir Google Maps
                     if (intent.resolveActivity(context.packageManager) != null) {
                         context.startActivity(intent)
-                        snackbarHostState.showSnackbar("Abriendo navegación a ${stop.customerName}")
+                        val messageId = context.resources.getIdentifier("navigation_opening_message", "string", context.packageName)
+                        val message = if (messageId != 0) {
+                            viewModel.localeManager.getLocalizedString(messageId, stop.customerName)
+                        } else {
+                            "Abriendo navegación a ${stop.customerName}"
+                        }
+                        snackbarHostState.showSnackbar(message)
                     } else {
                         // Si Google Maps no está instalado, abrir en el navegador
                         val browserUri = Uri.parse(
                             "https://www.google.com/maps/dir/?api=1&destination=${stop.latitude},${stop.longitude}&travelmode=driving"
                         )
                         context.startActivity(Intent(Intent.ACTION_VIEW, browserUri))
-                        snackbarHostState.showSnackbar("Abriendo Google Maps en navegador")
+                        val messageId = context.resources.getIdentifier("navigation_opening_browser", "string", context.packageName)
+                        val message = if (messageId != 0) {
+                            viewModel.localeManager.getLocalizedString(messageId)
+                        } else {
+                            "Abriendo Google Maps en navegador"
+                        }
+                        snackbarHostState.showSnackbar(message)
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("RouteExecution", "Error al abrir navegación", e)
-                    snackbarHostState.showSnackbar("Error al abrir navegación: ${e.message}")
+                    val messageId = context.resources.getIdentifier("navigation_error_message", "string", context.packageName)
+                    val message = if (messageId != 0) {
+                        viewModel.localeManager.getLocalizedString(messageId, e.message ?: "")
+                    } else {
+                        "Error al abrir navegación: ${e.message}"
+                    }
+                    snackbarHostState.showSnackbar(message)
                 }
                 
                 // Limpiar el estado de navegación
@@ -93,14 +113,17 @@ fun RouteExecutionScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Ejecución de Ruta #$routeId",
+                            text = localizedStringResource(R.string.route_execution_title, viewModel.localeManager) + " #$routeId",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF1565C0)
                         )
                         uiState.route?.let { route ->
                             Text(
-                                text = "Progreso: ${uiState.completionPercentage}%",
+                                text = String.format(
+                                    localizedStringResource(R.string.route_execution_progress_percentage, viewModel.localeManager),
+                                    uiState.completionPercentage
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF1565C0).copy(alpha = 0.7f)
                             )
@@ -310,7 +333,7 @@ private fun ExecutionContent(
         // Progreso header
         item {
             Text(
-                text = "Progreso de Ejecución",
+                text = "Progreso de Ruta",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -631,7 +654,7 @@ private fun ExecutionBottomBar(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = "Completa todas las paradas para finalizar la ruta",
+                        text = "¡Ruta completada con éxito!",
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -822,8 +845,9 @@ private fun ConfirmCompleteRouteDialog(
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("• $completedStops paradas completadas")
-                        Text("• ${totalStops - completedStops} paradas omitidas")
+                        Text(
+                            "Paradas omitidas: ${totalStops - completedStops}"
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))

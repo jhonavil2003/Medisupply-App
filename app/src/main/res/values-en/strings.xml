@@ -578,4 +578,69 @@
     <string name="order_status_delivered">Delivered</string>
     <string name="order_status_cancelled">Cancelled</string>
 
+    <!-- Route Card Labels -->
+    <string name="route_card_title">Route</string>
+    <string name="route_card_stops_label">Stops</string>
+    <string name="route_card_distance_label">Distance</string>
+    <string name="route_card_time_label">Time</string>
+    <string name="route_card_progress_label">Progress</string>
+    <string name="route_card_progress_format" formatted="false">%d / %d stops</string>
+    
+    <!-- Route Detail Screen -->
+    <string name="route_detail_metrics_title">Route metrics</string>
+    <string name="route_detail_total_distance_label">Total distance</string>
+    <string name="route_detail_estimated_duration_label">Est. duration</string>
+    <string name="route_detail_stops_label">Stops</string>
+    <string name="route_detail_confirm_route_button">Confirm route</string>
+    <string name="route_detail_start_route_button">Start route</string>
+    
+    <!-- Route Execution Screen -->
+    <string name="route_execution_title">Route Execution</string>
+    <string name="route_execution_next_stop_title">Next stop</string>
+    <string name="route_execution_progress_title">Execution Progress</string>
+    <string name="route_execution_all_stops_title">All Stops</string>
+    <string name="route_execution_total_stops_title">Total stops</string>
+    <string name="route_execution_complete_message">Complete all stops to finish the route</string>
+    <string name="route_execution_progress_percentage">Progress: %d%%</string>
+    <string name="route_execution_completed_stops">%d stops completed</string>
+    <string name="route_execution_skipped_stops">%d stops skipped</string>
+    
+    <!-- Route Execution Buttons -->
+    <string name="route_execution_navigate_button">Navigate</string>
+    <string name="route_execution_complete_button">Complete</string>
+    <string name="route_execution_skip_button">Skip</string>
+    
+    <!-- Complete Stop Modal -->
+    <string name="complete_stop_modal_title">Complete stop</string>
+    <string name="complete_stop_modal_customer_label">Customer:</string>
+    <string name="complete_stop_modal_address_label">Address:</string>
+    <string name="complete_stop_modal_notes_label">Visit notes (optional)</string>
+    <string name="complete_stop_modal_notes_hint">Add notes about the visit...</string>
+    <string name="complete_stop_modal_cancel_button">Cancel</string>
+    <string name="complete_stop_modal_confirm_button">Confirm</string>
+    <string name="complete_stop_modal_confirmation_message">Do you confirm that you completed the visit to %1$s?</string>
+    <string name="complete_stop_modal_notes_optional">Notes (optional)</string>
+    
+    <!-- Skip Stop Modal -->
+    <string name="skip_stop_modal_title">Skip Stop</string>
+    <string name="skip_stop_modal_message">Are you sure you want to skip this stop?</string>
+    <string name="skip_stop_modal_cancel_button">Cancel</string>
+    <string name="skip_stop_modal_confirm_button">Skip</string>
+    <string name="skip_stop_modal_confirmation_message">Why do you skip the visit to %1$s?</string>
+    <string name="skip_stop_modal_reason_label">Reason *</string>
+    <string name="skip_stop_modal_reason_required">Reason is required</string>
+    
+    <!-- Complete Route Modal -->
+    <string name="complete_route_modal_title">Complete Route</string>
+    <string name="complete_route_modal_message">Are you sure you want to complete this route?</string>
+    <string name="complete_route_modal_cancel_button">Cancel</string>
+    <string name="complete_route_modal_confirm_button">Complete Route</string>
+    <string name="complete_route_modal_confirmation_message">Do you confirm that you have finished executing the route?</string>
+    
+    <!-- System messages -->
+    <string name="navigation_opening_message">Opening navigation to %1$s</string>
+    <string name="navigation_error_message">Navigation error: %1$s</string>
+    <string name="action_cannot_be_undone">This action cannot be undone.</string>
+    <string name="navigation_opening_browser">Opening Google Maps in browser</string>
+
 </resources>

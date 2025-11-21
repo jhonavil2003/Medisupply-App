@@ -3,6 +3,7 @@ package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.usecase.route.*
 import com.misw.medisupply.presentation.salesforce.screens.routes.state.RouteExecutionUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ class RouteExecutionViewModel @Inject constructor(
     private val getRouteUseCase: GetRouteUseCase,
     private val completeStopUseCase: CompleteStopUseCase,
     private val skipStopUseCase: SkipStopUseCase,
-    private val completeRouteUseCase: CompleteRouteUseCase
+    private val completeRouteUseCase: CompleteRouteUseCase,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(RouteExecutionUiState())
