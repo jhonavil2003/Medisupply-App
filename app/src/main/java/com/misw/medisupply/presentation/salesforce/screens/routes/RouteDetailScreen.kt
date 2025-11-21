@@ -3,6 +3,7 @@ package com.misw.medisupply.presentation.salesforce.screens.routes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -40,15 +41,37 @@ fun RouteDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(localizedStringResource(R.string.route_detail_title, localeManager, routeId)) },
+                title = {
+                    Column {
+                        Text(
+                            text = localizedStringResource(R.string.route_detail_title, localeManager, routeId),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                        Text(
+                            text = "Gestión de Rutas",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1565C0).copy(alpha = 0.7f)
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = localizedStringResource(R.string.route_detail_back, localeManager))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = localizedStringResource(R.string.route_detail_back, localeManager),
+                            tint = Color(0xFF1565C0)
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = localizedStringResource(R.string.route_detail_refresh, localeManager))
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = localizedStringResource(R.string.route_detail_refresh, localeManager),
+                            tint = Color(0xFF1565C0)
+                        )
                     }
                     
                     if (uiState.route?.status == RouteStatus.DRAFT) {
@@ -60,7 +83,10 @@ fun RouteDetailScreen(
                             )
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFDAE5FF)
+                )
             )
         },
         bottomBar = {
@@ -120,6 +146,7 @@ fun RouteDetailScreen(
             title = localizedStringResource(R.string.route_dialog_confirm_title, localeManager),
             message = localizedStringResource(R.string.route_dialog_confirm_message, localeManager),
             confirmText = localizedStringResource(R.string.route_action_confirm, localeManager),
+            confirmColor = Color(0xFF4CAF50),
             onConfirm = {
                 viewModel.confirmRoute {
                     // Success callback
@@ -136,6 +163,7 @@ fun RouteDetailScreen(
             title = localizedStringResource(R.string.route_dialog_start_title, localeManager),
             message = localizedStringResource(R.string.route_dialog_start_message, localeManager),
             confirmText = localizedStringResource(R.string.route_action_start, localeManager),
+            confirmColor = Color(0xFF4CAF50),
             onConfirm = {
                 viewModel.startRoute { routeId ->
                     onNavigateToExecution(routeId)
@@ -206,6 +234,16 @@ private fun RouteDetailContent(
             RouteHeaderCard(route = route, localeManager = localeManager)
         }
         
+        // Métricas header
+        item {
+            Text(
+                text = "Métricas de Ruta",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1565C0)
+            )
+        }
+        
         // Métricas
         item {
             RouteMetricsCard(metrics = route.metrics)
@@ -226,7 +264,8 @@ private fun RouteDetailContent(
             Text(
                 text = localizedStringResource(R.string.route_info_stops, localeManager, route.stops.size),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1565C0)
             )
         }
         
@@ -255,9 +294,11 @@ private fun RouteHeaderCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -380,7 +421,10 @@ private fun RouteActions(
                     Button(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f),
-                        enabled = !isConfirming
+                        enabled = !isConfirming,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50)
+                        )
                     ) {
                         if (isConfirming) {
                             CircularProgressIndicator(
@@ -399,7 +443,10 @@ private fun RouteActions(
                     Button(
                         onClick = onStart,
                         modifier = Modifier.weight(1f),
-                        enabled = !isStarting
+                        enabled = !isStarting,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50)
+                        )
                     ) {
                         if (isStarting) {
                             CircularProgressIndicator(

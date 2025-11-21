@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -91,19 +92,28 @@ fun RouteExecutionScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Ejecución de Ruta #$routeId")
+                        Text(
+                            text = "Ejecución de Ruta #$routeId",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
                         uiState.route?.let { route ->
                             Text(
                                 text = "Progreso: ${uiState.completionPercentage}%",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = ColorTextSecondary
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF1565C0).copy(alpha = 0.7f)
                             )
                         }
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color(0xFF1565C0)
+                        )
                     }
                 },
                 actions = {
@@ -113,7 +123,10 @@ fun RouteExecutionScreen(
                         contentDescription = "GPS",
                         tint = if (uiState.isLocationAvailable) ColorSuccess else MaterialTheme.colorScheme.error
                     )
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFDAE5FF)
+                )
             )
         },
         bottomBar = {
@@ -264,6 +277,18 @@ private fun ExecutionContent(
             )
         }
         
+        // Siguiente parada header
+        nextPendingStop?.let { stop ->
+            item {
+                Text(
+                    text = "Próxima Parada",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1565C0)
+                )
+            }
+        }
+        
         // Siguiente parada
         nextPendingStop?.let { stop ->
             item {
@@ -282,17 +307,28 @@ private fun ExecutionContent(
             RouteMetricsCard(metrics = route.metrics)
         }
         
+        // Progreso header
+        item {
+            Text(
+                text = "Progreso de Ejecución",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1565C0)
+            )
+        }
+        
         // Progreso
         item {
             ProgressCard(route = route)
         }
         
-        // Lista de paradas
+        // Lista de paradas header
         item {
             Text(
                 text = "Todas las Paradas",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1565C0)
             )
         }
         
@@ -334,9 +370,11 @@ private fun NextStopCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -348,13 +386,6 @@ private fun NextStopCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Próxima Parada",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                
                 Surface(
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.primary
@@ -484,23 +515,17 @@ private fun ProgressCard(
     
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Progreso de Ejecución",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

@@ -138,6 +138,7 @@ fun OrderReviewScreen(
             // Customer Information Section
             item {
                 SectionTitle(text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_customer_info))
+                Spacer(modifier = Modifier.height(8.dp))
                 CustomerSummaryCard(customer = customer)
             }
 
@@ -166,6 +167,7 @@ fun OrderReviewScreen(
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 SectionTitle(text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_summary))
+                Spacer(modifier = Modifier.height(8.dp))
                 OrderSummaryCard(
                     subtotal = subtotal,
                     tax = 0f, // TODO: Calculate tax
@@ -186,7 +188,11 @@ fun OrderReviewScreen(
                         onClick = { showConfirmDialog = true },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !isLoading
+                        enabled = !isLoading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            contentColor = Color.White
+                        )
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(

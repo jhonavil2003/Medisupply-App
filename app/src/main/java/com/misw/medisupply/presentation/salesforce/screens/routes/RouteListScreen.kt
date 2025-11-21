@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -83,16 +86,24 @@ fun RouteListScreen(
                             containerColor = if (uiState.hasActiveFilters) {
                                 MaterialTheme.colorScheme.error
                             } else {
-                                MaterialTheme.colorScheme.surfaceVariant
+                                Color(0xFFDAE5FF)
                             }
                         ) {
-                            Icon(Icons.Default.FilterList, contentDescription = localizedStringResource(R.string.route_list_filters, localeViewModel.localeManager))
+                            Icon(
+                                Icons.Default.FilterList, 
+                                contentDescription = localizedStringResource(R.string.route_list_filters, localeViewModel.localeManager),
+                                tint = Color(0xFF1565C0)
+                            )
                         }
                     }
                     
                     // Refresh
                     IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = localizedStringResource(R.string.route_list_refresh, localeViewModel.localeManager))
+                        Icon(
+                            Icons.Default.Refresh, 
+                            contentDescription = localizedStringResource(R.string.route_list_refresh, localeViewModel.localeManager),
+                            tint = Color(0xFF1565C0)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -301,7 +312,7 @@ private fun RouteStatisticsCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(14.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatItem(
@@ -468,63 +479,92 @@ private fun FiltersDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(localeManager.getLocalizedString(R.string.route_list_filters_dialog_title)) },
+        title = { 
+            Text(
+                text = localeManager.getLocalizedString(R.string.route_list_filters_dialog_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1565C0)
+            ) 
+        },
         text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                // Filtro de fecha
-                Column {
-                    Text(
-                        text = localeManager.getLocalizedString(R.string.route_list_date_label),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // Opciones de fecha rápidas
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        FilterChip(
-                            selected = selectedDate == LocalDate.now(),
-                            onClick = { onDateSelected(LocalDate.now()) },
-                            label = { Text(localeManager.getLocalizedString(R.string.route_list_today)) }
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Filtro de fecha
+                    Column {
+                        Text(
+                            text = localeManager.getLocalizedString(R.string.route_list_date_label),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
                         )
-                        FilterChip(
-                            selected = selectedDate == null,
-                            onClick = { onDateSelected(null) },
-                            label = { Text(localeManager.getLocalizedString(R.string.route_list_all_dates)) }
-                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Opciones de fecha rápidas
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            FilterChip(
+                                selected = selectedDate == LocalDate.now(),
+                                onClick = { onDateSelected(LocalDate.now()) },
+                                label = { Text(localeManager.getLocalizedString(R.string.route_list_today)) },
+                                modifier = Modifier.weight(1f)
+                            )
+                            FilterChip(
+                                selected = selectedDate == null,
+                                onClick = { onDateSelected(null) },
+                                label = { Text(localeManager.getLocalizedString(R.string.route_list_all_dates)) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
-                }
-                
-                Divider()
-                
-                // Filtro de estado
-                Column {
-                    Text(
-                        text = localeManager.getLocalizedString(R.string.route_list_status_label),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
                     
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        listOf(null to localeManager.getLocalizedString(R.string.route_list_all_statuses)) + RouteStatus.values().map { 
-                            it to getStatusDisplayName(it, localeManager) 
-                        }.forEach { (status, name) ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = selectedStatus == status,
-                                    onClick = { onStatusSelected(status) }
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = name)
+                    HorizontalDivider(color = Color(0xFF1565C0).copy(alpha = 0.3f))
+                    
+                    // Filtro de estado
+                    Column {
+                        Text(
+                            text = localeManager.getLocalizedString(R.string.route_list_status_label),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(null to localeManager.getLocalizedString(R.string.route_list_all_statuses)) + RouteStatus.values().map { 
+                                it to getStatusDisplayName(it, localeManager) 
+                            }.forEach { (status, name) ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { onStatusSelected(status) }
+                                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = selectedStatus == status,
+                                        onClick = { onStatusSelected(status) }
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = if (selectedStatus == status) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
                             }
                         }
                     }
@@ -532,8 +572,18 @@ private fun FiltersDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(localeManager.getLocalizedString(R.string.route_list_apply))
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = localeManager.getLocalizedString(R.string.route_list_apply),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
             }
         },
         dismissButton = {

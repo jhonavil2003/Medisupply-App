@@ -116,7 +116,7 @@ fun CreateOrderScreen(
         ) {
             Text(
                 text = localizedStringResource(R.string.create_order_select_customer, localeManager),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
             )
@@ -285,7 +285,8 @@ fun CreateOrderScreen(
                     .height(56.dp),
                 enabled = state.selectedCustomer != null,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1565C0),
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White,
                     disabledContainerColor = Color(0xFFBDBDBD)
                 ),
                 shape = RoundedCornerShape(12.dp)
