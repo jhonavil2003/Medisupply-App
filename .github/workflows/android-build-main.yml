@@ -32,6 +32,11 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> local.properties
 
+      - name: Set up Gradle environment
+        run: |
+          echo "org.gradle.java.home=$JAVA_HOME" >> gradle.properties
+          echo "JAVA_HOME is set to: $JAVA_HOME"
+
       - name: Run Unit Tests
         id: run-tests
         run: |
