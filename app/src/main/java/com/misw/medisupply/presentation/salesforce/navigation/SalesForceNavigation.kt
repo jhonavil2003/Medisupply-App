@@ -67,7 +67,8 @@ fun SalesForceNavigation(
         SalesForceNavGraph(
             navController = navController,
             modifier = Modifier.padding(paddingValues),
-            onNavigateToRoleSelection = onNavigateToRoleSelection
+            onNavigateToRoleSelection = onNavigateToRoleSelection,
+            localeManager = localeManager
         )
     }
 }

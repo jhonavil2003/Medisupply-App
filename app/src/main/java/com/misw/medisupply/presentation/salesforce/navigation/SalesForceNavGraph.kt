@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.google.gson.Gson
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.presentation.salesforce.screens.home.SalesForceHomeScreen
@@ -50,7 +51,8 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
 fun SalesForceNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    onNavigateToRoleSelection: () -> Unit = {}
+    onNavigateToRoleSelection: () -> Unit = {},
+    localeManager: LocaleManager
 ) {
     NavHost(
         navController = navController,
@@ -475,7 +477,8 @@ fun SalesForceNavGraph(
                     // Navegar a CreateVisitScreen con el customerId
                     // TODO: Pasar el customerId como argumento si es necesario
                     navController.navigate(SalesForceRoutes.CREATE_VISIT)
-                }
+                },
+                localeManager = localeManager
             )
         }
     }

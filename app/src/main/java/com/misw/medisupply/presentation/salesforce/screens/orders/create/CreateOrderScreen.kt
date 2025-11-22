@@ -377,7 +377,7 @@ private fun SelectedCustomerCard(customer: Customer, localeManager: com.misw.med
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE8F5E9)
+            containerColor = Color(0xFFE3F2FD)
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

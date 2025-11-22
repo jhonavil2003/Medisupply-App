@@ -596,7 +596,6 @@
     
     <!-- Route Execution Screen -->
     <string name="route_execution_title">Ejecución de Ruta</string>
-    <string name="route_execution_next_stop_title">Próxima parada</string>
     <string name="route_execution_progress_title">Progreso de Ejecución</string>
     <string name="route_execution_all_stops_title">Todas las Paradas</string>
     <string name="route_execution_total_stops_title">Total de paradas</string>
@@ -604,11 +603,6 @@
     <string name="route_execution_progress_percentage">Progreso: %d%%</string>
     <string name="route_execution_completed_stops">%d paradas completadas</string>
     <string name="route_execution_skipped_stops">%d paradas omitidas</string>
-    
-    <!-- Route Execution Buttons -->
-    <string name="route_execution_navigate_button">Navegar</string>
-    <string name="route_execution_complete_button">Completar</string>
-    <string name="route_execution_skip_button">Omitir</string>
     
     <!-- Complete Stop Modal -->
     <string name="complete_stop_modal_title">Completar parada</string>
@@ -637,10 +631,36 @@
     <string name="complete_route_modal_confirm_button">Completar Ruta</string>
     <string name="complete_route_modal_confirmation_message">¿Confirmas que has finalizado la ejecución de la ruta?</string>
     
-    <!-- System messages -->
-    <string name="navigation_opening_message">Abriendo navegación a %1$s</string>
-    <string name="navigation_error_message">Error al abrir navegación: %1$s</string>
-    <string name="action_cannot_be_undone">Esta acción no se puede deshacer.</string>
-    <string name="navigation_opening_browser">Abriendo Google Maps en navegador</string>
+    <!-- Route Details -->
+    <string name="route_detail_continue_execution_button">Continuar ejecución</string>
+    <string name="route_detail_complete_button">Completar</string>
+    
+    <!-- Route Execution -->
+    <string name="route_execution_next_stop_title">Próxima parada</string>
+    <string name="route_execution_navigate_button">Navegar</string>
+    <string name="route_execution_complete_button">Completar</string>
+    <string name="route_execution_skip_button">Omitir</string>
+    <string name="route_execution_completed_success">¡Ruta completada con éxito!</string>
+    <string name="route_completed_successfully">Ruta completada exitosamente</string>
+    <string name="route_execution_complete_route_button">Completar Ruta</string>
+
+    <!-- Order Deletion -->
+    <string name="order_delete_button">Eliminar orden</string>
+    <string name="order_delete_confirm_title">Confirmar eliminación</string>
+    <string name="order_delete_confirm_message">¿Estás seguro de que quieres eliminar esta orden? Esta acción no se puede deshacer.</string>
+    <string name="order_delete_confirm_button">Eliminar</string>
+    <string name="order_delete_cancel_button">Cancelar</string>
+    <string name="order_deleted_success">Orden eliminada exitosamente</string>
+
+    <!-- Customer Detail Strings -->
+    <string name="address_information">Información de Dirección</string>
+    <string name="customer_type_label">Tipo de Cliente:</string>
+    <string name="total_orders_label">Total Órdenes</string>
+    <string name="active_orders_label">Órdenes Activas</string>
+    <string name="total_revenue_label">Ingresos Totales</string>
+    <string name="average_order_label">Orden Promedio</string>
+    <string name="last_order_label">Última Orden</string>
+    <string name="no_orders_label">Sin órdenes</string>
+    <string name="show_all_orders">Ver todas las órdenes</string>
 
 </resources>

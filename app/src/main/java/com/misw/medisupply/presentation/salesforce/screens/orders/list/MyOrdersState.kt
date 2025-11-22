@@ -11,6 +11,7 @@ import java.util.Date
 data class MyOrdersState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isDeleting: Boolean = false,
     val orders: List<Order> = emptyList(),
     val customers: List<Customer> = emptyList(),
     val selectedStatus: OrderStatus? = null,
@@ -18,7 +19,8 @@ data class MyOrdersState(
     val selectedDateRange: DateRange? = null,
     val error: String? = null,
     val selectedOrder: Order? = null,
-    val isLoadingCustomers: Boolean = false
+    val isLoadingCustomers: Boolean = false,
+    val successMessage: String? = null
 ) {
     /**
      * Check if there are any orders
@@ -120,4 +122,14 @@ sealed class MyOrdersEvent {
      * Clear error message
      */
     object ClearError : MyOrdersEvent()
+    
+    /**
+     * Delete an order
+     */
+    data class DeleteOrder(val orderId: Int) : MyOrdersEvent()
+    
+    /**
+     * Clear success message
+     */
+    object ClearSuccessMessage : MyOrdersEvent()
 }

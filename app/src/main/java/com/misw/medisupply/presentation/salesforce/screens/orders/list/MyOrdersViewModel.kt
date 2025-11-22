@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
+import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MyOrdersViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
-    private val getCustomersUseCase: GetCustomersUseCase
+    private val getCustomersUseCase: GetCustomersUseCase,
+    private val deleteOrderUseCase: DeleteOrderUseCase
 ) : ViewModel() {
     
     private val _state = MutableStateFlow(MyOrdersState())
@@ -56,6 +58,8 @@ class MyOrdersViewModel @Inject constructor(
             is MyOrdersEvent.ClearFilters -> clearAllFilters()
             is MyOrdersEvent.SelectOrder -> selectOrder(event.order)
             is MyOrdersEvent.ClearError -> clearError()
+            is MyOrdersEvent.DeleteOrder -> deleteOrder(event.orderId)
+            is MyOrdersEvent.ClearSuccessMessage -> clearSuccessMessage()
         }
     }
     
@@ -201,5 +205,48 @@ class MyOrdersViewModel @Inject constructor(
      */
     private fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+    
+    /**
+     * Delete an order
+     */
+    private fun deleteOrder(orderId: Int) {
+        viewModelScope.launch {
+            _state.update { it.copy(isDeleting = true, error = null) }
+            
+            deleteOrderUseCase(orderId).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        // Loading state already set above
+                    }
+                    is Resource.Success -> {
+                        // Remove order from local list and show success message
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isDeleting = false,
+                                orders = currentState.orders.filter { it.id != orderId },
+                                successMessage = "order_deleted_successfully", // Resource key for internationalization
+                                error = null
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update { 
+                            it.copy(
+                                isDeleting = false,
+                                error = resource.message
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Clear success message
+     */
+    private fun clearSuccessMessage() {
+        _state.update { it.copy(successMessage = null) }
     }
 }

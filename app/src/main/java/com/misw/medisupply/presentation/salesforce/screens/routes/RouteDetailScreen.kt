@@ -473,7 +473,7 @@ private fun RouteActions(
                     ) {
                         Icon(Icons.Default.Navigation, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Continuar Ejecución")
+                        Text(localizedStringResource(R.string.route_detail_continue_execution_button, localeManager))
                     }
                     
                     Button(
@@ -492,7 +492,7 @@ private fun RouteActions(
                         } else {
                             Icon(Icons.Default.CheckCircle, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Completar")
+                            Text(localizedStringResource(R.string.route_detail_complete_button, localeManager))
                         }
                     }
                 }

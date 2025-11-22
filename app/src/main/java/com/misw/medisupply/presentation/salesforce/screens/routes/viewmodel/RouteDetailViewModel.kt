@@ -2,6 +2,8 @@ package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.usecase.route.*
 import com.misw.medisupply.presentation.salesforce.screens.routes.state.RouteDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +20,8 @@ class RouteDetailViewModel @Inject constructor(
     private val confirmRouteUseCase: ConfirmRouteUseCase,
     private val startRouteUseCase: StartRouteUseCase,
     private val completeRouteUseCase: CompleteRouteUseCase,
-    private val cancelRouteUseCase: CancelRouteUseCase
+    private val cancelRouteUseCase: CancelRouteUseCase,
+    private val localeManager: LocaleManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(RouteDetailUiState())
@@ -152,7 +155,7 @@ class RouteDetailViewModel @Inject constructor(
                         it.copy(
                             isCompleting = false,
                             route = route,
-                            successMessage = "Ruta completada exitosamente",
+                            successMessage = localeManager.getLocalizedString(R.string.route_completed_successfully),
                             showCompleteDialog = false
                         )
                     }

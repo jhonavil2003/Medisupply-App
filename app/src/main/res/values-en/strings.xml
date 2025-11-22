@@ -596,7 +596,6 @@
     
     <!-- Route Execution Screen -->
     <string name="route_execution_title">Route Execution</string>
-    <string name="route_execution_next_stop_title">Next stop</string>
     <string name="route_execution_progress_title">Execution Progress</string>
     <string name="route_execution_all_stops_title">All Stops</string>
     <string name="route_execution_total_stops_title">Total stops</string>
@@ -604,11 +603,6 @@
     <string name="route_execution_progress_percentage">Progress: %d%%</string>
     <string name="route_execution_completed_stops">%d stops completed</string>
     <string name="route_execution_skipped_stops">%d stops skipped</string>
-    
-    <!-- Route Execution Buttons -->
-    <string name="route_execution_navigate_button">Navigate</string>
-    <string name="route_execution_complete_button">Complete</string>
-    <string name="route_execution_skip_button">Skip</string>
     
     <!-- Complete Stop Modal -->
     <string name="complete_stop_modal_title">Complete stop</string>
@@ -637,10 +631,36 @@
     <string name="complete_route_modal_confirm_button">Complete Route</string>
     <string name="complete_route_modal_confirmation_message">Do you confirm that you have finished executing the route?</string>
     
-    <!-- System messages -->
-    <string name="navigation_opening_message">Opening navigation to %1$s</string>
-    <string name="navigation_error_message">Navigation error: %1$s</string>
-    <string name="action_cannot_be_undone">This action cannot be undone.</string>
-    <string name="navigation_opening_browser">Opening Google Maps in browser</string>
+    <!-- Route Details -->
+    <string name="route_detail_continue_execution_button">Continue execution</string>
+    <string name="route_detail_complete_button">Complete</string>
+    
+    <!-- Route Execution -->
+    <string name="route_execution_next_stop_title">Next Stop</string>
+    <string name="route_execution_navigate_button">Navigate</string>
+    <string name="route_execution_complete_button">Complete</string>
+    <string name="route_execution_skip_button">Skip</string>
+    <string name="route_execution_completed_success">Route completed successfully!</string>
+    <string name="route_completed_successfully">Route completed successfully</string>
+    <string name="route_execution_complete_route_button">Complete Route</string>
+
+    <!-- Order Deletion -->
+    <string name="order_delete_button">Delete order</string>
+    <string name="order_delete_confirm_title">Confirm deletion</string>
+    <string name="order_delete_confirm_message">Are you sure you want to delete this order? This action cannot be undone.</string>
+    <string name="order_delete_confirm_button">Delete</string>
+    <string name="order_delete_cancel_button">Cancel</string>
+    <string name="order_deleted_success">Order deleted successfully</string>
+
+    <!-- Customer Detail Strings -->
+    <string name="address_information">Address Information</string>
+    <string name="customer_type_label">Customer Type:</string>
+    <string name="total_orders_label">Total Orders</string>
+    <string name="active_orders_label">Active Orders</string>
+    <string name="total_revenue_label">Total Revenue</string>
+    <string name="average_order_label">Average Order</string>
+    <string name="last_order_label">Last Order</string>
+    <string name="no_orders_label">No orders</string>
+    <string name="show_all_orders">Show all orders</string>
 
 </resources>

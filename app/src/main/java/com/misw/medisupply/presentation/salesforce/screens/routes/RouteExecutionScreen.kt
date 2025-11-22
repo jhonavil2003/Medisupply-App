@@ -18,7 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.misw.medisupply.R
-import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.core.i18n.localizedStringResource
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.RouteExecutionMapCard
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.RouteMetricsCard
 import com.misw.medisupply.presentation.salesforce.screens.routes.components.StopItem
@@ -35,6 +36,7 @@ fun RouteExecutionScreen(
     onNavigateBack: () -> Unit,
     onRouteCompleted: () -> Unit,
     onNavigateToCreateVisit: (customerId: Int) -> Unit = {},
+    localeManager: LocaleManager,
     viewModel: RouteExecutionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -64,7 +66,7 @@ fun RouteExecutionScreen(
                         context.startActivity(intent)
                         val messageId = context.resources.getIdentifier("navigation_opening_message", "string", context.packageName)
                         val message = if (messageId != 0) {
-                            viewModel.localeManager.getLocalizedString(messageId, stop.customerName)
+                            localeManager.getLocalizedString(messageId, stop.customerName)
                         } else {
                             "Abriendo navegación a ${stop.customerName}"
                         }
@@ -77,7 +79,7 @@ fun RouteExecutionScreen(
                         context.startActivity(Intent(Intent.ACTION_VIEW, browserUri))
                         val messageId = context.resources.getIdentifier("navigation_opening_browser", "string", context.packageName)
                         val message = if (messageId != 0) {
-                            viewModel.localeManager.getLocalizedString(messageId)
+                            localeManager.getLocalizedString(messageId)
                         } else {
                             "Abriendo Google Maps en navegador"
                         }
@@ -87,7 +89,7 @@ fun RouteExecutionScreen(
                     android.util.Log.e("RouteExecution", "Error al abrir navegación", e)
                     val messageId = context.resources.getIdentifier("navigation_error_message", "string", context.packageName)
                     val message = if (messageId != 0) {
-                        viewModel.localeManager.getLocalizedString(messageId, e.message ?: "")
+                        localeManager.getLocalizedString(messageId, e.message ?: "")
                     } else {
                         "Error al abrir navegación: ${e.message}"
                     }
@@ -113,7 +115,7 @@ fun RouteExecutionScreen(
                 title = {
                     Column {
                         Text(
-                            text = localizedStringResource(R.string.route_execution_title, viewModel.localeManager) + " #$routeId",
+                            text = localizedStringResource(R.string.route_execution_title, localeManager) + " #$routeId",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF1565C0)
@@ -121,7 +123,7 @@ fun RouteExecutionScreen(
                         uiState.route?.let { route ->
                             Text(
                                 text = String.format(
-                                    localizedStringResource(R.string.route_execution_progress_percentage, viewModel.localeManager),
+                                    localizedStringResource(R.string.route_execution_progress_percentage, localeManager),
                                     uiState.completionPercentage
                                 ),
                                 style = MaterialTheme.typography.bodySmall,
@@ -156,7 +158,8 @@ fun RouteExecutionScreen(
             uiState.route?.let { route ->
                 ExecutionBottomBar(
                     canCompleteRoute = uiState.canCompleteRoute,
-                    onCompleteRoute = { viewModel.showCompleteRouteDialog(true) }
+                    onCompleteRoute = { viewModel.showCompleteRouteDialog(true) },
+                    localeManager = localeManager
                 )
             }
         }
@@ -195,7 +198,8 @@ fun RouteExecutionScreen(
                         },
                         onStopSkip = { stopId ->
                             viewModel.showSkipStopDialog(true, stopId)
-                        }
+                        },
+                        localeManager = localeManager
                     )
                 }
             }
@@ -282,7 +286,8 @@ private fun ExecutionContent(
     distanceToNext: Double?,
     onStopNavigate: (Int) -> Unit,
     onStopComplete: (Int) -> Unit,
-    onStopSkip: (Int) -> Unit
+    onStopSkip: (Int) -> Unit,
+    localeManager: LocaleManager
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -304,7 +309,7 @@ private fun ExecutionContent(
         nextPendingStop?.let { stop ->
             item {
                 Text(
-                    text = "Próxima Parada",
+                    text = localizedStringResource(R.string.route_execution_next_stop_title, localeManager),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1565C0)
@@ -320,7 +325,8 @@ private fun ExecutionContent(
                     distance = distanceToNext,
                     onNavigate = { onStopNavigate(stop.id) },
                     onComplete = { onStopComplete(stop.id) },
-                    onSkip = { onStopSkip(stop.id) }
+                    onSkip = { onStopSkip(stop.id) },
+                    localeManager = localeManager
                 )
             }
         }
@@ -333,7 +339,7 @@ private fun ExecutionContent(
         // Progreso header
         item {
             Text(
-                text = "Progreso de Ruta",
+                text = localizedStringResource(R.string.route_execution_progress_title, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -348,7 +354,7 @@ private fun ExecutionContent(
         // Lista de paradas header
         item {
             Text(
-                text = "Todas las Paradas",
+                text = localizedStringResource(R.string.route_execution_all_stops_title, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -389,7 +395,8 @@ private fun NextStopCard(
     distance: Double?,
     onNavigate: () -> Unit,
     onComplete: () -> Unit,
-    onSkip: () -> Unit
+    onSkip: () -> Unit,
+    localeManager: LocaleManager
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -481,7 +488,7 @@ private fun NextStopCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "Navegar",
+                        localizedStringResource(R.string.route_execution_navigate_button, localeManager),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -501,7 +508,7 @@ private fun NextStopCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "Completar",
+                        localizedStringResource(R.string.route_execution_complete_button, localeManager),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -518,7 +525,7 @@ private fun NextStopCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "Omitir",
+                        localizedStringResource(R.string.route_execution_skip_button, localeManager),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -625,7 +632,8 @@ private fun ProgressStat(
 @Composable
 private fun ExecutionBottomBar(
     canCompleteRoute: Boolean,
-    onCompleteRoute: () -> Unit
+    onCompleteRoute: () -> Unit,
+    localeManager: LocaleManager
 ) {
     Surface(
         tonalElevation = 3.dp
@@ -645,7 +653,7 @@ private fun ExecutionBottomBar(
                 ) {
                     Icon(Icons.Default.CheckCircle, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Completar Ruta")
+                    Text(localizedStringResource(R.string.route_execution_complete_route_button, localeManager))
                 }
             } else {
                 Surface(
@@ -654,7 +662,7 @@ private fun ExecutionBottomBar(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = "¡Ruta completada con éxito!",
+                        text = localizedStringResource(R.string.route_execution_completed_success, localeManager),
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

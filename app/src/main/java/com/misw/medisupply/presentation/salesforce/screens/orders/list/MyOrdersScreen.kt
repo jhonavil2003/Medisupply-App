@@ -31,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -87,6 +89,10 @@ fun MyOrdersScreen(
     // Filter modal state
     var showFilterModal by remember { mutableStateOf(false) }
     
+    // Delete confirmation dialog state
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var orderToDelete by remember { mutableStateOf<Order?>(null) }
+    
     // Reload orders when screen is displayed
     LaunchedEffect(Unit) {
         viewModel.onEvent(MyOrdersEvent.LoadOrders)
@@ -97,6 +103,15 @@ fun MyOrdersScreen(
         state.error?.let { error ->
             snackbarHostState.showSnackbar(error)
             viewModel.onEvent(MyOrdersEvent.ClearError)
+        }
+    }
+    
+    // Show success message in snackbar
+    LaunchedEffect(state.successMessage) {
+        state.successMessage?.let { messageKey ->
+            val message = localeManager.getLocalizedString(R.string.order_deleted_success)
+            snackbarHostState.showSnackbar(message)
+            viewModel.onEvent(MyOrdersEvent.ClearSuccessMessage)
         }
     }
     
@@ -148,7 +163,19 @@ fun MyOrdersScreen(
                 )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { snackbarData ->
+                    Snackbar(
+                        snackbarData = snackbarData,
+                        containerColor = Color(0xFF4CAF50), // Verde para éxito
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+            ) 
+        },
         containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
         PullToRefreshBox(
@@ -203,6 +230,10 @@ fun MyOrdersScreen(
                                     order.id?.let { orderId ->
                                         onNavigateToEditOrder(orderId.toString())
                                     }
+                                },
+                                onDeleteClick = { order: Order ->
+                                    orderToDelete = order
+                                    showDeleteDialog = true
                                 }
                             )
                         }
@@ -228,6 +259,62 @@ fun MyOrdersScreen(
                 onApplyFilters = { /* Filters are applied immediately */ },
                 onClearFilters = { viewModel.onEvent(MyOrdersEvent.ClearFilters) },
                 onDismiss = { showFilterModal = false }
+            )
+        }
+        
+        // Delete Confirmation Dialog
+        if (showDeleteDialog && orderToDelete != null) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDeleteDialog = false
+                    orderToDelete = null
+                },
+                title = {
+                    Text(
+                        text = localizedStringResource(R.string.order_delete_confirm_title, localeManager),
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = localizedStringResource(R.string.order_delete_confirm_message, localeManager)
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            orderToDelete?.id?.let { orderId ->
+                                viewModel.onEvent(MyOrdersEvent.DeleteOrder(orderId))
+                            }
+                            showDeleteDialog = false
+                            orderToDelete = null
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFD32F2F)
+                        )
+                    ) {
+                        Text(
+                            text = localizedStringResource(R.string.order_delete_confirm_button, localeManager),
+                            color = Color.White
+                        )
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showDeleteDialog = false
+                            orderToDelete = null
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        )
+                    ) {
+                        Text(
+                            text = localizedStringResource(R.string.order_delete_cancel_button, localeManager),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             )
         }
     }
@@ -363,6 +450,7 @@ private fun OrdersList(
     localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onDetailClick: (Order) -> Unit,
     onEditClick: (Order) -> Unit,
+    onDeleteClick: (Order) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -385,7 +473,8 @@ private fun OrdersList(
                     order = order,
                     localeManager = localeManager,
                     onDetailClick = { onDetailClick(order) },
-                    onEditClick = { onEditClick(order) }
+                    onEditClick = { onEditClick(order) },
+                    onDeleteClick = { onDeleteClick(order) }
                 )
             }
         }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +47,7 @@ fun OrderCard(
     localeManager: LocaleManager,
     onDetailClick: () -> Unit,
     onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -166,18 +168,34 @@ fun OrderCard(
                             color = MaterialTheme.colorScheme.primary
                         )
                         
-                        // Edit button (only for pending orders) - more compact
+                        // Edit and Delete buttons (only for pending orders)
                         if (order.status == OrderStatus.PENDING) {
-                            IconButton(
-                                onClick = onEditClick,
-                                modifier = Modifier.size(32.dp)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Editar orden",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                                IconButton(
+                                    onClick = onEditClick,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Editar orden",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                
+                                IconButton(
+                                    onClick = onDeleteClick,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = localizedStringResource(R.string.order_delete_button, localeManager),
+                                        tint = Color(0xFFD32F2F),
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         }
                     }

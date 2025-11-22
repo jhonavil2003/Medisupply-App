@@ -3,6 +3,7 @@ package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
 import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.usecase.route.*
 import com.misw.medisupply.presentation.salesforce.screens.routes.state.RouteExecutionUiState
@@ -226,7 +227,7 @@ class RouteExecutionViewModel @Inject constructor(
                             isCompletingRoute = false,
                             route = route,
                             showCompleteRouteDialog = false,
-                            successMessage = "Ruta completada exitosamente"
+                            successMessage = localeManager.getLocalizedString(R.string.route_completed_successfully)
                         )
                     }
                     onSuccess()

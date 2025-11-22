@@ -253,7 +253,7 @@ private fun CustomerInfoCard(customer: Customer, localeManager: com.misw.medisup
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD6E3FF)
+            containerColor = Color(0xFFE3F2FD)
         )
     ) {
         Column(
