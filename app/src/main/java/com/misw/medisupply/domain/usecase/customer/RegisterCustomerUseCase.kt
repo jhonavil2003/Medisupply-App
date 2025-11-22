@@ -23,22 +23,34 @@ class RegisterCustomerUseCase @Inject constructor(
      * Register a new customer with validation
      * 
      * @param businessName Company/Institution name
+     * @param tradeName Trade name (optional)
      * @param documentNumber NIT/RUC or identification number
+     * @param contactName Contact person name (optional)
      * @param contactEmail Contact email address
      * @param contactPhone Contact phone number
      * @param address Physical address
+     * @param neighborhood Neighborhood (optional)
      * @param city City (optional)
      * @param department Department/State (optional)
+     * @param country Country (default: Colombia)
+     * @param latitude Latitude coordinate (optional)
+     * @param longitude Longitude coordinate (optional)
      * @return Flow with Resource containing the registered customer
      */
     operator fun invoke(
         businessName: String,
+        tradeName: String? = null,
         documentNumber: String,
+        contactName: String? = null,
         contactEmail: String,
         contactPhone: String,
         address: String,
+        neighborhood: String? = null,
         city: String? = null,
-        department: String? = null
+        department: String? = null,
+        country: String = "Colombia",
+        latitude: Double? = null,
+        longitude: Double? = null
     ): Flow<Resource<Customer>> {
         Log.d(TAG, "=== USECASE RECIBIÓ DATOS ===")
         Log.d(TAG, "businessName: '$businessName'")
@@ -82,13 +94,19 @@ class RegisterCustomerUseCase @Inject constructor(
         
         return customerRepository.registerCustomer(
             businessName = businessName.trim(),
+            tradeName = tradeName?.trim(),
             documentNumber = documentNumber.trim(),
             documentType = "NIT", // Default to NIT for institutions
+            contactName = contactName?.trim(),
             contactEmail = contactEmail.trim().lowercase(),
             contactPhone = contactPhone.trim(),
             address = address.trim(),
+            neighborhood = neighborhood?.trim(),
             city = city?.trim(),
             department = department?.trim(),
+            country = country.trim(),
+            latitude = latitude,
+            longitude = longitude,
             customerType = "hospital" // Default customer type - lowercase as required by API
         )
     }

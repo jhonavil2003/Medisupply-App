@@ -117,7 +117,17 @@ fun CustomerRegistrationScreen(
                     label = localizedStringResource(R.string.registration_business_name, viewModel.localeManager),
                     error = uiState.businessNameError,
                     enabled = !uiState.isLoading
-                )            // Document Number Row
+                )
+                
+                // Trade Name
+                CustomTextField(
+                    value = uiState.tradeName,
+                    onValueChange = viewModel::updateTradeName,
+                    label = localizedStringResource(R.string.registration_trade_name, viewModel.localeManager),
+                    enabled = !uiState.isLoading
+                )
+                
+                // Document Number Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -169,6 +179,14 @@ fun CustomerRegistrationScreen(
                 }
             }
             
+            // Contact Name
+            CustomTextField(
+                value = uiState.contactName,
+                onValueChange = viewModel::updateContactName,
+                label = localizedStringResource(R.string.registration_contact_name, viewModel.localeManager),
+                enabled = !uiState.isLoading
+            )
+            
             // Address Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -184,25 +202,55 @@ fun CustomerRegistrationScreen(
                 )
                 
                 CustomTextField(
-                    value = uiState.contactPhone,
-                    onValueChange = viewModel::updateContactPhone,
-                    label = localizedStringResource(R.string.registration_phone, viewModel.localeManager),
-                    error = uiState.contactPhoneError,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    value = uiState.neighborhood,
+                    onValueChange = viewModel::updateNeighborhood,
+                    label = localizedStringResource(R.string.registration_neighborhood, viewModel.localeManager),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
             }
             
-            // Cell and Email Row
+            // City and Department Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 CustomTextField(
+                    value = uiState.city,
+                    onValueChange = viewModel::updateCity,
+                    label = localizedStringResource(R.string.registration_city, viewModel.localeManager),
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                CustomTextField(
                     value = uiState.department,
                     onValueChange = viewModel::updateDepartment,
-                    label = localizedStringResource(R.string.registration_cell, viewModel.localeManager),
+                    label = localizedStringResource(R.string.registration_department, viewModel.localeManager),
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            // Country Row
+            CustomTextField(
+                value = uiState.country,
+                onValueChange = viewModel::updateCountry,
+                label = localizedStringResource(R.string.registration_country, viewModel.localeManager),
+                enabled = !uiState.isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            // Phone and Email Row
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CustomTextField(
+                    value = uiState.contactPhone,
+                    onValueChange = viewModel::updateContactPhone,
+                    label = localizedStringResource(R.string.registration_phone, viewModel.localeManager),
+                    error = uiState.contactPhoneError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
@@ -214,6 +262,32 @@ fun CustomerRegistrationScreen(
                     label = localizedStringResource(R.string.registration_email, viewModel.localeManager),
                     error = uiState.contactEmailError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            // Coordinates Section (Optional)
+            SectionTitle(localizedStringResource(R.string.registration_gps_location, viewModel.localeManager))
+            
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CustomTextField(
+                    value = uiState.latitude,
+                    onValueChange = viewModel::updateLatitude,
+                    label = localizedStringResource(R.string.registration_latitude, viewModel.localeManager),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                CustomTextField(
+                    value = uiState.longitude,
+                    onValueChange = viewModel::updateLongitude,
+                    label = localizedStringResource(R.string.registration_longitude, viewModel.localeManager),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )

@@ -44,25 +44,37 @@ interface CustomerRepository {
      * Register a new customer
      * 
      * @param businessName Company/Institution name
+     * @param tradeName Trade name (optional)
      * @param documentNumber NIT/RUC or identification number
      * @param documentType Type of document (NIT, CC, etc.)
+     * @param contactName Contact person name (optional)
      * @param contactEmail Contact email address
      * @param contactPhone Contact phone number
      * @param address Physical address
+     * @param neighborhood Neighborhood (optional)
      * @param city City (optional)
      * @param department Department/State (optional)
+     * @param country Country (default: Colombia)
+     * @param latitude Latitude coordinate (optional)
+     * @param longitude Longitude coordinate (optional)
      * @param customerType Type of customer (HOSPITAL, CLINICA, etc.)
      * @return Flow emitting Resource with created customer
      */
     fun registerCustomer(
         businessName: String,
+        tradeName: String? = null,
         documentNumber: String,
         documentType: String = "NIT",
+        contactName: String? = null,
         contactEmail: String,
         contactPhone: String,
         address: String,
+        neighborhood: String? = null,
         city: String? = null,
         department: String? = null,
+        country: String = "Colombia",
+        latitude: Double? = null,
+        longitude: Double? = null,
         customerType: String = "HOSPITAL"
     ): Flow<Resource<Customer>>
     
