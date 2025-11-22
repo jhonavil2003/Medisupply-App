@@ -15,6 +15,7 @@ import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.order.CreateOrderUseCase
 import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
 import com.misw.medisupply.domain.usecase.cart.ClearCartResult
+import com.misw.medisupply.core.i18n.LocaleManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -45,6 +46,7 @@ class OrderViewModelTest {
     
     private lateinit var createOrderUseCase: CreateOrderUseCase
     private lateinit var clearCartUseCase: ClearCartUseCase
+    private lateinit var localeManager: LocaleManager
     private lateinit var viewModel: OrderViewModel
 
     private val testCustomer = Customer(
@@ -124,6 +126,7 @@ class OrderViewModelTest {
         Dispatchers.setMain(testDispatcher)
         createOrderUseCase = mock()
         clearCartUseCase = mock()
+        localeManager = mock()
         
         // Mock clearCartUseCase to return success by default
         whenever(clearCartUseCase.invoke()).thenReturn(
@@ -134,7 +137,7 @@ class OrderViewModelTest {
             )))
         )
         
-        viewModel = OrderViewModel(createOrderUseCase, clearCartUseCase)
+        viewModel = OrderViewModel(createOrderUseCase, clearCartUseCase, localeManager)
     }
 
     @After

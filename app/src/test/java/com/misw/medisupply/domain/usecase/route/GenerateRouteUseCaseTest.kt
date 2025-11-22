@@ -5,6 +5,7 @@ import com.misw.medisupply.domain.model.route.OptimizationStrategy
 import com.misw.medisupply.domain.model.route.Route
 import com.misw.medisupply.domain.model.route.RouteMetrics
 import com.misw.medisupply.domain.model.route.RouteStatus
+import com.misw.medisupply.domain.model.route.RouteGenerationResult
 import com.misw.medisupply.domain.model.route.RouteStop
 import com.misw.medisupply.domain.model.route.StopStatus
 import com.misw.medisupply.domain.model.route.WorkHours
@@ -98,7 +99,10 @@ class GenerateRouteUseCaseTest {
                 workHours = anyOrNull(),
                 serviceTimePerVisitMinutes = any()
             )
-        ).thenReturn(Result.success(Pair(testRoute, estimatedTime)))
+        ).thenReturn(Result.success(RouteGenerationResult(
+            route = testRoute,
+            computationTime = estimatedTime
+        )))
 
         val result = useCase(
             salespersonId = 1,
@@ -109,9 +113,9 @@ class GenerateRouteUseCaseTest {
         )
 
         assertTrue(result.isSuccess)
-        val (route, time) = result.getOrNull()!!
-        assertEquals(testRoute, route)
-        assertEquals(estimatedTime, time)
+        val routeResult = result.getOrNull()!!
+        assertEquals(testRoute, routeResult.route)
+        assertEquals(estimatedTime, routeResult.computationTime)
         verify(repository).generateRoute(
             salespersonId = 1,
             salespersonName = "Vendedor Test",
@@ -169,7 +173,7 @@ class GenerateRouteUseCaseTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("La fecha de planificación debe ser futura", result.exceptionOrNull()?.message)
+        assertEquals("La fecha de planificación debe ser al menos mañana", result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -191,7 +195,7 @@ class GenerateRouteUseCaseTest {
                 workHours = anyOrNull(),
                 serviceTimePerVisitMinutes = any()
             )
-        ).thenReturn(Result.success(Pair(testRoute, null)))
+        ).thenReturn(Result.success(RouteGenerationResult(route = testRoute)))
 
         useCase(
             salespersonId = 1,
@@ -236,7 +240,7 @@ class GenerateRouteUseCaseTest {
                 workHours = anyOrNull(),
                 serviceTimePerVisitMinutes = any()
             )
-        ).thenReturn(Result.success(Pair(testRoute, null)))
+        ).thenReturn(Result.success(RouteGenerationResult(route = testRoute)))
 
         useCase(
             salespersonId = 1,
@@ -284,7 +288,7 @@ class GenerateRouteUseCaseTest {
                 workHours = anyOrNull(),
                 serviceTimePerVisitMinutes = any()
             )
-        ).thenReturn(Result.success(Pair(testRoute, null)))
+        ).thenReturn(Result.success(RouteGenerationResult(route = testRoute)))
 
         useCase(
             salespersonId = 1,
@@ -361,7 +365,7 @@ class GenerateRouteUseCaseTest {
                 workHours = anyOrNull(),
                 serviceTimePerVisitMinutes = any()
             )
-        ).thenReturn(Result.success(Pair(testRoute, null)))
+        ).thenReturn(Result.success(RouteGenerationResult(route = testRoute)))
 
         useCase(
             salespersonId = 1,

@@ -19,6 +19,8 @@ import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrderByIdUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
 import com.misw.medisupply.domain.usecase.order.UpdateOrderUseCase
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -48,10 +50,11 @@ class OrdersViewModelTest {
     
     private lateinit var getCustomersUseCase: GetCustomersUseCase
     private lateinit var getCustomersBySalespersonUseCase: GetCustomersBySalespersonUseCase
-    private lateinit var getOrdersUseCase: GetOrdersUseCase
     private lateinit var getOrderByIdUseCase: GetOrderByIdUseCase
+    private lateinit var getOrdersUseCase: GetOrdersUseCase
     private lateinit var updateOrderUseCase: UpdateOrderUseCase
     private lateinit var deleteOrderUseCase: DeleteOrderUseCase
+    private lateinit var localeManager: LocaleManager
     private lateinit var viewModel: OrdersViewModel
 
     private val testCustomers = listOf(
@@ -134,10 +137,11 @@ class OrdersViewModelTest {
         Dispatchers.setMain(testDispatcher)
         getCustomersUseCase = mock()
         getCustomersBySalespersonUseCase = mock()
-        getOrdersUseCase = mock()
         getOrderByIdUseCase = mock()
+        getOrdersUseCase = mock()
         updateOrderUseCase = mock()
         deleteOrderUseCase = mock()
+        localeManager = mock()
         
         // Mock default behavior for GetCustomersBySalespersonUseCase
         whenever(getCustomersBySalespersonUseCase.invoke(any(), anyOrNull()))
@@ -156,7 +160,8 @@ class OrdersViewModelTest {
             getOrderByIdUseCase,
             getOrdersUseCase,
             updateOrderUseCase,
-            deleteOrderUseCase
+            deleteOrderUseCase,
+            localeManager
         )
     }
 
@@ -438,6 +443,9 @@ class OrdersViewModelTest {
                 Resource.Success(testOrder)
             )
         )
+        
+        whenever(localeManager.getLocalizedString(R.string.order_updated_successfully))
+            .thenReturn("Orden actualizada exitosamente")
 
         viewModel = createViewModel()
         
@@ -591,6 +599,9 @@ class OrdersViewModelTest {
                     Resource.Success(Unit)
                 )
             )
+            
+        whenever(localeManager.getLocalizedString(R.string.order_deleted_successfully))
+            .thenReturn("Pedido eliminado exitosamente")
 
         viewModel = createViewModel()
 
