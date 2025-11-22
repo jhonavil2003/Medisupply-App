@@ -61,7 +61,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.orders.create.viewmodel.CreateOrderScreenViewModel
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
@@ -70,8 +75,13 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
 fun CreateOrderScreen(
     onNavigateBack: () -> Unit,
     onNavigateToProductSelection: (Customer) -> Unit,
-    viewModel: OrdersViewModel = hiltViewModel()
+    viewModel: OrdersViewModel = hiltViewModel(),
+    screenViewModel: CreateOrderScreenViewModel = hiltViewModel()
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = screenViewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
+    
     val state by viewModel.state.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -91,8 +101,8 @@ fun CreateOrderScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Nueva Orden",
-                subtitle = "Crea una orden de pedido",
+                title = localizedStringResource(R.string.create_order_new_order_title, localeManager),
+                subtitle = localizedStringResource(R.string.create_order_screen_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -105,8 +115,8 @@ fun CreateOrderScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Seleccionar Cliente",
-                style = MaterialTheme.typography.titleLarge,
+                text = localizedStringResource(R.string.create_order_select_customer, localeManager),
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
             )
@@ -115,6 +125,7 @@ fun CreateOrderScreen(
             state.error?.let { errorMessage ->
                 ErrorCard(
                     message = errorMessage,
+                    localeManager = localeManager,
                     onRetry = { viewModel.onEvent(com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent.LoadCustomers) },
                     onDismiss = { viewModel.onEvent(com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent.ClearError) }
                 )
@@ -123,13 +134,14 @@ fun CreateOrderScreen(
             // Mostrar mensaje cuando no hay clientes y no hay error
             if (!state.isLoading && state.customers.isEmpty() && state.error == null) {
                 EmptyStateCard(
+                    localeManager = localeManager,
                     onRetry = { viewModel.onEvent(com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent.LoadCustomers) }
                 )
             }
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
-                    value = state.selectedCustomer?.getDisplayName() ?: "Buscar o seleccionar cliente",
+                    value = state.selectedCustomer?.getDisplayName() ?: localizedStringResource(R.string.create_order_search_select_customer, localeManager),
                     onValueChange = {},
                     readOnly = true,
                     modifier = Modifier
@@ -191,11 +203,11 @@ fun CreateOrderScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(8.dp),
-                                placeholder = { Text("Buscar por nombre o documento...") },
+                                placeholder = { Text(localizedStringResource(R.string.create_order_search_by_name_or_document, localeManager)) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Search,
-                                        contentDescription = "Buscar"
+                                        contentDescription = localizedStringResource(R.string.create_order_search_action, localeManager)
                                     )
                                 },
                                 trailingIcon = {
@@ -203,7 +215,7 @@ fun CreateOrderScreen(
                                         IconButton(onClick = { searchQuery = "" }) {
                                             Icon(
                                                 imageVector = Icons.Default.Clear,
-                                                contentDescription = "Limpiar"
+                                                contentDescription = localizedStringResource(R.string.create_order_clear_action, localeManager)
                                             )
                                         }
                                     }
@@ -226,7 +238,7 @@ fun CreateOrderScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "No se encontraron clientes",
+                                        text = localizedStringResource(R.string.create_order_no_customers_found, localeManager),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -240,6 +252,7 @@ fun CreateOrderScreen(
                                         CustomerDropdownItem(
                                             customer = customer,
                                             isSelected = state.selectedCustomer?.id == customer.id,
+                                            localeManager = localeManager,
                                             onClick = {
                                                 viewModel.selectCustomer(customer)
                                                 expanded = false
@@ -256,7 +269,7 @@ fun CreateOrderScreen(
 
             val selectedCustomer = state.selectedCustomer
             if (selectedCustomer != null) {
-                SelectedCustomerCard(customer = selectedCustomer)
+                SelectedCustomerCard(customer = selectedCustomer, localeManager = localeManager)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -272,7 +285,8 @@ fun CreateOrderScreen(
                     .height(56.dp),
                 enabled = state.selectedCustomer != null,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1565C0),
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White,
                     disabledContainerColor = Color(0xFFBDBDBD)
                 ),
                 shape = RoundedCornerShape(12.dp)
@@ -289,7 +303,7 @@ fun CreateOrderScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Continuar a Productos",
+                        text = localizedStringResource(R.string.create_order_continue_to_products, localeManager),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -304,6 +318,7 @@ fun CreateOrderScreen(
 private fun CustomerDropdownItem(
     customer: Customer,
     isSelected: Boolean,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onClick: () -> Unit
 ) {
     Row(
@@ -349,7 +364,7 @@ private fun CustomerDropdownItem(
         if (isSelected) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Seleccionado",
+                contentDescription = localizedStringResource(R.string.create_order_selected, localeManager),
                 tint = Color(0xFF4CAF50),
                 modifier = Modifier.size(24.dp)
             )
@@ -358,11 +373,11 @@ private fun CustomerDropdownItem(
 }
 
 @Composable
-private fun SelectedCustomerCard(customer: Customer) {
+private fun SelectedCustomerCard(customer: Customer, localeManager: com.misw.medisupply.core.i18n.LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE8F5E9)
+            containerColor = Color(0xFFE3F2FD)
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -392,7 +407,7 @@ private fun SelectedCustomerCard(customer: Customer) {
 
             Column {
                 Text(
-                    text = "Cliente Seleccionado",
+                    text = localizedStringResource(R.string.create_order_selected_customer, localeManager),
                     style = MaterialTheme.typography.labelMedium,
                     color = Color(0xFF2E7D32),
                     fontWeight = FontWeight.Medium
@@ -416,6 +431,7 @@ private fun SelectedCustomerCard(customer: Customer) {
 @Composable
 private fun ErrorCard(
     message: String,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onRetry: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -452,7 +468,7 @@ private fun ErrorCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Error al cargar clientes",
+                    text = localizedStringResource(R.string.create_order_error_loading_customers, localeManager),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFC62828)
@@ -481,7 +497,7 @@ private fun ErrorCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Reintentar", style = MaterialTheme.typography.labelMedium)
+                        Text(localizedStringResource(R.string.create_order_retry_action, localeManager), style = MaterialTheme.typography.labelMedium)
                     }
                     Button(
                         onClick = onDismiss,
@@ -492,7 +508,7 @@ private fun ErrorCard(
                         modifier = Modifier.height(36.dp)
                     ) {
                         Text(
-                            "Cerrar",
+                            localizedStringResource(R.string.create_order_close_action, localeManager),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color(0xFF546E7A)
                         )
@@ -506,7 +522,7 @@ private fun ErrorCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Clear,
-                    contentDescription = "Cerrar",
+                    contentDescription = localizedStringResource(R.string.create_order_close_action, localeManager),
                     tint = Color(0xFFD32F2F),
                     modifier = Modifier.size(20.dp)
                 )
@@ -520,6 +536,7 @@ private fun ErrorCard(
  */
 @Composable
 private fun EmptyStateCard(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onRetry: () -> Unit
 ) {
     Card(
@@ -554,7 +571,7 @@ private fun EmptyStateCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "No hay clientes disponibles",
+                text = localizedStringResource(R.string.create_order_no_customers_available, localeManager),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFF57F17)
@@ -563,7 +580,7 @@ private fun EmptyStateCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "No se pudieron cargar los clientes. Por favor, intenta de nuevo.",
+                text = localizedStringResource(R.string.create_order_no_customers_available_description, localeManager),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color(0xFFF9A825),
                 textAlign = TextAlign.Center
@@ -586,7 +603,7 @@ private fun EmptyStateCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Cargar Clientes",
+                    localizedStringResource(R.string.create_order_load_customers, localeManager),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )

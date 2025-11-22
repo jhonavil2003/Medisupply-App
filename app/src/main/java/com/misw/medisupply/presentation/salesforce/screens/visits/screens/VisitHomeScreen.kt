@@ -30,19 +30,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.VisitHomeViewModel
 
 @Composable
 fun VisitHomeScreen(
     onNavigateToRegisterVisit: () -> Unit = {},
     onNavigateToVisitRoute: () -> Unit = {},
-    onNavigateBack: (() -> Unit)? = null
+    onNavigateBack: (() -> Unit)? = null,
+    viewModel: VisitHomeViewModel = hiltViewModel()
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = viewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Visitas",
-                subtitle = "Fuerza de ventas - Medisupply",
+                title = localizedStringResource(R.string.visits_title, localeManager),
+                subtitle = localizedStringResource(R.string.sales_force_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -60,8 +70,8 @@ fun VisitHomeScreen(
                 icon = Icons.Filled.LocationOn,
                 avatarBackgroundColor = Color(0xFFD6E3FF),
                 iconTint = Color(0xFF3C5BAA),
-                title = "Registrar visita",
-                subtitle = "Registra una nueva visita a un cliente",
+                title = localizedStringResource(R.string.register_visit_title, localeManager),
+                subtitle = localizedStringResource(R.string.register_visit_subtitle, localeManager),
                 onClick = onNavigateToRegisterVisit
             )
 
@@ -69,8 +79,8 @@ fun VisitHomeScreen(
                 icon = Icons.Filled.Map,
                 avatarBackgroundColor = Color(0xFFB4FFF1),
                 iconTint = Color(0xFF008678),
-                title = "Ruta de visitas",
-                subtitle = "Consulta y organiza tu ruta de visitas",
+                title = localizedStringResource(R.string.visit_route_title, localeManager),
+                subtitle = localizedStringResource(R.string.visit_route_subtitle, localeManager),
                 onClick = onNavigateToVisitRoute
             )
         }

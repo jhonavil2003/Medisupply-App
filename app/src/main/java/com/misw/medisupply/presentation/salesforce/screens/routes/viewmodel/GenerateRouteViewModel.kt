@@ -2,6 +2,7 @@ package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.domain.model.route.Location
 import com.misw.medisupply.domain.model.route.OptimizationStrategy
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class GenerateRouteViewModel @Inject constructor(
     private val generateRouteUseCase: GenerateRouteUseCase,
     private val getCustomersUseCase: GetCustomersUseCase,
-    private val userSessionManager: UserSessionManager
+    private val userSessionManager: UserSessionManager,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(GenerateRouteUiState())
@@ -157,7 +159,13 @@ class GenerateRouteViewModel @Inject constructor(
      * Actualizar fecha de la ruta
      */
     fun updateSelectedDate(date: LocalDate) {
-        _uiState.update { it.copy(selectedDate = date) }
+        // Asegurar que la fecha sea al menos mañana
+        val validDate = if (date.isBefore(LocalDate.now().plusDays(1))) {
+            LocalDate.now().plusDays(1)
+        } else {
+            date
+        }
+        _uiState.update { it.copy(selectedDate = validDate) }
     }
     
     /**
@@ -219,6 +227,17 @@ class GenerateRouteViewModel @Inject constructor(
             return
         }
         
+        // Validación adicional de fecha
+        if (state.selectedDate.isBefore(LocalDate.now().plusDays(1))) {
+            _uiState.update { 
+                it.copy(
+                    selectedDate = LocalDate.now().plusDays(1),
+                    error = "La fecha debe ser al menos mañana. Se ha ajustado automáticamente."
+                ) 
+            }
+            return
+        }
+        
         viewModelScope.launch {
             _uiState.update { it.copy(isGenerating = true, error = null) }
             
@@ -263,21 +282,28 @@ class GenerateRouteViewModel @Inject constructor(
                 )
                 
                 result.fold(
-                    onSuccess = { (route, computationTime) ->
+                    onSuccess = { result ->
+                        android.util.Log.d("GenerateRouteVM", "Route generated successfully. ID: ${result.route.id}, Warnings: ${result.warnings.size}")
                         _uiState.update { 
                             it.copy(
                                 isGenerating = false,
-                                generatedRoute = route,
-                                computationTime = computationTime
+                                generatedRoute = result.route,
+                                computationTime = result.computationTime,
+                                warnings = result.warnings,
+                                error = null
                             )
                         }
-                        onSuccess(route.id)
+                        // Navegar inmediatamente, sin depender de warnings
+                        android.util.Log.d("GenerateRouteVM", "Calling onSuccess with route ID: ${result.route.id}")
+                        onSuccess(result.route.id)
                     },
                     onFailure = { error ->
+                        android.util.Log.e("GenerateRouteVM", "Route generation failed: ${error.message}", error)
                         _uiState.update { 
                             it.copy(
                                 isGenerating = false,
-                                error = error.message ?: "Error al generar ruta"
+                                error = error.message ?: "Error al generar ruta",
+                                warnings = emptyList()
                             )
                         }
                     }
@@ -305,5 +331,12 @@ class GenerateRouteViewModel @Inject constructor(
      */
     fun clearValidationError() {
         _uiState.update { it.copy(validationError = null) }
+    }
+    
+    /**
+     * Limpiar warnings
+     */
+    fun clearWarnings() {
+        _uiState.update { it.copy(warnings = emptyList()) }
     }
 }

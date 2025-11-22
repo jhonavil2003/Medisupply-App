@@ -1,0 +1,675 @@
+<resources>
+    <string name="app_name">Medisupply</string>
+    <string name="title_activity_navigation_bar">NavigationBar</string>
+    
+    <!-- Role Selection Screen -->
+    <string name="role_selection_title">Select your role to continue</string>
+    <string name="role_sales_force_title">Sales Force</string>
+    <string name="role_sales_force_description">Full access for internal staff</string>
+    <string name="role_customer_title">Customer</string>
+    <string name="role_customer_description">Self-service for purchases and orders</string>
+    <string name="register_new_customer">New customer?</string>
+    <string name="register_button">Register</string>
+    <string name="help_text">Not sure which role to choose? Contact the administrator</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+    <string name="language_toggle_description">Change language</string>
+    
+    <!-- Customer Home Screen -->
+    <string name="customer_home_welcome">Welcome to Medisupply</string>
+    <string name="customer_home_subtitle">Self-Service Purchasing Portal</string>
+    <string name="customer_home_instructions">Use the bottom navigation bar to access different sections:</string>
+    <string name="customer_home_shop_feature">• Shop - Explore and purchase medical products</string>
+    <string name="customer_home_orders_feature">• Orders - Check the status of your orders</string>
+    <string name="customer_home_account_feature">• Account - Manage your profile and settings</string>
+    <string name="customer_home_change_role">🔧 Change Role (Temporary)</string>
+    <string name="content_description_home">Home</string>
+    
+    <!-- SalesForce Home Screen -->
+    <string name="salesforce_home_welcome">Welcome to Medisupply - Sales Force</string>
+    <string name="salesforce_home_subtitle">Medical Supplies Management System</string>
+    <string name="salesforce_home_instructions">Use the bottom navigation bar to access different sections:</string>
+    <string name="salesforce_home_visits_feature">• Visits - Customer visit management and optimized routes</string>
+    <string name="salesforce_home_orders_feature">• Orders - Order creation and management</string>
+    <string name="salesforce_home_performance_feature">• Performance - Sales metrics and statistics</string>
+    <string name="salesforce_home_change_role">🔧 Change Role (Temporary)</string>
+    
+    <!-- Navigation Bar -->
+    <string name="nav_home">Home</string>
+    <string name="nav_shop">Shop</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_visits">Visits</string>
+    <string name="nav_performance">Performance</string>
+    
+    <!-- Customer Registration Screen -->
+    <string name="registration_title">Register</string>
+    <string name="registration_back_description">Back</string>
+    <string name="registration_app_name">MediSupply</string>
+    <string name="registration_basic_data">Basic Information</string>
+    <string name="registration_business_name">Business Name</string>
+    <string name="registration_trade_name">Trade Name (Optional)</string>
+    <string name="registration_document_number">Tax ID</string>
+    <string name="registration_internal_code">Internal Code</string>
+    <string name="registration_contact_name">Contact Name (Optional)</string>
+    <string name="registration_address">Address</string>
+    <string name="registration_neighborhood">Neighborhood</string>
+    <string name="registration_city">City</string>
+    <string name="registration_department">State/Province</string>
+    <string name="registration_country">Country</string>
+    <string name="registration_phone">Phone</string>
+    <string name="registration_cell">Cell Phone</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_gps_location">GPS Location (Optional)</string>
+    <string name="registration_latitude">Latitude</string>
+    <string name="registration_longitude">Longitude</string>
+    <string name="registration_access_data">Access Information</string>
+    <string name="registration_username">Username</string>
+    <string name="registration_password">Access Key</string>
+    <string name="registration_cancel">Cancel</string>
+    <string name="registration_save">Save</string>
+    <string name="registration_valid">Valid</string>
+    <string name="registration_error">Error</string>
+    <string name="registration_show_password">Show access key</string>
+    <string name="registration_hide_password">Hide access key</string>
+    
+    <!-- Shop Screen -->
+    <string name="shop_create_order_description">Create order</string>
+    <string name="shop_history_title">Purchase history</string>
+    <string name="shop_show_label">Show</string>
+    <string name="shop_total_label">Total: %s</string>
+    <string name="shop_no_orders_title">You have no purchases yet</string>
+    <string name="shop_no_orders_subtitle">Create your first order by tapping the Create button</string>
+    <string name="shop_rejected_products_title">Rejected products</string>
+    <string name="shop_quantity_label">Quantity: %d</string>
+    <string name="shop_agreement_conditions_title">Agreed conditions</string>
+    
+    <!-- Visits Screen -->
+    <string name="visits_content_description">Visits</string>
+    <string name="visits_title">Visits</string>
+    <string name="visits_subtitle">Customer visit management</string>
+    <string name="visits_coming_soon">This screen will be available soon</string>
+    
+    <!-- Agreement Conditions -->
+    <string name="condition_discount_title">Discount:</string>
+    <string name="condition_payment_term_title">Payment term:</string>
+    <string name="condition_taxes_title">Taxes:</string>
+    <string name="condition_discount_value">8% until Dec 15, 2025</string>
+    <string name="condition_payment_term_value">30 days</string>
+    <string name="condition_taxes_value">19% VAT included</string>
+    
+    <!-- General labels -->
+    <string name="label_not_available">N/A</string>
+    <string name="label_dropdown">Dropdown menu</string>
+    
+    <!-- Error messages and components -->
+    <string name="error_content_description">Error</string>
+    <string name="button_retry">Retry</string>
+    <string name="label_all_items">All</string>
+    <string name="error_loading_orders">Error loading orders</string>
+    <string name="error_network">Connection error</string>
+    
+    <!-- Customer Order Review Screen -->
+    <string name="order_review_title">Review order</string>
+    <string name="order_review_subtitle">Shop - Medisupply</string>
+    <string name="delivery_date_title">Preferred Delivery Date</string>
+    <string name="delivery_date_info">📦 Select your preferred delivery date. Confirmation is subject to availability and distribution policies.</string>
+    <string name="delivery_date_label">Delivery date</string>
+    <string name="delivery_date_select">Select date</string>
+    <string name="customer_info_section">Customer Information</string>
+    <string name="products_section">Products (%1$d %2$s)</string>
+    <string name="product_item">item</string>
+    <string name="product_items">items</string>
+    <string name="order_summary_section">Order Summary</string>
+    <string name="button_confirm_order">Confirm and Create Order</string>
+    <string name="creating_order">Creating order...</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+    
+    <!-- Order creation messages -->
+    <string name="order_created_success">Your order has been created successfully.</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="error_creating_order">Error creating the order</string>
+    
+    <!-- Product Selection Screen -->
+    <string name="select_products_title">Select Products</string>
+    <string name="edit_products_title">Edit Products</string>
+    <string name="salesforce_subtitle">Sales force - Medisupply</string>
+    <string name="selected_customer_label">Selected Customer</string>
+    <string name="customer_name_label">Name:</string>
+    <string name="customer_nit_label">NIT:</string>
+    <string name="customer_email_label">Email:</string>
+    <string name="search_products_hint">Search products...</string>
+    <string name="search_description">Search</string>
+    <string name="clear_search_description">Clear search</string>
+    <string name="loading_stock_text">Loading stock...</string>
+    <string name="stock_not_available">Stock N/A</string>
+    <string name="stock_not_available_banner">Stock not available</string>
+    <string name="page_info">Page %1$d of %2$d - %3$d products</string>
+    <string name="cold_chain_indicator">❄️ Cold chain</string>
+    <string name="previous_button">← Previous</string>
+    <string name="next_button">Next →</string>
+    <string name="error_title">❌ Error</string>
+    <string name="no_products_found">No products found</string>
+    <string name="adjust_search_filters">Try adjusting the search filters</string>
+    <string name="out_of_stock">Out of stock</string>
+    <string name="available_units">%d available</string>
+    <string name="add_to_cart_description">Add to cart</string>
+    <string name="remove_from_cart_description">Remove from cart</string>
+    <string name="out_of_stock_message">No stock available</string>
+    <string name="max_quantity_reached">Maximum quantity reached</string>
+    <string name="product_singular">product</string>
+    <string name="product_plural">products</string>
+    <string name="total_label">Total:</string>
+    <string name="confirm_order_button">Confirm Order</string>
+    <string name="update_order_button">Update Order</string>
+    
+    <!-- Content descriptions and additional strings -->
+    <string name="warning_content_description">Warning</string>
+    <string name="retry_content_description">Retry</string>
+    <string name="product_sku_label">SKU: %s</string>
+    
+    <!-- Product ViewModel error messages -->
+    <string name="error_loading_products">Error loading products</string>
+    <string name="error_unknown_generic">Unknown error</string>
+    <string name="error_stock_load_failed">Could not load stock. %s</string>
+    <string name="error_stock_load_retry">Please try again</string>
+    <string name="error_insufficient_stock">Insufficient stock (available: %d)</string>
+    <string name="error_stock_reservation_failed">Could not reserve stock</string>
+    
+    <!-- Confirmation and Success Dialogs -->
+    <string name="confirm_order_title">Confirm Order</string>
+    <string name="update_order_title">Update Order</string>
+    <string name="confirm_order_message">Are you sure you want to create this order? Once confirmed, it will be processed immediately.</string>
+    <string name="confirm_update_order_message">Are you sure you want to update this order? Once confirmed, it will be processed immediately.</string>
+    <string name="confirm_button">Confirm</string>
+    <string name="success_title">Success!</string>
+    <string name="order_number_label">Order Number:</string>
+    <string name="accept_button">Accept</string>
+    <string name="order_created_success_message">Order created successfully</string>
+    <string name="order_updated_success_message">Order updated successfully</string>
+    
+    <!-- Order Detail Screen -->
+    <string name="order_detail_title">Order Detail</string>
+    <string name="order_detail_main_title">Purchase Order</string>
+    <string name="order_data_section_title">Order Data</string>
+    <string name="customer_data_section_title">Customer Data</string>
+    <string name="medisupply_data_section_title">Medisupply Data</string>
+    <string name="back_button_description">Back</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="order_header_date_label">Order date:</string>
+    <string name="order_status_label">Status:</string>
+    <string name="customer_data_title">Customer Data</string>
+    <string name="customer_label">Customer:</string>
+    <string name="customer_id_label">Customer ID: %d</string>
+    <string name="medisupply_data_title">Medisupply Data</string>
+    <string name="delivery_date_detail_label">Delivery date:</string>
+    <string name="delivery_time_label">Delivery time:</string>
+    <string name="partial_delivery_label">Partial delivery:</string>
+    <string name="carrier_label">Carrier:</string>
+    <string name="items_count_label">Items: %d</string>
+    <string name="quantities_label">Quantities: %d ea</string>
+    <string name="date_undefined">To be defined</string>
+    <string name="delivery_time_default">8:50 am</string>
+    <string name="partial_delivery_none">None</string>
+    <string name="carrier_default">Truck 1</string>
+    
+    <!-- Order Tracking Screen -->
+    <string name="order_tracking_title">Delivery Tracking</string>
+    <string name="order_tracking_subtitle">Check your order status</string>
+    <string name="filters_description">Filters</string>
+    <string name="refresh_description">Refresh</string>
+    <string name="filters_section_title">Filters</string>
+    <string name="status_filter_label">Status</string>
+    <string name="order_all_statuses">All statuses</string>
+    <string name="delivery_date_filter">Delivery date</string>
+    <string name="date_from_label">From</string>
+    <string name="date_to_label">To</string>
+    <string name="date_from_description">Date from</string>
+    <string name="date_to_description">Date to</string>
+    <string name="clear_filters_button">Clear filters</string>
+    <string name="accept_button_dialog">Accept</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="date_picker_from_title">Date from</string>
+    <string name="date_picker_to_title">Date to</string>
+    <string name="order_detail_button">Detail</string>
+    <string name="order_no_number">No number</string>
+    <string name="order_no_date">No date</string>
+    <string name="order_total_label_tracking">Total:</string>
+    <string name="order_date_label_tracking">Order date:</string>
+    <string name="delivery_date_label_tracking">Delivery date:</string>
+    <string name="no_orders_title">No orders</string>
+    <string name="no_orders_message">No orders found with the selected filters</string>
+    
+    <!-- Create Visit Screen -->
+    <string name="create_visit_title">Create Visit</string>
+    <string name="tab_data">Data</string>
+    <string name="tab_location">Location</string>
+    <string name="tab_files">Files</string>
+    <string name="saving_label">Saving...</string>
+    <string name="save_visit_button">Save visit</string>
+    <string name="save_visit_description">Save visit</string>
+    <string name="visit_saved_success">✅ Visit saved successfully! You can now complete location and files.</string>
+    <string name="visit_info_title">Visit Information</string>
+    <string name="visit_saved_complete">✅ Visit saved successfully. Go to \'Location\' and \'Files\' tabs to complete additional information.</string>
+    <string name="select_customer_start">1️⃣ Select a customer to start</string>
+    <string name="ready_to_save">3️⃣ Ready to save! Customer, date and time confirmed.</string>
+    <string name="confirm_visit_date">2️⃣ Confirm the visit date (tap the date field)</string>
+    <string name="confirm_visit_time">2️⃣ Confirm the visit time (tap the time field)</string>
+    <string name="confirm_date_time">2️⃣ Confirm the visit date and time</string>
+    <string name="saving_changes">Saving changes...</string>
+    <string name="visit_client_label">Visit client:</string>
+    <string name="contact_label">Contact: %s</string>
+    <string name="customer_phone_label">Phone: %s</string>
+    <string name="customer_address_label">Address: %s</string>
+    <string name="select_customer_continue">Select a customer to continue with the visit data</string>
+    <string name="auto_save_info">💾 Changes to contacted persons, findings, and notes are automatically saved.</string>
+    <string name="visit_date_label">Visit date</string>
+    <string name="select_date_description">Select date</string>
+    <string name="visit_time_label">Visit time</string>
+    <string name="select_time_description">Select time</string>
+    <string name="contacted_persons_label">Contacted persons</string>
+    <string name="contacted_persons_placeholder">E.g: Dr. Garcia, Nurse Lopez</string>
+    <string name="clinical_findings_label">Clinical findings</string>
+    <string name="clinical_findings_placeholder">Describe relevant findings...</string>
+    <string name="additional_notes_label">Additional notes</string>
+    <string name="additional_notes_placeholder">Observations, comments...</string>
+    <string name="visit_location_title">Visit Location</string>
+    <string name="address_auto_save">💾 The address is automatically saved to your visit.</string>
+    <string name="save_visit_first">📍 You must first save the visit in the \'Data\' tab to add location.</string>
+    <string name="saving_location">Saving location...</string>
+    <string name="visit_address_label">Visit address</string>
+    <string name="address_placeholder">E.g: 7th Ave #123-45, Bogota</string>
+    <string name="map_view">Map view</string>
+    <string name="integration_coming_soon">Integration coming soon</string>
+    <string name="select_location_button">Select location</string>
+    <string name="ok_button">OK</string>
+    <string name="map_description">Map</string>
+    <string name="client_description">Client</string>
+    
+    <!-- VisitHome Screen -->
+    <string name="sales_force_subtitle">Sales Force - Medisupply</string>
+    <string name="register_visit_title">Register Visit</string>
+    <string name="register_visit_subtitle">Register a new customer visit</string>
+    <string name="visit_route_title">Visit Route</string>
+    <string name="visit_route_subtitle">Check and organize your visit route</string>
+    
+    <!-- VisitList Screen -->
+    <string name="visit_list_subtitle">Visits - Medisupply</string>
+    <string name="create_visit_fab">Create visit</string>
+    <string name="search_customer_placeholder">Search customer...</string>
+    
+    <!-- ArchivosTabContent -->
+    <string name="files_attached_title">Attached files</string>
+    <string name="files_info_message">📎 Attach photos, documents and other files related to your visit. Formats: PDF, DOC, TXT, JPG, PNG, etc. Maximum 10MB per file.</string>
+    <string name="close_button">Close</string>
+    <string name="uploading_file">Uploading...</string>
+    <string name="select_file_button">Select file</string>
+    <string name="finalize_visit_title">Finalize visit</string>
+    <string name="finalize_visit_warning">⚠️ When completing the visit, you will not be able to make more changes. Make sure you have completed all necessary information.</string>
+    <string name="complete_visit_button">Complete Visit</string>
+    <string name="loading_files">Loading files...</string>
+    <string name="no_files_attached">No files attached</string>
+    <string name="use_button_add_files">Use the button above to add files</string>
+
+    <!-- OrdersScreen strings -->
+    <string name="orders_title">Orders</string>
+    <string name="create_order_title">Create Order</string>
+    <string name="create_order_subtitle">Build your order with real-time availability</string>
+    <string name="my_orders_title">My Orders</string>
+    <string name="my_orders_subtitle">Status, filters, and order details</string>
+
+    <!-- CustomerDetailScreen strings -->
+    <string name="back_button">Back</string>
+    <string name="customer_detail_title">Customer Detail</string>
+    <string name="no_visits_title">No visits made</string>
+    <string name="no_visits_message">No completed visits found for this customer</string>
+    <string name="visits_error_message">Error loading visits</string>
+    <string name="active_status">Active</string>
+    <string name="inactive_status">Inactive</string>
+    <string name="business_information">Business Information</string>
+    <string name="business_name_label">Business Name:</string>
+    <string name="trade_name_label">Trade Name:</string>
+    <string name="document_type_label">Document Type:</string>
+    <string name="document_number_label">Document Number:</string>
+    <string name="customer_code_label">Customer Code:</string>
+    <string name="contact_information">Contact Information</string>
+    <string name="contact_name_label">Contact:</string>
+    <string name="email_label">Email:</string>
+    <string name="phone_label">Phone:</string>
+    <string name="location_information">Location Information</string>
+    <string name="address_label">Address:</string>
+    <string name="city_label">City:</string>
+    <string name="department_label">Department:</string>
+    <string name="country_label">Country:</string>
+    <string name="assigned_salesperson">Assigned Salesperson</string>
+    <string name="gps_location">GPS Location</string>
+    <string name="customer_location">Customer location</string>
+    <string name="sales_statistics">Sales Statistics</string>
+    <string name="total_orders">Total Orders</string>
+    <string name="active_orders">Active Orders</string>
+    <string name="total_revenue">Total Revenue</string>
+    <string name="average_order_value">Average per Order</string>
+    <string name="top_requested_products">Top Requested Products</string>
+    <string name="units">units</string>
+    <string name="recent_orders">Recent Orders</string>
+    <string name="no_recent_orders">No recent orders</string>
+    <string name="view_more">View</string>
+    <string name="view_less">View less</string>
+    <string name="order_singular">more order</string>
+    <string name="orders_plural">more orders</string>
+    <string name="visits">Visits</string>
+    <string name="no_visits_registered">No visits registered</string>
+    <string name="visit_singular">more visit</string>
+    <string name="visits_plural">more visits</string>
+    <string name="clinical_findings">Findings:</string>
+
+    <!-- MyOrdersScreen strings -->
+    <string name="orders_subtitle">Orders - Medisupply</string>
+    <string name="orders_all_statuses">All statuses</string>
+    <string name="orders_filter_action">Filter</string>
+    <string name="orders_no_orders_found">No orders found</string>
+    <string name="orders_try_other_filters">Try other filters</string>
+    <string name="orders_pagination_info">Page %1\$d of %2\$d - %3\$d orders</string>
+    <string name="orders_previous_button">← Previous</string>
+    <string name="orders_next_button">Next →</string>
+    <string name="orders_no_orders_title">No orders</string>
+    <string name="orders_no_orders_message">You have not registered any orders yet</string>
+    <!-- Create Order Screen -->
+    <string name="create_order_new_order_title">New Order</string>
+    <string name="create_order_screen_subtitle">Create an order</string>
+    <string name="create_order_select_customer">Select Customer</string>
+    <string name="create_order_search_select_customer">Search or select customer</string>
+    <string name="create_order_search_by_name_or_document">Search by name or document...</string>
+    <string name="create_order_search_action">Search</string>
+    <string name="create_order_clear_action">Clear</string>
+    <string name="create_order_no_customers_found">No customers found</string>
+    <string name="create_order_continue_to_products">Continue to Products</string>
+    <string name="create_order_selected_customer">Selected Customer</string>
+    <string name="create_order_error_loading_customers">Error loading customers</string>
+    <string name="create_order_retry_action">Retry</string>
+    <string name="create_order_close_action">Close</string>
+    <string name="create_order_no_customers_available">No customers available</string>
+    <string name="create_order_no_customers_available_description">Could not load customers. Please try again.</string>
+    <string name="create_order_load_customers">Load Customers</string>
+    <string name="create_order_selected">Selected</string>
+
+    <!-- Orders System Error Messages and Notifications -->
+    <string name="error_searching_customers">Error searching customers: %s</string>
+    <string name="order_not_found">Order not found</string>
+    <string name="error_loading_order">Error loading order</string>
+    <string name="incomplete_order_data">Incomplete data to update order</string>
+    <string name="order_updated_successfully">Order updated successfully</string>
+    <string name="error_updating_order">Error updating order</string>
+    <string name="order_deleted_successfully">Order deleted successfully</string>
+    <string name="error_deleting_order">Error deleting order</string>
+    
+    <!-- Additional Product System Messages -->
+    <string name="error_loading_stock">Could not load stock. %s</string>
+    <string name="try_again">Try again</string>
+
+    <!-- Route List Screen -->
+    <string name="route_list_title">Visit Routes</string>
+    <string name="route_list_go_back">Back</string>
+    <string name="route_list_filters">Filters</string>
+    <string name="route_list_refresh">Refresh</string>
+    <string name="route_list_new_route">New Route</string>
+    <string name="route_list_unknown_error">Unknown error</string>
+    <string name="route_list_active_filters">Active filters:</string>
+    <string name="route_list_date_filter">• Date: %s</string>
+    <string name="route_list_status_filter">• Status: %s</string>
+    <string name="route_list_clear">Clear</string>
+    <string name="route_list_total_routes">Total routes</string>
+    <string name="route_list_showing">Showing</string>
+    <string name="route_list_no_routes_with_filters">No routes with these filters</string>
+    <string name="route_list_no_routes_created">No routes created</string>
+    <string name="route_list_adjust_filters">Try adjusting the filters</string>
+    <string name="route_list_create_first_route">Create your first optimized route</string>
+    <string name="route_list_clear_filters">Clear filters</string>
+    <string name="route_list_create_route">Create route</string>
+    <string name="route_list_error_loading">Error loading routes</string>
+    <string name="route_list_retry">Retry</string>
+    <string name="route_list_filters_dialog_title">Route Filters</string>
+    <string name="route_list_date_label">Date</string>
+    <string name="route_list_today">Today</string>
+    <string name="route_list_all_dates">All</string>
+    <string name="route_list_status_label">Status</string>
+    <string name="route_list_all_statuses">All</string>
+    <string name="route_list_apply">Apply</string>
+    
+    <!-- Route Status Names -->
+    <string name="route_status_draft">Draft</string>
+    <string name="route_status_confirmed">Confirmed</string>
+    <string name="route_status_in_progress">In Progress</string>
+    <string name="route_status_completed">Completed</string>
+    <string name="route_status_cancelled">Cancelled</string>
+
+    <!-- Order Review Screen -->
+    <string name="order_review_edit_title">Edit Order</string>
+    <string name="order_review_create_title">Review Order</string>
+    <string name="order_review_salesforce_subtitle">Sales Force - Medisupply</string>
+    <string name="order_review_customer_info">Customer Information</string>
+    <string name="order_review_products_single">Products (%d item)</string>
+    <string name="order_review_products_plural">Products (%d items)</string>
+    <string name="order_review_summary">Order Summary</string>
+    <string name="order_review_processing">Processing...</string>
+    <string name="order_review_confirm_update">Confirm and Update Order</string>
+    <string name="order_review_confirm_create">Confirm and Create Order</string>
+    <string name="order_review_cancel">Cancel</string>
+    <string name="order_review_delete_order">Delete Order</string>
+
+
+    <!-- Order Card -->
+    <string name="order_card_edit_order">Edit order</string>
+
+    <!-- Delete Order Dialog -->
+    <string name="delete_order_title">Delete Order</string>
+    <string name="delete_order_message">Are you sure you want to delete order %s? This action cannot be undone.</string>
+    <string name="delete_order_button">Delete</string>
+
+    <!-- Customer Types -->
+    <string name="customer_type_hospital">Hospital</string>
+    <string name="customer_type_clinica">Clinic</string>
+    <string name="customer_type_farmacia">Pharmacy</string>
+    <string name="customer_type_distribuidor">Distributor</string>
+    <string name="customer_type_ips">IPS</string>
+    <string name="customer_type_eps">EPS</string>
+    
+    <!-- Customer List Screen -->
+    <string name="customer_consultation_title">Customer Consultation</string>
+    <string name="customer_consultation_subtitle">Sales Force - Medisupply</string>
+    <string name="customer_list_search_placeholder">Search customer...</string>
+    <string name="customer_list_search_action">Search</string>
+    <string name="customer_list_filter_all">All</string>
+    <string name="customer_list_no_customers">No customers found</string>
+    <string name="customer_list_no_customers_description">No customers found with the selected filters</string>
+    
+    <!-- Customer Item -->
+    <string name="customer_item_profile_button">Profile</string>
+    
+    <!-- Generate Route Screen -->
+    <string name="generate_route_title">Generate Route</string>
+    <string name="generate_route_back">Back</string>
+    <string name="generate_route_clear_selection">Clear (%d)</string>
+    <string name="generate_route_fab">Generate Route</string>
+    <string name="generate_route_configuration">Route Configuration</string>
+    <string name="generate_route_date_label">Route date</string>
+    <string name="generate_route_optimization_label">Optimization strategy</string>
+    <string name="generate_route_start_time">Start</string>
+    <string name="generate_route_end_time">End</string>
+    <string name="generate_route_service_time">Service time per visit</string>
+    <string name="generate_route_service_time_minutes">%d minutes</string>
+    <string name="generate_route_custom_location">Custom start location</string>
+    
+    <!-- Start Location Section -->
+    <string name="generate_route_start_location_title">Start Location</string>
+    <string name="generate_route_open_map">Open map</string>
+    <string name="generate_route_custom_location_default">Custom location</string>
+    <string name="generate_route_select_on_map">Select on map</string>
+    <string name="generate_route_change_location">Change location</string>
+    
+    <!-- Customer Selection -->
+    <string name="generate_route_select_customers">Select Customers</string>
+    <string name="generate_route_select_all">Select all</string>
+    <string name="generate_route_search_customers">Search customers...</string>
+    <string name="generate_route_customers_selected">%1$d customers selected out of %2$d</string>
+    
+    <!-- Loading and States -->
+    <string name="generate_route_loading_customers">Loading customers...</string>
+    <string name="generate_route_error_loading_customers">Error loading customers</string>
+    <string name="generate_route_no_customers_search">No customers found with \'%s\'</string>
+    <string name="generate_route_no_customers_gps">No customers with GPS location configured</string>
+    <string name="generate_route_generating">Generating optimized route...</string>
+    <string name="generate_route_generating_subtitle">This may take a few seconds</string>
+    <string name="generate_route_retry">Retry</string>
+    
+    <!-- Optimization Strategies -->
+    <string name="optimization_strategy_distance">Shortest distance</string>
+    <string name="optimization_strategy_time">Shortest time</string>
+    <string name="optimization_strategy_balanced">Balanced</string>
+    <string name="optimization_strategy_distance_desc">Minimizes total distance</string>
+    <string name="optimization_strategy_time_desc">Minimizes travel time</string>
+    <string name="optimization_strategy_balanced_desc">Balance between distance and time</string>
+    
+    <!-- Dialogs -->
+    <string name="generate_route_optimization_dialog_title">Optimization Strategy</string>
+    <string name="generate_route_dialog_close">Close</string>
+    <string name="generate_route_dialog_accept">Accept</string>
+    <string name="generate_route_dialog_cancel">Cancel</string>
+    <string name="generate_route_date_picker_title">Select route date</string>
+    <string name="generate_route_time_picker_start_title">Start time</string>
+    <string name="generate_route_time_picker_end_title">End time</string>
+    
+    <!-- Route Components -->
+    <string name="route_customer_no_address">No address</string>
+    <string name="route_customer_gps_coordinates">GPS Coordinates</string>
+
+    <!-- Route Detail Screen -->
+    <string name="route_detail_title">Route Details #%1$d</string>
+    <string name="route_detail_back">Back</string>
+    <string name="route_detail_refresh">Refresh</string>
+    <string name="route_detail_cancel_route">Cancel route</string>
+    <string name="route_detail_error_loading">Error loading route</string>
+    
+    <!-- Route Info -->
+    <string name="route_info_route_number">Route #%1$d</string>
+    <string name="route_info_planned_date">Planned date</string>
+    <string name="route_info_started">Started</string>
+    <string name="route_info_completed">Completed</string>
+    <string name="route_info_stops">Stops (%1$d)</string>
+    
+    <!-- Route Actions and Dialogs -->
+    <string name="route_action_confirm">Confirm</string>
+    <string name="route_action_start">Start</string>
+    <string name="route_action_execute">Execute</string>
+    <string name="route_action_complete">Complete</string>
+    
+    <string name="route_dialog_confirm_title">Confirm Route</string>
+    <string name="route_dialog_confirm_message">Are you sure you want to confirm this route? Once confirmed, you can start it on the planned date.</string>
+    <string name="route_dialog_start_title">Start Route</string>
+    <string name="route_dialog_start_message">Are you ready to start executing this route? GPS tracking will be activated.</string>
+    <string name="route_dialog_complete_title">Complete Route</string>
+    <string name="route_dialog_complete_message">Do you confirm that you have completed all stops on the route? This action cannot be undone.</string>
+    <string name="route_dialog_cancel_title">Cancel Route</string>
+    <string name="route_dialog_cancel_message">Are you sure you want to cancel this route? This action cannot be undone.</string>
+    <string name="route_dialog_cancel_action">Cancel Route</string>
+    
+    <!-- Route Components -->
+    <string name="route_stop_completed_mark">✓ Completed</string>
+    <string name="route_stop_complete_action">Complete</string>
+    <string name="route_metrics_completed">Completed</string>
+
+    <!-- Order Status Names -->
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_confirmed">Confirmed</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_shipped">Shipped</string>
+    <string name="order_status_delivered">Delivered</string>
+    <string name="order_status_cancelled">Cancelled</string>
+
+    <!-- Route Card Labels -->
+    <string name="route_card_title">Route</string>
+    <string name="route_card_stops_label">Stops</string>
+    <string name="route_card_distance_label">Distance</string>
+    <string name="route_card_time_label">Time</string>
+    <string name="route_card_progress_label">Progress</string>
+    <string name="route_card_progress_format" formatted="false">%d / %d stops</string>
+    
+    <!-- Route Detail Screen -->
+    <string name="route_detail_metrics_title">Route metrics</string>
+    <string name="route_detail_total_distance_label">Total distance</string>
+    <string name="route_detail_estimated_duration_label">Est. duration</string>
+    <string name="route_detail_stops_label">Stops</string>
+    <string name="route_detail_confirm_route_button">Confirm route</string>
+    <string name="route_detail_start_route_button">Start route</string>
+    
+    <!-- Route Execution Screen -->
+    <string name="route_execution_title">Route Execution</string>
+    <string name="route_execution_progress_title">Execution Progress</string>
+    <string name="route_execution_all_stops_title">All Stops</string>
+    <string name="route_execution_total_stops_title">Total stops</string>
+    <string name="route_execution_complete_message">Complete all stops to finish the route</string>
+    <string name="route_execution_progress_percentage">Progress: %d%%</string>
+    <string name="route_execution_completed_stops">%d stops completed</string>
+    <string name="route_execution_skipped_stops">%d stops skipped</string>
+    
+    <!-- Complete Stop Modal -->
+    <string name="complete_stop_modal_title">Complete stop</string>
+    <string name="complete_stop_modal_customer_label">Customer:</string>
+    <string name="complete_stop_modal_address_label">Address:</string>
+    <string name="complete_stop_modal_notes_label">Visit notes (optional)</string>
+    <string name="complete_stop_modal_notes_hint">Add notes about the visit...</string>
+    <string name="complete_stop_modal_cancel_button">Cancel</string>
+    <string name="complete_stop_modal_confirm_button">Confirm</string>
+    <string name="complete_stop_modal_confirmation_message">Do you confirm that you completed the visit to %1$s?</string>
+    <string name="complete_stop_modal_notes_optional">Notes (optional)</string>
+    
+    <!-- Skip Stop Modal -->
+    <string name="skip_stop_modal_title">Skip Stop</string>
+    <string name="skip_stop_modal_message">Are you sure you want to skip this stop?</string>
+    <string name="skip_stop_modal_cancel_button">Cancel</string>
+    <string name="skip_stop_modal_confirm_button">Skip</string>
+    <string name="skip_stop_modal_confirmation_message">Why do you skip the visit to %1$s?</string>
+    <string name="skip_stop_modal_reason_label">Reason *</string>
+    <string name="skip_stop_modal_reason_required">Reason is required</string>
+    
+    <!-- Complete Route Modal -->
+    <string name="complete_route_modal_title">Complete Route</string>
+    <string name="complete_route_modal_message">Are you sure you want to complete this route?</string>
+    <string name="complete_route_modal_cancel_button">Cancel</string>
+    <string name="complete_route_modal_confirm_button">Complete Route</string>
+    <string name="complete_route_modal_confirmation_message">Do you confirm that you have finished executing the route?</string>
+    
+    <!-- Route Details -->
+    <string name="route_detail_continue_execution_button">Continue execution</string>
+    <string name="route_detail_complete_button">Complete</string>
+    
+    <!-- Route Execution -->
+    <string name="route_execution_next_stop_title">Next Stop</string>
+    <string name="route_execution_navigate_button">Navigate</string>
+    <string name="route_execution_complete_button">Complete</string>
+    <string name="route_execution_skip_button">Skip</string>
+    <string name="route_execution_completed_success">Route completed successfully!</string>
+    <string name="route_completed_successfully">Route completed successfully</string>
+    <string name="route_execution_complete_route_button">Complete Route</string>
+
+    <!-- Order Deletion -->
+    <string name="order_delete_button">Delete order</string>
+    <string name="order_delete_confirm_title">Confirm deletion</string>
+    <string name="order_delete_confirm_message">Are you sure you want to delete this order? This action cannot be undone.</string>
+    <string name="order_delete_confirm_button">Delete</string>
+    <string name="order_delete_cancel_button">Cancel</string>
+    <string name="order_deleted_success">Order deleted successfully</string>
+
+    <!-- Customer Detail Strings -->
+    <string name="address_information">Address Information</string>
+    <string name="customer_type_label">Customer Type:</string>
+    <string name="total_orders_label">Total Orders</string>
+    <string name="active_orders_label">Active Orders</string>
+    <string name="total_revenue_label">Total Revenue</string>
+    <string name="average_order_label">Average Order</string>
+    <string name="last_order_label">Last Order</string>
+    <string name="no_orders_label">No orders</string>
+    <string name="show_all_orders">Show all orders</string>
+
+</resources>

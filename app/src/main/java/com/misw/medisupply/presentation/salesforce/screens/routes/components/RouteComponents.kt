@@ -18,11 +18,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.route.Route
 import com.misw.medisupply.domain.model.route.RouteMetrics
 import com.misw.medisupply.domain.model.route.RouteStatus
 import com.misw.medisupply.domain.model.route.RouteStop
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.ui.theme.ColorPrimaryDark
 import com.misw.medisupply.ui.theme.ColorSuccess
 import com.misw.medisupply.ui.theme.ColorWarning
@@ -39,6 +42,7 @@ fun CustomerCheckboxItem(
     customer: Customer,
     isSelected: Boolean,
     onSelectionChanged: (Boolean) -> Unit,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -76,7 +80,7 @@ fun CustomerCheckboxItem(
                 )
                 
                 Text(
-                    text = customer.address ?: "Sin dirección",
+                    text = customer.address ?: localeManager.getLocalizedString(com.misw.medisupply.R.string.route_customer_no_address),
                     style = MaterialTheme.typography.bodySmall,
                     color = ColorTextSecondary,
                     maxLines = 1,
@@ -96,7 +100,7 @@ fun CustomerCheckboxItem(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "GPS: ${customer.latitude}, ${customer.longitude}",
+                            text = localeManager.getLocalizedString(com.misw.medisupply.R.string.route_customer_gps_coordinates) + ": ${customer.latitude}, ${customer.longitude}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -113,6 +117,7 @@ fun CustomerCheckboxItem(
 @Composable
 fun RouteCard(
     route: Route,
+    localeManager: LocaleManager,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -134,72 +139,90 @@ fun RouteCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Ruta #${route.id}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        text = localizedStringResource(R.string.route_card_title, localeManager) + " #${route.id}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = route.salespersonName,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 
-                RouteStatusChip(status = route.status)
+                RouteStatusChip(
+                    status = route.status,
+                    localeManager = localeManager
+                )
             }
             
             Spacer(modifier = Modifier.height(12.dp))
             
-            // Fecha
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            // Fecha con mejor diseño
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = route.plannedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = route.plannedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy")),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             
-            // Métricas
+            // Métricas con mejor espaciado y diseño
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 RouteMetricItem(
                     icon = Icons.Default.Store,
-                    label = "Paradas",
-                    value = "${route.stops.size}"
+                    label = localizedStringResource(R.string.route_card_stops_label, localeManager),
+                    value = "${route.metrics.pendingStops}",
+                    modifier = Modifier.weight(1f)
                 )
                 
                 RouteMetricItem(
                     icon = Icons.Default.Route,
-                    label = "Distancia",
-                    value = String.format("%.1f km", route.metrics.totalDistanceKm)
+                    label = localizedStringResource(R.string.route_card_distance_label, localeManager),
+                    value = String.format("%.1f km", route.metrics.totalDistanceKm),
+                    modifier = Modifier.weight(1f)
                 )
                 
                 RouteMetricItem(
                     icon = Icons.Default.AccessTime,
-                    label = "Tiempo",
-                    value = "${route.metrics.estimatedDurationMinutes} min"
+                    label = localizedStringResource(R.string.route_card_time_label, localeManager),
+                    value = "${route.metrics.estimatedDurationMinutes} min",
+                    modifier = Modifier.weight(1f)
                 )
             }
             
             // Progreso si está en curso
             if (route.status == RouteStatus.IN_PROGRESS) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 
                 val completed = route.stops.count { it.completedAt != null }
                 val total = route.stops.size
@@ -238,33 +261,34 @@ fun RouteCard(
 @Composable
 fun RouteStatusChip(
     status: RouteStatus,
+    localeManager: LocaleManager,
     modifier: Modifier = Modifier
 ) {
-    val (backgroundColor, textColor, text) = when (status) {
+    val (backgroundColor, textColor, stringRes) = when (status) {
         RouteStatus.DRAFT -> Triple(
             MaterialTheme.colorScheme.surfaceVariant,
             ColorTextPrimary,
-            "Borrador"
+            R.string.route_status_draft
         )
         RouteStatus.CONFIRMED -> Triple(
             ColorPrimaryDark.copy(alpha = 0.2f),
             ColorPrimaryDark,
-            "Confirmada"
+            R.string.route_status_confirmed
         )
         RouteStatus.IN_PROGRESS -> Triple(
             ColorWarning.copy(alpha = 0.2f),
             ColorWarning,
-            "En Curso"
+            R.string.route_status_in_progress
         )
         RouteStatus.COMPLETED -> Triple(
             ColorSuccess.copy(alpha = 0.2f),
             ColorSuccess,
-            "Completada"
+            R.string.route_status_completed
         )
         RouteStatus.CANCELLED -> Triple(
             ButtonDangerBg.copy(alpha = 0.2f),
             ButtonDangerBg,
-            "Cancelada"
+            R.string.route_status_cancelled
         )
     }
     
@@ -274,7 +298,7 @@ fun RouteStatusChip(
         color = backgroundColor
     ) {
         Text(
-            text = text,
+            text = localizedStringResource(stringRes, localeManager),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
@@ -293,29 +317,34 @@ fun RouteMetricItem(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Column(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = ColorTextSecondary
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -592,23 +621,15 @@ fun RouteMetricsCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+            containerColor = Color(0xFFE3F2FD)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Métricas de Ruta",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly

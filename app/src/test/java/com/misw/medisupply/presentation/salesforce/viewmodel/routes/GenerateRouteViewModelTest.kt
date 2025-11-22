@@ -4,11 +4,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.core.session.UserSessionManager
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.customer.DocumentType
 import com.misw.medisupply.domain.model.route.OptimizationStrategy
 import com.misw.medisupply.domain.model.route.Route
+import com.misw.medisupply.domain.model.route.RouteGenerationResult
 import com.misw.medisupply.domain.model.route.RouteMetrics
 import com.misw.medisupply.domain.model.route.RouteStatus
 import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
@@ -44,6 +46,7 @@ class GenerateRouteViewModelTest {
     private lateinit var generateRouteUseCase: GenerateRouteUseCase
     private lateinit var getCustomersUseCase: GetCustomersUseCase
     private lateinit var userSessionManager: UserSessionManager
+    private lateinit var localeManager: LocaleManager
     private lateinit var viewModel: GenerateRouteViewModel
 
     private val testCustomers = listOf(
@@ -148,6 +151,7 @@ class GenerateRouteViewModelTest {
         generateRouteUseCase = mock()
         getCustomersUseCase = mock()
         userSessionManager = mock()
+        localeManager = mock()
     }
 
     @After
@@ -159,7 +163,8 @@ class GenerateRouteViewModelTest {
         return GenerateRouteViewModel(
             generateRouteUseCase,
             getCustomersUseCase,
-            userSessionManager
+            userSessionManager,
+            localeManager
         )
     }
 
@@ -423,7 +428,7 @@ class GenerateRouteViewModelTest {
                 workHours = anyOrNull(),
                 serviceTimePerVisitMinutes = any()
             )
-        ).thenReturn(Result.success(Pair(testRoute, 120.0)))
+        ).thenReturn(Result.success(RouteGenerationResult(route = testRoute, computationTime = 120.0)))
 
         viewModel = createViewModel()
         viewModel.toggleCustomerSelection(1)

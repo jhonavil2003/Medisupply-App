@@ -35,6 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.salesforce.screens.orders.create.viewmodel.CustomerListScreenViewModel
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.presentation.salesforce.components.CustomerItem
@@ -52,9 +57,14 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
 @Composable
 fun CustomerListScreen(
     viewModel: OrdersViewModel = hiltViewModel(),
+    screenViewModel: CustomerListScreenViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
     onNavigateToCustomerDetail: (Customer) -> Unit = {}
 ) {
+    // Obtener LocaleManager del ViewModel
+    val localeManager = screenViewModel.localeManager
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
+    
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
@@ -70,8 +80,8 @@ fun CustomerListScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Consulta de Clientes",
-                subtitle = "Fuerza de ventas - Medisupply",
+                title = localizedStringResource(R.string.customer_consultation_title, localeManager),
+                subtitle = localizedStringResource(R.string.customer_consultation_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         },
@@ -91,7 +101,8 @@ fun CustomerListScreen(
                 // Search bar
                 SearchBar(
                     query = state.searchQuery,
-                    onQueryChange = { viewModel.onEvent(OrdersEvent.SearchCustomers(it)) }
+                    onQueryChange = { viewModel.onEvent(OrdersEvent.SearchCustomers(it)) },
+                    localeManager = localeManager
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -100,7 +111,8 @@ fun CustomerListScreen(
                 FilterChips(
                     customerTypes = viewModel.getCustomerTypes(),
                     selectedType = state.selectedFilter,
-                    onTypeSelected = { viewModel.onEvent(OrdersEvent.FilterByType(it)) }
+                    onTypeSelected = { viewModel.onEvent(OrdersEvent.FilterByType(it)) },
+                    localeManager = localeManager
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -119,6 +131,7 @@ fun CustomerListScreen(
                     state.hasCustomers() -> {
                         CustomerList(
                             customers = state.getFilteredCustomers(),
+                            localeManager = localeManager,
                             onCustomerClick = { customer ->
                                 // Navigate to customer detail instead of just selecting
                                 onNavigateToCustomerDetail(customer)
@@ -126,7 +139,7 @@ fun CustomerListScreen(
                         )
                     }
                     else -> {
-                        EmptyState()
+                        EmptyState(localeManager = localeManager)
                     }
                 }
             }
@@ -141,17 +154,18 @@ fun CustomerListScreen(
 private fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier.fillMaxWidth(),
-        placeholder = { Text("Buscar clientes...") },
+        placeholder = { Text(localizedStringResource(R.string.customer_list_search_placeholder, localeManager)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Buscar"
+                contentDescription = localizedStringResource(R.string.customer_list_search_action, localeManager)
             )
         },
         singleLine = true
@@ -166,6 +180,7 @@ private fun FilterChips(
     customerTypes: List<CustomerType>,
     selectedType: CustomerType?,
     onTypeSelected: (CustomerType?) -> Unit,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -177,7 +192,7 @@ private fun FilterChips(
             FilterChip(
                 selected = selectedType == null,
                 onClick = { onTypeSelected(null) },
-                label = { Text("Todos") }
+                label = { Text(localizedStringResource(R.string.customer_list_filter_all, localeManager)) }
             )
         }
         
@@ -186,7 +201,7 @@ private fun FilterChips(
             FilterChip(
                 selected = selectedType == type,
                 onClick = { onTypeSelected(type) },
-                label = { Text(type.displayName) }
+                label = { Text(type.getLocalizedDisplayName(localeManager)) }
             )
         }
     }
@@ -198,6 +213,7 @@ private fun FilterChips(
 @Composable
 private fun CustomerList(
     customers: List<Customer>,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onCustomerClick: (Customer) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -209,6 +225,7 @@ private fun CustomerList(
         items(customers, key = { it.id }) { customer ->
             CustomerItem(
                 customer = customer,
+                localeManager = localeManager,
                 onClick = onCustomerClick
             )
         }
@@ -220,6 +237,7 @@ private fun CustomerList(
  */
 @Composable
 private fun EmptyState(
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -230,13 +248,13 @@ private fun EmptyState(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "No hay clientes",
+                text = localizedStringResource(R.string.customer_list_no_customers, localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "No se encontraron clientes con los filtros seleccionados",
+                text = localizedStringResource(R.string.customer_list_no_customers_description, localeManager),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -2,6 +2,7 @@ package com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.VisitListUiState
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.Visit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import java.time.LocalTime
 
 @HiltViewModel
 class VisitListViewModel @Inject constructor(
+    val localeManager: LocaleManager
     // Inject repository when created
 ) : ViewModel() {
 

@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,19 +34,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.orders.Mode
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CartItemCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.OrderSummaryCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.SectionTitle
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ConfirmOrderDialog
-import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.DeleteOrderDialog
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.ErrorDialog
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.dialogs.SuccessDialog
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.viewmodel.OrderReviewScreenViewModel
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrderViewModel
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
@@ -65,19 +66,19 @@ fun OrderReviewScreen(
     orderId: String? = null,
     orderStatus: OrderStatus? = null,
     createViewModel: OrderViewModel = hiltViewModel(),
-    editViewModel: OrdersViewModel = hiltViewModel()
+    editViewModel: OrdersViewModel = hiltViewModel(),
+    localeViewModel: OrderReviewScreenViewModel = hiltViewModel()
 ) {
     // Use different ViewModel depending on mode
     val createState by createViewModel.state.collectAsState()
     val editState by editViewModel.state.collectAsState()
     
     var showConfirmDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
 
     // Determine which state and flags to use based on mode
-    val isLoading = if (mode == Mode.EDIT) editState.isSaving || editState.isDeleting else createState.isLoading
+    val isLoading = if (mode == Mode.EDIT) editState.isSaving else createState.isLoading
     val error = if (mode == Mode.EDIT) editState.error else createState.error
     val successOrder = if (mode == Mode.EDIT) {
         // Use the updatedOrder directly from state
@@ -85,23 +86,10 @@ fun OrderReviewScreen(
     } else {
         createState.createdOrder
     }
-    
-    // Get order number for delete confirmation
-    val orderNumber = if (mode == Mode.EDIT) orderId else null
 
     // Calculate totals
     val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
     val itemCount = cartItems.values.sumOf { it.quantity }
-    
-    // Handle delete success
-    LaunchedEffect(editState.deleteSuccessMessage) {
-        if (editState.deleteSuccessMessage != null) {
-            // Clear the state first to prevent re-triggering
-            editViewModel.onEvent(com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent.ClearDeleteSuccess)
-            // Navigate using onOrderSuccess which clears the backstack properly
-            onOrderSuccess("DELETED")
-        }
-    }
 
     // Handle order success result
     if (successOrder != null && !showSuccessDialog) {
@@ -115,8 +103,11 @@ fun OrderReviewScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = if (mode == Mode.EDIT) "Editar Pedido" else "Revisar Pedido",
-                subtitle = "Fuerza de ventas - Medisupply",
+                title = if (mode == Mode.EDIT) 
+                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_edit_title)
+                else 
+                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_create_title),
+                subtitle = localeViewModel.localeManager.getLocalizedString(R.string.order_review_salesforce_subtitle),
                 onNavigateBack = onNavigateBack
             )
         }
@@ -130,14 +121,26 @@ fun OrderReviewScreen(
         ) {
             // Customer Information Section
             item {
-                SectionTitle(text = "Información del Cliente")
+                SectionTitle(text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_customer_info))
+                Spacer(modifier = Modifier.height(8.dp))
                 CustomerSummaryCard(customer = customer)
             }
 
             // Order Items Section
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                SectionTitle(text = "Productos ($itemCount ${if (itemCount == 1) "item" else "items"})")
+                val productsText = if (itemCount == 1) {
+                    String.format(
+                        localeViewModel.localeManager.getLocalizedString(R.string.order_review_products_single),
+                        itemCount
+                    )
+                } else {
+                    String.format(
+                        localeViewModel.localeManager.getLocalizedString(R.string.order_review_products_plural),
+                        itemCount
+                    )
+                }
+                SectionTitle(text = productsText)
             }
 
             items(cartItems.values.toList()) { cartItem ->
@@ -147,7 +150,8 @@ fun OrderReviewScreen(
             // Order Summary Section
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                SectionTitle(text = "Resumen del Pedido")
+                SectionTitle(text = localeViewModel.localeManager.getLocalizedString(R.string.order_review_summary))
+                Spacer(modifier = Modifier.height(8.dp))
                 OrderSummaryCard(
                     subtotal = subtotal,
                     tax = 0f, // TODO: Calculate tax
@@ -168,7 +172,11 @@ fun OrderReviewScreen(
                         onClick = { showConfirmDialog = true },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        enabled = !isLoading
+                        enabled = !isLoading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            contentColor = Color.White
+                        )
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(
@@ -177,7 +185,7 @@ fun OrderReviewScreen(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Procesando...")
+                            Text(localeViewModel.localeManager.getLocalizedString(R.string.order_review_processing))
                         } else {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
@@ -186,7 +194,10 @@ fun OrderReviewScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (mode == Mode.EDIT) "Confirmar y Actualizar Pedido" else "Confirmar y Crear Pedido",
+                                text = if (mode == Mode.EDIT) 
+                                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_confirm_update)
+                                else 
+                                    localeViewModel.localeManager.getLocalizedString(R.string.order_review_confirm_create),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -200,32 +211,7 @@ fun OrderReviewScreen(
                         shape = RoundedCornerShape(12.dp),
                         enabled = !isLoading
                     ) {
-                        Text("Cancelar")
-                    }
-                    
-                    // Delete button (only in EDIT mode for PENDING orders)
-                    if (mode == Mode.EDIT && orderStatus == OrderStatus.PENDING) {
-                        Button(
-                            onClick = { showDeleteDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            ),
-                            enabled = !isLoading
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Eliminar Pedido",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        Text(localeViewModel.localeManager.getLocalizedString(R.string.order_review_cancel))
                     }
                 }
 
@@ -238,6 +224,7 @@ fun OrderReviewScreen(
     if (showConfirmDialog) {
         ConfirmOrderDialog(
             isEditMode = mode == Mode.EDIT,
+            localeManager = createViewModel.localeManager,
             onConfirm = {
                 showConfirmDialog = false
                 if (mode == Mode.EDIT && orderId != null) {
@@ -260,7 +247,11 @@ fun OrderReviewScreen(
         val orderNumber = successOrder.orderNumber ?: "N/A"
         SuccessDialog(
             orderNumber = orderNumber,
-            message = if (mode == Mode.EDIT) "Pedido actualizado exitosamente" else "Pedido creado exitosamente",
+            message = if (mode == Mode.EDIT) 
+                createViewModel.localeManager.getLocalizedString(R.string.order_updated_success_message)
+            else 
+                createViewModel.localeManager.getLocalizedString(R.string.order_created_success_message),
+            localeManager = createViewModel.localeManager,
             onDismiss = {
                 showSuccessDialog = false
                 if (mode == Mode.EDIT) {
@@ -285,25 +276,6 @@ fun OrderReviewScreen(
                     createViewModel.clearError()
                 }
             }
-        )
-    }
-    
-    // Delete Confirmation Dialog
-    if (showDeleteDialog) {
-        DeleteOrderDialog(
-            orderNumber = orderNumber,
-            onConfirm = {
-                showDeleteDialog = false
-                // Use the numeric ID from the state, not the string orderId parameter
-                val numericOrderId = editState.orderIdEditingNumeric
-                if (numericOrderId != null) {
-                    android.util.Log.d("OrderReviewScreen", "Deleting order with ID: $numericOrderId")
-                    editViewModel.onEvent(com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent.DeleteOrder(numericOrderId))
-                } else {
-                    android.util.Log.e("OrderReviewScreen", "Cannot delete: orderIdEditingNumeric is null")
-                }
-            },
-            onDismiss = { showDeleteDialog = false }
         )
     }
 }

@@ -23,7 +23,7 @@ interface RouteRepository {
         endLocation: Location? = null,
         workHours: WorkHours? = null,
         serviceTimePerVisitMinutes: Int = 30
-    ): Result<Pair<Route, Double?>> // Route + computation time
+    ): Result<RouteGenerationResult>
     
     /**
      * Obtener detalle de una ruta

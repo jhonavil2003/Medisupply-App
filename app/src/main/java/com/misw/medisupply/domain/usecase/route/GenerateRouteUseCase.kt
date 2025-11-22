@@ -3,6 +3,7 @@ package com.misw.medisupply.domain.usecase.route
 import com.misw.medisupply.domain.model.route.Location
 import com.misw.medisupply.domain.model.route.OptimizationStrategy
 import com.misw.medisupply.domain.model.route.Route
+import com.misw.medisupply.domain.model.route.RouteGenerationResult
 import com.misw.medisupply.domain.model.route.WorkHours
 import com.misw.medisupply.domain.repository.RouteRepository
 import java.time.LocalDate
@@ -25,7 +26,7 @@ class GenerateRouteUseCase @Inject constructor(
         endLocation: Location? = null,
         workHours: WorkHours? = null,
         serviceTimePerVisitMinutes: Int = 30
-    ): Result<Pair<Route, Double?>> {
+    ): Result<RouteGenerationResult> {
         // Validaciones
         if (customerIds.isEmpty()) {
             return Result.failure(Exception("Debe seleccionar al menos un cliente"))
@@ -35,8 +36,8 @@ class GenerateRouteUseCase @Inject constructor(
             return Result.failure(Exception("Máximo 20 clientes por ruta"))
         }
         
-        if (plannedDate.isBefore(LocalDate.now())) {
-            return Result.failure(Exception("La fecha de planificación debe ser futura"))
+        if (plannedDate.isBefore(LocalDate.now().plusDays(1))) {
+            return Result.failure(Exception("La fecha de planificación debe ser al menos mañana"))
         }
         
         return repository.generateRoute(

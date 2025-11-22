@@ -3,6 +3,7 @@ package com.misw.medisupply.presentation.salesforce.screens.orders.review.compon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 
 /**
@@ -13,8 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 fun SectionTitle(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleLarge,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurface
+        color = Color(0xFF1565C0)
     )
 }

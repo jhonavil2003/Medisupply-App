@@ -100,8 +100,26 @@ fun RouteStopDto.toRouteStop(): RouteStop {
         contactName = this.customer.contact.name,
         contactPhone = this.customer.contact.phone,
         contactEmail = this.customer.contact.email,
-        estimatedArrival = LocalDateTime.parse(this.estimatedTimes.arrival, dateTimeFormatter),
-        estimatedDeparture = LocalDateTime.parse(this.estimatedTimes.departure, dateTimeFormatter),
+        estimatedArrival = try {
+            LocalDateTime.parse(this.estimatedTimes.arrival, dateTimeFormatter)
+        } catch (e: Exception) {
+            // Fallback para otros formatos de fecha
+            try {
+                LocalDateTime.parse(this.estimatedTimes.arrival.replace("Z", ""))
+            } catch (e2: Exception) {
+                LocalDateTime.now() // Fallback
+            }
+        },
+        estimatedDeparture = try {
+            LocalDateTime.parse(this.estimatedTimes.departure, dateTimeFormatter)
+        } catch (e: Exception) {
+            // Fallback para otros formatos de fecha
+            try {
+                LocalDateTime.parse(this.estimatedTimes.departure.replace("Z", ""))
+            } catch (e2: Exception) {
+                LocalDateTime.now().plusMinutes(this.estimatedTimes.serviceMinutes.toLong()) // Fallback
+            }
+        },
         serviceMinutes = this.estimatedTimes.serviceMinutes,
         distanceFromPreviousKm = this.distanceMetrics.fromPreviousKm,
         travelTimeMinutes = this.distanceMetrics.travelTimeMinutes,

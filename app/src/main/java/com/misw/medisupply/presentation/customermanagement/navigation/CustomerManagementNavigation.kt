@@ -19,16 +19,23 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.presentation.customermanagement.viewmodel.CustomerShopViewModel
 import com.misw.medisupply.ui.theme.NavBarBackground
 import com.misw.medisupply.ui.theme.NavBarIconBlue
 import com.misw.medisupply.ui.theme.NavBarIconGreen
@@ -42,11 +49,17 @@ fun CustomerManagementNavigation(
     onNavigateToRoleSelection: () -> Unit = {}
 ) {
     val navController = rememberNavController()
+    // Get LocaleManager from a ViewModel for navigation
+    val viewModel: CustomerShopViewModel = hiltViewModel()
+    val localeManager = viewModel.localeManager
     
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            CustomerManagementBottomNavigationBar(navController = navController)
+            CustomerManagementBottomNavigationBar(
+                navController = navController,
+                localeManager = localeManager
+            )
         }
     ) { paddingValues ->
         CustomerManagementNavGraph(
@@ -62,34 +75,38 @@ fun CustomerManagementNavigation(
  * Shows navigation items specific to self-service clients
  */
 @Composable
-private fun CustomerManagementBottomNavigationBar(navController: NavHostController) {
+private fun CustomerManagementBottomNavigationBar(
+    navController: NavHostController,
+    localeManager: LocaleManager
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val currentLanguage = localeManager.currentLanguage.collectAsState().value
     
     val navigationItems = listOf(
         NavigationItem(
-            title = "Inicio",
+            title = localizedStringResource(R.string.nav_home, localeManager),
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             route = CustomerManagementRoutes.HOME,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = "Compras",
+            title = localizedStringResource(R.string.nav_shop, localeManager),
             selectedIcon = Icons.Filled.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
             route = CustomerManagementRoutes.SHOP,
             iconColor = NavBarIconGreen
         ),
         NavigationItem(
-            title = "Pedidos",
+            title = localizedStringResource(R.string.nav_orders, localeManager),
             selectedIcon = Icons.Filled.Receipt,
             unselectedIcon = Icons.Outlined.Receipt,
             route = CustomerManagementRoutes.ORDERS,
             iconColor = NavBarIconBlue
         ),
         NavigationItem(
-            title = "Cuenta",
+            title = localizedStringResource(R.string.nav_account, localeManager),
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
             route = CustomerManagementRoutes.ACCOUNT,
@@ -102,9 +119,43 @@ private fun CustomerManagementBottomNavigationBar(navController: NavHostControll
         tonalElevation = 8.dp
     ) {
         navigationItems.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { 
-                it.route == item.route 
-            } == true
+            // Enhanced selection logic to handle sub-routes
+            val isSelected = when (item.route) {
+                CustomerManagementRoutes.SHOP -> {
+                    // Select Shop tab when in any shop-related screen (including order creation from shop)
+                    currentDestination?.hierarchy?.any { destination ->
+                        val route = destination.route
+                        route == CustomerManagementRoutes.SHOP ||
+                        route == CustomerManagementRoutes.CREATE_ORDER_PRODUCTS ||
+                        route == CustomerManagementRoutes.CREATE_ORDER_REVIEW ||
+                        route == CustomerManagementRoutes.PRODUCT_DETAIL ||
+                        route?.startsWith("${CustomerManagementRoutes.PRODUCT_DETAIL}/") == true ||
+                        route?.startsWith("customer_create_order") == true ||
+                        route?.contains("shop") == true
+                    } == true
+                }
+                CustomerManagementRoutes.ORDERS -> {
+                    // Select Orders tab when in any order-related screen (excluding creation flow from shop)
+                    currentDestination?.hierarchy?.any { destination ->
+                        val route = destination.route
+                        (route == CustomerManagementRoutes.ORDERS ||
+                        route == CustomerManagementRoutes.ORDER_DETAIL ||
+                        route?.startsWith("${CustomerManagementRoutes.ORDER_DETAIL}/") == true ||
+                        route == CustomerManagementRoutes.ORDER_TRACKING ||
+                        route?.startsWith("customer_order") == true) &&
+                        // Exclude order creation flow which belongs to Shop
+                        route != CustomerManagementRoutes.CREATE_ORDER_PRODUCTS &&
+                        route != CustomerManagementRoutes.CREATE_ORDER_REVIEW &&
+                        !route?.startsWith("customer_create_order")!!
+                    } == true
+                }
+                else -> {
+                    // Default behavior for other tabs
+                    currentDestination?.hierarchy?.any { 
+                        it.route == item.route 
+                    } == true
+                }
+            }
             
             NavigationBarItem(
                 icon = {

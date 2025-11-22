@@ -3,6 +3,8 @@ package com.misw.medisupply.presentation.salesforce.screens.orders.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
+import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +16,13 @@ import javax.inject.Inject
 
 /**
  * ViewModel for My Orders Screen
- * Manages the state and business logic for displaying seller's orders with pagination
+ * Manages the state and business logic for displaying seller's orders with advanced filtering
  */
 @HiltViewModel
 class MyOrdersViewModel @Inject constructor(
-    private val getOrdersUseCase: GetOrdersUseCase
+    private val getOrdersUseCase: GetOrdersUseCase,
+    private val getCustomersUseCase: GetCustomersUseCase,
+    private val deleteOrderUseCase: DeleteOrderUseCase
 ) : ViewModel() {
     
     private val _state = MutableStateFlow(MyOrdersState())
@@ -31,12 +35,13 @@ class MyOrdersViewModel @Inject constructor(
     private val currentSellerId: String = "SELLER-001"
     
     /**
-     * Número de órdenes por página
+     * Obtener todos los resultados sin paginación
      */
-    private val ordersPerPage: Int = 20
+    private val maxResults: Int = 1000
     
     init {
         loadOrders()
+        loadCustomers()
     }
     
     /**
@@ -45,62 +50,34 @@ class MyOrdersViewModel @Inject constructor(
     fun onEvent(event: MyOrdersEvent) {
         when (event) {
             is MyOrdersEvent.LoadOrders -> loadOrders()
-            is MyOrdersEvent.LoadNextPage -> loadNextPage()
-            is MyOrdersEvent.LoadPreviousPage -> loadPreviousPage()
+            is MyOrdersEvent.LoadCustomers -> loadCustomers()
             is MyOrdersEvent.RefreshOrders -> refreshOrders()
             is MyOrdersEvent.FilterByStatus -> filterByStatus(event.status)
+            is MyOrdersEvent.FilterByCustomer -> filterByCustomer(event.customerId)
+            is MyOrdersEvent.FilterByDateRange -> filterByDateRange(event.dateRange)
+            is MyOrdersEvent.ClearFilters -> clearAllFilters()
             is MyOrdersEvent.SelectOrder -> selectOrder(event.order)
             is MyOrdersEvent.ClearError -> clearError()
+            is MyOrdersEvent.DeleteOrder -> deleteOrder(event.orderId)
+            is MyOrdersEvent.ClearSuccessMessage -> clearSuccessMessage()
         }
     }
     
     /**
-     * Load first page of orders from repository
+     * Load orders from repository with current filters
      */
     private fun loadOrders() {
-        loadPage(1)
-    }
-    
-    /**
-     * Load next page of orders
-     */
-    private fun loadNextPage() {
-        val currentState = _state.value
-        if (currentState.currentPage < currentState.totalPages && !currentState.isLoadingMore) {
-            loadPage(currentState.currentPage + 1)
-        }
-    }
-    
-    /**
-     * Load previous page of orders
-     */
-    private fun loadPreviousPage() {
-        val currentState = _state.value
-        if (currentState.currentPage > 1 && !currentState.isLoadingMore) {
-            loadPage(currentState.currentPage - 1)
-        }
-    }
-    
-    /**
-     * Load a specific page of orders
-     */
-    private fun loadPage(page: Int) {
         viewModelScope.launch {
-            // Set loading state based on whether it's first load or page change
-            if (page == 1 && _state.value.orders.isEmpty()) {
-                _state.update { it.copy(isLoading = true, error = null) }
-            } else {
-                _state.update { it.copy(isLoadingMore = true, error = null) }
-            }
+            _state.update { it.copy(isLoading = true, error = null) }
             
-            // Get selected status to pass to backend
-            val statusFilter = _state.value.selectedStatus?.value
+            val currentState = _state.value
             
             getOrdersUseCase(
                 sellerId = currentSellerId,
-                status = statusFilter,  // Apply filter on backend
-                page = page,
-                perPage = ordersPerPage
+                customerId = currentState.selectedCustomerId,
+                status = currentState.selectedStatus?.value,
+                page = 1,
+                perPage = maxResults
             ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
@@ -111,14 +88,8 @@ class MyOrdersViewModel @Inject constructor(
                         _state.update { 
                             it.copy(
                                 isLoading = false,
-                                isLoadingMore = false,
                                 isRefreshing = false,
-                                // Replace orders with the new page (not append)
                                 orders = paginatedResult?.items ?: emptyList(),
-                                currentPage = paginatedResult?.page ?: page,
-                                totalPages = paginatedResult?.totalPages ?: 1,
-                                totalOrders = paginatedResult?.total ?: 0,
-                                hasMore = paginatedResult?.hasMore ?: false,
                                 error = null
                             )
                         }
@@ -127,7 +98,6 @@ class MyOrdersViewModel @Inject constructor(
                         _state.update { 
                             it.copy(
                                 isLoading = false,
-                                isLoadingMore = false,
                                 isRefreshing = false,
                                 error = resource.message
                             )
@@ -139,23 +109,88 @@ class MyOrdersViewModel @Inject constructor(
     }
     
     /**
-     * Refresh orders (pull to refresh - resets to page 1)
+     * Load customers for filtering
+     */
+    private fun loadCustomers() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoadingCustomers = true) }
+            
+            getCustomersUseCase(
+                sellerId = currentSellerId.toIntOrNull() // Convert if needed
+            ).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        // Loading already set above
+                    }
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                isLoadingCustomers = false,
+                                customers = resource.data ?: emptyList()
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                isLoadingCustomers = false,
+                                error = resource.message
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Refresh orders (pull to refresh)
      */
     private fun refreshOrders() {
         viewModelScope.launch {
             _state.update { it.copy(isRefreshing = true) }
-            loadPage(1)
+            loadOrders()
         }
     }
     
     /**
      * Filter orders by status
-     * Resets to page 1 and reloads with filter applied on backend
+     * Reloads orders with filter applied on backend
      */
     private fun filterByStatus(status: com.misw.medisupply.domain.model.order.OrderStatus?) {
         _state.update { it.copy(selectedStatus = status) }
-        // Reload from page 1 with the new filter
-        loadPage(1)
+        loadOrders()
+    }
+    
+    /**
+     * Filter orders by customer
+     * Reloads orders with filter applied on backend
+     */
+    private fun filterByCustomer(customerId: Int?) {
+        _state.update { it.copy(selectedCustomerId = customerId) }
+        loadOrders()
+    }
+    
+    /**
+     * Filter orders by date range
+     * Applied on client-side since API doesn't support date filtering
+     */
+    private fun filterByDateRange(dateRange: DateRange?) {
+        _state.update { it.copy(selectedDateRange = dateRange) }
+    }
+    
+    /**
+     * Clear all filters
+     */
+    private fun clearAllFilters() {
+        _state.update {
+            it.copy(
+                selectedStatus = null,
+                selectedCustomerId = null,
+                selectedDateRange = null
+            )
+        }
+        loadOrders()
     }
     
     /**
@@ -170,5 +205,48 @@ class MyOrdersViewModel @Inject constructor(
      */
     private fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+    
+    /**
+     * Delete an order
+     */
+    private fun deleteOrder(orderId: Int) {
+        viewModelScope.launch {
+            _state.update { it.copy(isDeleting = true, error = null) }
+            
+            deleteOrderUseCase(orderId).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        // Loading state already set above
+                    }
+                    is Resource.Success -> {
+                        // Remove order from local list and show success message
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isDeleting = false,
+                                orders = currentState.orders.filter { it.id != orderId },
+                                successMessage = "order_deleted_successfully", // Resource key for internationalization
+                                error = null
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update { 
+                            it.copy(
+                                isDeleting = false,
+                                error = resource.message
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Clear success message
+     */
+    private fun clearSuccessMessage() {
+        _state.update { it.copy(successMessage = null) }
     }
 }

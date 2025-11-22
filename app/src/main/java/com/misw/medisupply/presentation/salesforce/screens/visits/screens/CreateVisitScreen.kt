@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState
 import com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.CreateVisitViewModel
 
@@ -49,16 +51,22 @@ fun CreateVisitScreen(
     viewModel: com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.CreateVisitViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
-    val tabTitles = listOf("Datos", "Ubicación", "Archivos")
     val uiState by viewModel.uiState.collectAsState()
+    val localeManager = viewModel.localeManager
+    
+    val tabTitles = listOf(
+        localizedStringResource(R.string.tab_data, localeManager),
+        localizedStringResource(R.string.tab_location, localeManager),
+        localizedStringResource(R.string.tab_files, localeManager)
+    )
     
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Crear visita",
-                subtitle = "Visitas - Medisupply",
+                title = localizedStringResource(R.string.create_visit_title, localeManager),
+                subtitle = localizedStringResource(R.string.visits_subtitle, localeManager),
                 onNavigateBack = onNavigateBack
             )
         },
@@ -88,7 +96,10 @@ fun CreateVisitScreen(
                 ExtendedFloatingActionButton(
                     text = { 
                         Text(
-                            if (uiState.isSaving) "Guardando..." else "Guardar visita",
+                            if (uiState.isSaving) 
+                                localizedStringResource(R.string.saving_label, localeManager) 
+                            else 
+                                localizedStringResource(R.string.save_visit_button, localeManager),
                             color = Color.White
                         )
                     },
@@ -102,7 +113,7 @@ fun CreateVisitScreen(
                         } else {
                             Icon(
                                 Icons.Default.Save, 
-                                contentDescription = "Guardar visita",
+                                contentDescription = localizedStringResource(R.string.save_visit_description, localeManager),
                                 tint = Color.White
                             )
                         }
@@ -133,12 +144,15 @@ fun CreateVisitScreen(
             datePickerState.selectedDateMillis = uiState.visitDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
         }
 
+        // Obtener strings localizadas fuera de LaunchedEffect
+        val visitSavedSuccessMessage = localizedStringResource(R.string.visit_saved_success, localeManager)
+        
         // Manejar éxito del guardado
         LaunchedEffect(uiState.saveSuccess) {
             if (uiState.saveSuccess) {
                 // Mostrar mensaje de éxito
                 snackbarHostState.showSnackbar(
-                    message = "✅ ¡Visita guardada exitosamente! Ahora puedes completar ubicación y archivos.",
+                    message = visitSavedSuccessMessage,
                     duration = SnackbarDuration.Long
                 )
                 // Cambiar al tab de ubicación automáticamente después de guardar
@@ -223,6 +237,7 @@ fun CreateVisitScreen(
                 when (selectedTabIndex) {
                     0 -> DatosTabContent(
                         uiState = uiState,
+                        localeManager = localeManager,
                         dateFormatter = dateFormatter,
                         timeFormatter = timeFormatter,
                         showDatePicker = showDatePicker,
@@ -242,11 +257,13 @@ fun CreateVisitScreen(
                     )
                     1 -> UbicacionTabContent(
                         uiState = uiState,
+                        localeManager = localeManager,
                         onAddressChange = viewModel::updateAddress
                     )
                     2 -> com.misw.medisupply.presentation.salesforce.screens.visits.components.ArchivosTabContent(
                         uiState = uiState,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        localeManager = localeManager
                     )
                 }
                 Spacer(Modifier.height(80.dp)) // Espacio para el FAB
@@ -259,6 +276,7 @@ fun CreateVisitScreen(
 @Composable
 private fun DatosTabContent(
     uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     dateFormatter: DateTimeFormatter,
     timeFormatter: DateTimeFormatter,
     showDatePicker: Boolean,
@@ -283,7 +301,7 @@ private fun DatosTabContent(
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                "Información de la visita", 
+                localizedStringResource(R.string.visit_info_title, localeManager), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -310,17 +328,17 @@ private fun DatosTabContent(
                     Column {
                         Text(
                             text = if (uiState.isVisitSaved) {
-                                "✅ Visita guardada exitosamente. Ve a las pestañas 'Ubicación' y 'Archivos' para completar información adicional."
+                                localizedStringResource(R.string.visit_saved_complete, localeManager)
                             } else if (!uiState.isCustomerSelected) {
-                                "1️⃣ Selecciona un cliente para comenzar"
+                                localizedStringResource(R.string.select_customer_start, localeManager)
                             } else if (uiState.isFormValid) {
-                                "3️⃣ ¡Listo para guardar! Cliente, fecha y hora confirmados."
+                                localizedStringResource(R.string.ready_to_save, localeManager)
                             } else if (uiState.isCustomerSelected && !uiState.hasModifiedDate) {
-                                "2️⃣ Confirma la fecha de la visita (toca el campo de fecha)"
+                                localizedStringResource(R.string.confirm_visit_date, localeManager)
                             } else if (uiState.isCustomerSelected && !uiState.hasModifiedTime) {
-                                "2️⃣ Confirma la hora de la visita (toca el campo de hora)"
+                                localizedStringResource(R.string.confirm_visit_time, localeManager)
                             } else {
-                                "2️⃣ Confirma la fecha y hora de la visita"
+                                localizedStringResource(R.string.confirm_date_time, localeManager)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
@@ -339,7 +357,7 @@ private fun DatosTabContent(
                                 )
                                 Spacer(Modifier.width(6.dp))
                                 Text(
-                                    text = "Guardando cambios...",
+                                    text = localizedStringResource(R.string.saving_changes, localeManager),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFF1565C0)
                                 )
@@ -383,13 +401,13 @@ private fun DatosTabContent(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Person,
-                                    contentDescription = "Cliente",
+                                    contentDescription = localizedStringResource(R.string.client_description, localeManager),
                                     tint = Color(0xFF1565C0),
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Text(
-                                    text = "Cliente de la visita:",
+                                    text = localizedStringResource(R.string.visit_client_label, localeManager),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = Color(0xFF1565C0)
                                 )
@@ -407,7 +425,7 @@ private fun DatosTabContent(
                             if (!customer.contactName.isNullOrEmpty()) {
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    text = "Contacto: ${customer.contactName}",
+                                    text = localizedStringResource(R.string.contact_label, localeManager).format(customer.contactName),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFF757575)
                                 )
@@ -415,7 +433,7 @@ private fun DatosTabContent(
                             
                             if (!customer.contactPhone.isNullOrEmpty()) {
                                 Text(
-                                    text = "Teléfono: ${customer.contactPhone}",
+                                    text = localizedStringResource(R.string.phone_label, localeManager).format(customer.contactPhone),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFF757575)
                                 )
@@ -423,7 +441,7 @@ private fun DatosTabContent(
                             
                             if (!customer.address.isNullOrEmpty()) {
                                 Text(
-                                    text = "Dirección: ${customer.address}",
+                                    text = localizedStringResource(R.string.address_label, localeManager).format(customer.address),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFF757575)
                                 )
@@ -446,7 +464,7 @@ private fun DatosTabContent(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
                 ) {
                     Text(
-                        text = "Selecciona un cliente para continuar con los datos de la visita",
+                        text = localizedStringResource(R.string.select_customer_continue, localeManager),
                         modifier = Modifier.padding(12.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF757575)
@@ -462,7 +480,7 @@ private fun DatosTabContent(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
                 ) {
                     Text(
-                        text = "💾 Los cambios en personas contactadas, hallazgos y notas se guardan automáticamente.",
+                        text = localizedStringResource(R.string.auto_save_info, localeManager),
                         modifier = Modifier.padding(12.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF2E7D32)
@@ -486,7 +504,7 @@ private fun DatosTabContent(
                     leadingIcon = { 
                         Icon(
                             Icons.Default.CalendarToday, 
-                            contentDescription = "Seleccionar fecha", 
+                            contentDescription = localizedStringResource(R.string.select_date_description, localeManager), 
                             tint = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)
                         ) 
                     },
@@ -519,7 +537,8 @@ private fun DatosTabContent(
                         onShowDatePicker(false)
                     },
                     onDismiss = { onShowDatePicker(false) },
-                    datePickerState = datePickerState
+                    datePickerState = datePickerState,
+                    localeManager = localeManager
                 )
             }
             
@@ -540,7 +559,7 @@ private fun DatosTabContent(
                     leadingIcon = { 
                         Icon(
                             Icons.Default.AccessTime, 
-                            contentDescription = "Seleccionar hora", 
+                            contentDescription = localizedStringResource(R.string.select_time_description, localeManager), 
                             tint = if (dateTimeEnabled) Color(0xFF1565C0) else Color(0xFFBDBDBD)
                         ) 
                     },
@@ -568,7 +587,8 @@ private fun DatosTabContent(
                         onShowTimePicker(false)
                     },
                     onDismiss = { onShowTimePicker(false) },
-                    timePickerState = timePickerState
+                    timePickerState = timePickerState,
+                    localeManager = localeManager
                 )
             }
             
@@ -577,8 +597,8 @@ private fun DatosTabContent(
             OutlinedTextField(
                 value = uiState.contactedPersons,
                 onValueChange = onContactedPersonsChange,
-                label = { Text("Personas contactadas") },
-                placeholder = { Text("Ej: Dr. García, Enf. López") },
+                label = { Text(localizedStringResource(R.string.contacted_persons_label, localeManager)) },
+                placeholder = { Text(localizedStringResource(R.string.contacted_persons_placeholder, localeManager)) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = detailsEnabled,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -597,8 +617,8 @@ private fun DatosTabContent(
             OutlinedTextField(
                 value = uiState.clinicalFindings,
                 onValueChange = onClinicalFindingsChange,
-                label = { Text("Hallazgos clínicos") },
-                placeholder = { Text("Describe los hallazgos relevantes...") },
+                label = { Text(localizedStringResource(R.string.clinical_findings_label, localeManager)) },
+                placeholder = { Text(localizedStringResource(R.string.clinical_findings_placeholder, localeManager)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
@@ -619,8 +639,8 @@ private fun DatosTabContent(
             OutlinedTextField(
                 value = uiState.additionalNotes,
                 onValueChange = onAdditionalNotesChange,
-                label = { Text("Notas adicionales") },
-                placeholder = { Text("Observaciones, comentarios...") },
+                label = { Text(localizedStringResource(R.string.additional_notes_label, localeManager)) },
+                placeholder = { Text(localizedStringResource(R.string.additional_notes_placeholder, localeManager)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
                 maxLines = 4,
@@ -642,6 +662,7 @@ private fun DatosTabContent(
 @Composable
 private fun UbicacionTabContent(
     uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
     onAddressChange: (String) -> Unit
 ) {
     Card(
@@ -651,7 +672,7 @@ private fun UbicacionTabContent(
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                "Ubicación de la visita", 
+                localizedStringResource(R.string.visit_location_title, localeManager), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
@@ -668,9 +689,9 @@ private fun UbicacionTabContent(
                 Column(Modifier.padding(12.dp)) {
                     Text(
                         text = if (uiState.isVisitSaved) {
-                            "💾 La dirección se guarda automáticamente en tu visita."
+                            localizedStringResource(R.string.address_auto_save, localeManager)
                         } else {
-                            "📍 Primero debes guardar la visita en el tab 'Datos' para poder agregar ubicación."
+                            localizedStringResource(R.string.save_visit_first, localeManager)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
@@ -689,7 +710,7 @@ private fun UbicacionTabContent(
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                text = "Guardando ubicación...",
+                                text = localizedStringResource(R.string.saving_location, localeManager),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF2E7D32)
                             )
@@ -703,9 +724,9 @@ private fun UbicacionTabContent(
             OutlinedTextField(
                 value = uiState.address,
                 onValueChange = onAddressChange,
-                label = { Text("Dirección de la visita") },
-                placeholder = { Text("Ej: Cra 7 #123-45, Bogotá") },
-                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF1565C0)) },
+                label = { Text(localizedStringResource(R.string.visit_address_label, localeManager)) },
+                placeholder = { Text(localizedStringResource(R.string.address_placeholder, localeManager)) },
+                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = localizedStringResource(R.string.address_label, localeManager), tint = Color(0xFF1565C0)) },
                 enabled = uiState.isVisitSaved, // Solo habilitado después de guardar la visita
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -739,18 +760,18 @@ private fun UbicacionTabContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Mapa",
+                            contentDescription = localizedStringResource(R.string.map_description, localeManager),
                             tint = Color(0xFF1565C0),
                             modifier = Modifier.size(48.dp)
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = "Vista del mapa",
+                            text = localizedStringResource(R.string.map_view, localeManager),
                             color = Color(0xFF1565C0),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "Integración próximamente",
+                            text = localizedStringResource(R.string.integration_coming_soon, localeManager),
                             color = Color(0xFF757575),
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -769,11 +790,11 @@ private fun UbicacionTabContent(
             ) {
                 Icon(
                     Icons.Default.LocationOn, 
-                    contentDescription = null,
+                    contentDescription = localizedStringResource(R.string.select_location_button, localeManager),
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("Seleccionar ubicación")
+                Text(localizedStringResource(R.string.select_location_button, localeManager))
             }
         }
     }
@@ -785,18 +806,19 @@ private fun UbicacionTabContent(
 private fun CustomDatePickerDialog(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit,
-    datePickerState: androidx.compose.material3.DatePickerState
+    datePickerState: androidx.compose.material3.DatePickerState,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
 ) {
     androidx.compose.material3.DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
-                Text("OK")
+                Text(localizedStringResource(R.string.ok_button, localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.cancel_button, localeManager))
             }
         }
     ) {
@@ -809,7 +831,8 @@ private fun CustomDatePickerDialog(
 private fun CustomTimePickerDialog(
     onTimeSelected: (Int, Int) -> Unit,
     onDismiss: () -> Unit,
-    timePickerState: TimePickerState
+    timePickerState: TimePickerState,
+    localeManager: com.misw.medisupply.core.i18n.LocaleManager
 ) {
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
@@ -819,12 +842,12 @@ private fun CustomTimePickerDialog(
                     onTimeSelected(timePickerState.hour, timePickerState.minute)
                 }
             ) {
-                Text("OK")
+                Text(localizedStringResource(R.string.ok_button, localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.cancel_button, localeManager))
             }
         },
         text = {

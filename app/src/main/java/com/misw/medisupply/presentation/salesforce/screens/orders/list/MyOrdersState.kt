@@ -1,26 +1,26 @@
 package com.misw.medisupply.presentation.salesforce.screens.orders.list
 
+import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
+import java.util.Date
 
 /**
- * UI State for My Orders Screen with pagination support
+ * UI State for My Orders Screen with advanced filtering
  */
 data class MyOrdersState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val isLoadingMore: Boolean = false,
+    val isDeleting: Boolean = false,
     val orders: List<Order> = emptyList(),
+    val customers: List<Customer> = emptyList(),
     val selectedStatus: OrderStatus? = null,
+    val selectedCustomerId: Int? = null,
+    val selectedDateRange: DateRange? = null,
     val error: String? = null,
     val selectedOrder: Order? = null,
-    
-    // Pagination state
-    val currentPage: Int = 1,
-    val totalPages: Int = 1,
-    val totalOrders: Int = 0,
-    val perPage: Int = 20,
-    val hasMore: Boolean = false
+    val isLoadingCustomers: Boolean = false,
+    val successMessage: String? = null
 ) {
     /**
      * Check if there are any orders
@@ -28,51 +28,68 @@ data class MyOrdersState(
     fun hasOrders(): Boolean = orders.isNotEmpty()
     
     /**
-     * Get orders to display (no local filtering - filter is applied on backend)
+     * Get orders to display with local filters applied
      */
     fun getFilteredOrders(): List<Order> {
-        return orders
+        var filteredOrders = orders
+        
+        // Apply date filter (client-side since API doesn't support it)
+        selectedDateRange?.let { dateRange ->
+            filteredOrders = filteredOrders.filter { order ->
+                order.orderDate?.let { orderDate ->
+                    orderDate.after(dateRange.startDate) || orderDate == dateRange.startDate &&
+                    orderDate.before(dateRange.endDate) || orderDate == dateRange.endDate
+                } ?: false
+            }
+        }
+        
+        return filteredOrders
     }
     
     /**
-     * Get count of orders by status (from current page only)
+     * Get customer by ID
      */
-    fun getOrderCountByStatus(status: OrderStatus): Int {
-        return orders.count { it.status == status }
+    fun getCustomerById(customerId: Int): Customer? {
+        return customers.find { it.id == customerId }
     }
     
     /**
-     * Get total count of loaded orders
+     * Check if any filters are active
      */
-    fun getTotalOrderCount(): Int = orders.size
+    fun hasActiveFilters(): Boolean {
+        return selectedStatus != null || selectedCustomerId != null || selectedDateRange != null
+    }
     
     /**
-     * Check if we can load more orders
+     * Get total count of filtered orders
      */
-    fun canLoadMore(): Boolean = hasMore && !isLoading && !isLoadingMore && !isRefreshing
+    fun getTotalFilteredOrderCount(): Int = getFilteredOrders().size
 }
+
+/**
+ * Data class for date range filtering
+ */
+data class DateRange(
+    val startDate: Date,
+    val endDate: Date
+)
 
 /**
  * Events that can be triggered from My Orders Screen
  */
 sealed class MyOrdersEvent {
     /**
-     * Load orders from repository (first page)
+     * Load orders from repository
      */
     object LoadOrders : MyOrdersEvent()
     
     /**
-     * Load next page of orders
+     * Load customers for filtering
      */
-    object LoadNextPage : MyOrdersEvent()
+    object LoadCustomers : MyOrdersEvent()
     
     /**
-     * Load previous page of orders
-     */
-    object LoadPreviousPage : MyOrdersEvent()
-    
-    /**
-     * Refresh orders (pull to refresh - resets to page 1)
+     * Refresh orders (pull to refresh)
      */
     object RefreshOrders : MyOrdersEvent()
     
@@ -80,6 +97,21 @@ sealed class MyOrdersEvent {
      * Filter orders by status
      */
     data class FilterByStatus(val status: OrderStatus?) : MyOrdersEvent()
+    
+    /**
+     * Filter orders by customer
+     */
+    data class FilterByCustomer(val customerId: Int?) : MyOrdersEvent()
+    
+    /**
+     * Filter orders by date range
+     */
+    data class FilterByDateRange(val dateRange: DateRange?) : MyOrdersEvent()
+    
+    /**
+     * Clear all filters
+     */
+    object ClearFilters : MyOrdersEvent()
     
     /**
      * Select an order to view details
@@ -90,4 +122,14 @@ sealed class MyOrdersEvent {
      * Clear error message
      */
     object ClearError : MyOrdersEvent()
+    
+    /**
+     * Delete an order
+     */
+    data class DeleteOrder(val orderId: Int) : MyOrdersEvent()
+    
+    /**
+     * Clear success message
+     */
+    object ClearSuccessMessage : MyOrdersEvent()
 }

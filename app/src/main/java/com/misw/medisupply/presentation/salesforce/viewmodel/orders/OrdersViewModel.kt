@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.R
 
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
@@ -32,7 +34,8 @@ class OrdersViewModel @Inject constructor(
     private val getOrderByIdUseCase: GetOrderByIdUseCase,
     private val getOrdersUseCase: GetOrdersUseCase,
     private val updateOrderUseCase: UpdateOrderUseCase,
-    private val deleteOrderUseCase: DeleteOrderUseCase
+    private val deleteOrderUseCase: DeleteOrderUseCase,
+    private val localeManager: LocaleManager
 ) : ViewModel() {
     
     companion object {
@@ -179,7 +182,10 @@ class OrdersViewModel @Inject constructor(
                             it.copy(
                                 isLoadingCustomers = false,
                                 customerSearchResults = emptyList(),
-                                error = "Error al buscar clientes: ${resource.message}"
+                                error = String.format(
+                                    localeManager.getLocalizedString(R.string.error_searching_customers),
+                                    resource.message ?: ""
+                                )
                             )
                         }
                     }
@@ -254,7 +260,7 @@ class OrdersViewModel @Inject constructor(
                                 _state.update {
                                     it.copy(
                                         isLoading = false,
-                                        error = "Orden no encontrada"
+                                        error = localeManager.getLocalizedString(R.string.order_not_found)
                                     )
                                 }
                             }
@@ -263,7 +269,7 @@ class OrdersViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isLoading = false,
-                                    error = resource.message ?: "Error al cargar la orden"
+                                    error = resource.message ?: localeManager.getLocalizedString(R.string.error_loading_order)
                                 )
                             }
                         }
@@ -286,7 +292,7 @@ class OrdersViewModel @Inject constructor(
         Log.d(TAG, "updateOrder() called - orderId: $orderId, customer: ${customer?.id}, cartItems: ${cartItems.size}")
         
         if (orderId == null || customer == null || cartItems.isEmpty()) {
-            val errorMsg = "Datos incompletos para actualizar la orden"
+            val errorMsg = localeManager.getLocalizedString(R.string.incomplete_order_data)
             android.util.Log.e("OrdersViewModel", errorMsg)
             _state.update { it.copy(error = errorMsg) }
             return
@@ -333,7 +339,7 @@ class OrdersViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isSaving = false,
-                                    successMessage = "Orden actualizada exitosamente",
+                                    successMessage = localeManager.getLocalizedString(R.string.order_updated_successfully),
                                     orders = currentOrders,
                                     updatedOrder = updatedOrder, // Store for success dialog
                                     error = null
@@ -345,7 +351,7 @@ class OrdersViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isSaving = false,
-                                    error = resource.message ?: "Error al actualizar la orden"
+                                    error = resource.message ?: localeManager.getLocalizedString(R.string.error_updating_order)
                                 )
                             }
                         }
@@ -386,7 +392,7 @@ class OrdersViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isLoading = false,
-                                    error = resource.message ?: "Error al cargar las órdenes"
+                                    error = resource.message ?: localeManager.getLocalizedString(R.string.error_loading_orders)
                                 )
                             }
                         }
@@ -434,13 +440,13 @@ class OrdersViewModel @Inject constructor(
                         _state.update { 
                             it.copy(
                                 isDeleting = false,
-                                deleteSuccessMessage = "Pedido eliminado exitosamente",
+                                deleteSuccessMessage = localeManager.getLocalizedString(R.string.order_deleted_successfully),
                                 error = null
                             ) 
                         }
                     }
                     is Resource.Error -> {
-                        val errorMsg = resource.message ?: "Error al eliminar el pedido"
+                        val errorMsg = resource.message ?: localeManager.getLocalizedString(R.string.error_deleting_order)
                         Log.e(TAG, "deleteOrder: Error - $errorMsg")
                         _state.update { 
                             it.copy(

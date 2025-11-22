@@ -3,7 +3,9 @@ package com.misw.medisupply.presentation.customermanagement.screens.orders.viewm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.domain.repository.order.OrderRepository
@@ -23,7 +25,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OrderTrackingViewModel @Inject constructor(
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     companion object {
@@ -283,9 +286,10 @@ data class OrderTrackingUiState(
 ) {
     /**
      * Get available status options for filter
+     * Note: statusOptions now uses dynamic localized strings in the UI
      */
     val statusOptions = listOf(
-        "todos" to "Todos los estados",
+        "todos" to "all_statuses", // String resource key for localization
         OrderStatus.PENDING.value to OrderStatus.PENDING.displayName,
         OrderStatus.CONFIRMED.value to OrderStatus.CONFIRMED.displayName, 
         OrderStatus.PROCESSING.value to OrderStatus.PROCESSING.displayName,

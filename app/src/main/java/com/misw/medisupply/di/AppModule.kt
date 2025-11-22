@@ -1,6 +1,7 @@
 package com.misw.medisupply.core.di
 
 import android.content.Context
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.core.session.SessionManager
 import com.misw.medisupply.core.session.UserSessionManager
 import dagger.Module
@@ -24,4 +25,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSessionManager(): SessionManager = SessionManager()
+    
+    @Provides
+    @Singleton
+    fun provideLocaleManager(
+        @ApplicationContext context: Context
+    ): LocaleManager = LocaleManager(context)
 }

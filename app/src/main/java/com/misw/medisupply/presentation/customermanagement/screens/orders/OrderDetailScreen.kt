@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.customermanagement.screens.orders
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,18 +38,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderItem
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.presentation.common.components.ErrorView
+import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.customermanagement.screens.orders.viewmodel.OrderDetailViewModel
+import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.SectionTitle
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -66,6 +74,7 @@ fun OrderDetailScreen(
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val localeManager = viewModel.localeManager
     
     // Load order detail when screen is opened
     LaunchedEffect(orderId) {
@@ -75,27 +84,10 @@ fun OrderDetailScreen(
     
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        text = uiState.order?.orderNumber ?: "Detalle del Pedido",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+            MedisupplyAppBar(
+                title = localizedStringResource(R.string.order_detail_main_title, localeManager),
+                subtitle = uiState.order?.orderNumber ?: "",
+                onNavigateBack = onNavigateBack
             )
         }
     ) { paddingValues ->
@@ -115,13 +107,13 @@ fun OrderDetailScreen(
                 }
                 uiState.error != null -> {
                     ErrorView(
-                        message = uiState.error ?: "Error desconocido",
+                        message = uiState.error ?: localizedStringResource(R.string.unknown_error, localeManager),
                         onRetry = { viewModel.retryLoad(orderId) }
                     )
                 }
                 uiState.order != null -> {
                     uiState.order?.let { order ->
-                        OrderDetailContent(order = order)
+                        OrderDetailContent(order = order, localeManager = localeManager)
                     }
                 }
             }
@@ -133,46 +125,48 @@ fun OrderDetailScreen(
  * Main content for order detail
  */
 @Composable
-private fun OrderDetailContent(order: Order) {
+private fun OrderDetailContent(order: Order, localeManager: LocaleManager) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Order Header Card
+        // Order Data Section
         item {
-            OrderHeaderCard(order = order)
+            SectionTitle(text = localizedStringResource(R.string.order_data_section_title, localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            OrderHeaderCard(order = order, localeManager = localeManager)
         }
         
-        // Customer Information Card
+        // Customer Data Section
         item {
-            CustomerInfoCard(order = order)
+            SectionTitle(text = localizedStringResource(R.string.customer_data_section_title, localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomerInfoCard(order = order, localeManager = localeManager)
         }
         
-        // Delivery Information Card
+        // Medisupply Data Section
         item {
-            DeliveryInfoCard(order = order)
+            SectionTitle(text = localizedStringResource(R.string.medisupply_data_section_title, localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            DeliveryInfoCard(order = order, localeManager = localeManager)
         }
         
         // Order Items Header
         item {
-            Text(
-                text = "Ítems: ${order.items.size}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Spacer(modifier = Modifier.height(8.dp))
+            SectionTitle(text = localizedStringResource(R.string.items_count_label, localeManager).format(order.items.size))
         }
         
         // Order Items List
         items(order.items) { item ->
-            OrderItemCard(item = item)
+            OrderItemCard(item = item, localeManager = localeManager)
         }
         
         // Order Total Card
         item {
-            OrderTotalCard(order = order)
+            OrderTotalCard(order = order, localeManager = localeManager)
         }
     }
 }
@@ -181,7 +175,7 @@ private fun OrderDetailContent(order: Order) {
  * Order header card with order number, dates and status
  */
 @Composable
-private fun OrderHeaderCard(order: Order) {
+private fun OrderHeaderCard(order: Order, localeManager: LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -196,7 +190,7 @@ private fun OrderHeaderCard(order: Order) {
             // Order Number
             Text(
                 text = order.orderNumber ?: "N/A",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -206,7 +200,7 @@ private fun OrderHeaderCard(order: Order) {
             // Order Date
             InfoRow(
                 icon = Icons.Default.CalendarToday,
-                label = "Fecha de la orden:",
+                label = localizedStringResource(R.string.order_header_date_label, localeManager),
                 value = formatDate(order.orderDate)
             )
             
@@ -224,12 +218,12 @@ private fun OrderHeaderCard(order: Order) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Estado: ",
+                    text = localizedStringResource(R.string.order_status_label, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = order.status.displayName,
+                    text = getStatusDisplayName(order.status, localeManager),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = getStatusColor(order.status)
@@ -243,7 +237,7 @@ private fun OrderHeaderCard(order: Order) {
  * Customer information card
  */
 @Composable
-private fun CustomerInfoCard(order: Order) {
+private fun CustomerInfoCard(order: Order, localeManager: LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -255,19 +249,11 @@ private fun CustomerInfoCard(order: Order) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = "Datos del Cliente",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
             
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            val customerName = order.customer?.getDisplayName() ?: ("Cliente ID: " + order.customerId.toString())
+            val customerName = order.customer?.getDisplayName() ?: localizedStringResource(R.string.customer_id_label, localeManager).format(order.customerId)
             InfoRow(
                 icon = Icons.Default.Person,
-                label = "Cliente:",
+                label = localizedStringResource(R.string.customer_label, localeManager),
                 value = customerName
             )
             
@@ -275,7 +261,7 @@ private fun CustomerInfoCard(order: Order) {
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoRow(
                     icon = Icons.Default.Business,
-                    label = "Email:",
+                    label = localizedStringResource(R.string.email_label, localeManager),
                     value = customerEmail
                 )
             }
@@ -287,7 +273,7 @@ private fun CustomerInfoCard(order: Order) {
  * Delivery information card
  */
 @Composable
-private fun DeliveryInfoCard(order: Order) {
+private fun DeliveryInfoCard(order: Order, localeManager: LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -299,45 +285,37 @@ private fun DeliveryInfoCard(order: Order) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = "Datos de Medisupply",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
             
             InfoRow(
                 icon = Icons.Default.CalendarToday,
-                label = "Fecha de entrega:",
+                label = localizedStringResource(R.string.delivery_date_detail_label, localeManager),
                 value = order.deliveryDate?.let { 
                     SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) 
-                } ?: "Por definir"
+                } ?: localizedStringResource(R.string.date_undefined, localeManager)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             InfoRow(
                 icon = Icons.Default.LocalShipping,
-                label = "Hora de entrega:",
-                value = "8:50 am"
+                label = localizedStringResource(R.string.delivery_time_label, localeManager),
+                value = localizedStringResource(R.string.delivery_time_default, localeManager)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             InfoRow(
                 icon = Icons.Default.LocalShipping,
-                label = "Entrega parcial:",
-                value = "Ninguna"
+                label = localizedStringResource(R.string.partial_delivery_label, localeManager),
+                value = localizedStringResource(R.string.partial_delivery_none, localeManager)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             InfoRow(
                 icon = Icons.Default.LocalShipping,
-                label = "Transportista:",
-                value = "Camión 1"
+                label = localizedStringResource(R.string.carrier_label, localeManager),
+                value = localizedStringResource(R.string.carrier_default, localeManager)
             )
         }
     }
@@ -347,7 +325,7 @@ private fun DeliveryInfoCard(order: Order) {
  * Order item card
  */
 @Composable
-private fun OrderItemCard(item: OrderItem) {
+private fun OrderItemCard(item: OrderItem, localeManager: LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
@@ -370,7 +348,7 @@ private fun OrderItemCard(item: OrderItem) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Cantidades: ${item.quantity} ea",
+                    text = localizedStringResource(R.string.quantities_label, localeManager).format(item.quantity),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -390,7 +368,7 @@ private fun OrderItemCard(item: OrderItem) {
  * Order total card
  */
 @Composable
-private fun OrderTotalCard(order: Order) {
+private fun OrderTotalCard(order: Order, localeManager: LocaleManager) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -407,7 +385,7 @@ private fun OrderTotalCard(order: Order) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Total:",
+                text = localizedStringResource(R.string.total_label, localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -488,4 +466,19 @@ private fun formatDate(date: Date?): String {
 private fun formatCurrency(amount: Double): String {
     val format = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
     return format.format(amount)
+}
+
+/**
+ * Get localized display name for order status
+ */
+@Composable
+private fun getStatusDisplayName(status: OrderStatus, localeManager: LocaleManager): String {
+    return when (status) {
+        OrderStatus.PENDING -> localizedStringResource(R.string.order_status_pending, localeManager)
+        OrderStatus.CONFIRMED -> localizedStringResource(R.string.order_status_confirmed, localeManager)
+        OrderStatus.PROCESSING -> localizedStringResource(R.string.order_status_processing, localeManager)
+        OrderStatus.SHIPPED -> localizedStringResource(R.string.order_status_shipped, localeManager)
+        OrderStatus.DELIVERED -> localizedStringResource(R.string.order_status_delivered, localeManager)
+        OrderStatus.CANCELLED -> localizedStringResource(R.string.order_status_cancelled, localeManager)
+    }
 }

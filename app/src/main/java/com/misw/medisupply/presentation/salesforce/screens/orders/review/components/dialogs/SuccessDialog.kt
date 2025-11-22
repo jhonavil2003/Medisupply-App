@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.core.i18n.LocaleManager
 
 /**
  * Success dialog
@@ -26,7 +30,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SuccessDialog(
     orderNumber: String,
-    message: String = "Su pedido ha sido creado correctamente.",
+    message: String,
+    localeManager: LocaleManager,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -41,7 +46,7 @@ fun SuccessDialog(
         },
         title = {
             Text(
-                text = "¡Éxito!",
+                text = localizedStringResource(R.string.success_title, localeManager),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -58,7 +63,7 @@ fun SuccessDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Número de Pedido:",
+                    text = localizedStringResource(R.string.order_number_label, localeManager),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -71,8 +76,14 @@ fun SuccessDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onDismiss) {
-                Text("Aceptar")
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(localizedStringResource(R.string.accept_button, localeManager))
             }
         }
     )

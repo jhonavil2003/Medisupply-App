@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 
 /**
  * Delete order confirmation dialog
@@ -19,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 @Composable
 fun DeleteOrderDialog(
     orderNumber: String?,
+    localeManager: LocaleManager,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -33,14 +36,17 @@ fun DeleteOrderDialog(
         },
         title = {
             Text(
-                text = "Eliminar Pedido",
+                text = localeManager.getLocalizedString(R.string.delete_order_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                text = "¿Está seguro que desea eliminar el pedido ${orderNumber ?: ""}? Esta acción no se puede deshacer.",
+                text = String.format(
+                    localeManager.getLocalizedString(R.string.delete_order_message),
+                    orderNumber ?: ""
+                ),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -51,12 +57,12 @@ fun DeleteOrderDialog(
                     containerColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Eliminar")
+                Text(localeManager.getLocalizedString(R.string.delete_order_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localeManager.getLocalizedString(R.string.button_cancel))
             }
         }
     )

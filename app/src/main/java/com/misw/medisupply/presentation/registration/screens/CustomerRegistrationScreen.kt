@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -24,6 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.misw.medisupply.R
+import com.misw.medisupply.presentation.components.CompactLanguageToggle
+import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.registration.viewmodel.CustomerRegistrationViewModel
 
 /**
@@ -47,74 +51,83 @@ fun CustomerRegistrationScreen(
         }
     }
     
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        text = "Registrarse",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        },
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
-        Column(
+    Box(modifier = modifier.fillMaxSize()) {
+        // Language toggle button positioned at top-right
+        CompactLanguageToggle(
+            localeManager = viewModel.localeManager,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
-        ) {
-            // Header
-            Text(
-                text = "MediSupply",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Basic Data Section
-            SectionTitle("Datos básicos")
-            
-            // Business Name
-            CustomTextField(
-                value = uiState.businessName,
-                onValueChange = viewModel::updateBusinessName,
-                label = "Razón social",
-                error = uiState.businessNameError,
-                enabled = !uiState.isLoading
-            )
-            
-            // Trade Name
-            CustomTextField(
-                value = uiState.tradeName,
-                onValueChange = viewModel::updateTradeName,
-                label = "Nombre comercial (Opcional)",
-                enabled = !uiState.isLoading
-            )
-            
-            // Document Number Row
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        )
+        
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { 
+                        Text(
+                            text = localizedStringResource(R.string.registration_title, viewModel.localeManager),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = localizedStringResource(R.string.registration_back_description, viewModel.localeManager)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            },
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp)
+            ) {
+                // Header
+                Text(
+                    text = localizedStringResource(R.string.registration_app_name, viewModel.localeManager),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Basic Data Section
+                SectionTitle(localizedStringResource(R.string.registration_basic_data, viewModel.localeManager))
+                
+                // Business Name
+                CustomTextField(
+                    value = uiState.businessName,
+                    onValueChange = viewModel::updateBusinessName,
+                    label = localizedStringResource(R.string.registration_business_name, viewModel.localeManager),
+                    error = uiState.businessNameError,
+                    enabled = !uiState.isLoading
+                )
+                
+                // Trade Name
+                CustomTextField(
+                    value = uiState.tradeName,
+                    onValueChange = viewModel::updateTradeName,
+                    label = localizedStringResource(R.string.registration_trade_name, viewModel.localeManager),
+                    enabled = !uiState.isLoading
+                )
+                
+                // Document Number Row
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -124,7 +137,7 @@ fun CustomerRegistrationScreen(
                     CustomTextField(
                         value = uiState.documentNumber,
                         onValueChange = viewModel::updateDocumentNumber,
-                        label = "NIT",
+                        label = localizedStringResource(R.string.registration_document_number, viewModel.localeManager),
                         error = uiState.documentNumberError,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         trailingIcon = {
@@ -138,14 +151,14 @@ fun CustomerRegistrationScreen(
                                 uiState.isDocumentValidated && uiState.documentNumberError == null -> {
                                     Icon(
                                         imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Válido",
+                                        contentDescription = localizedStringResource(R.string.registration_valid, viewModel.localeManager),
                                         tint = Color(0xFF4CAF50)
                                     )
                                 }
                                 uiState.documentNumberError != null -> {
                                     Icon(
                                         imageVector = Icons.Default.Error,
-                                        contentDescription = "Error",
+                                        contentDescription = localizedStringResource(R.string.registration_error, viewModel.localeManager),
                                         tint = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -160,7 +173,7 @@ fun CustomerRegistrationScreen(
                     CustomTextField(
                         value = uiState.internalCode,
                         onValueChange = viewModel::updateInternalCode,
-                        label = "Código interno",
+                        label = localizedStringResource(R.string.registration_internal_code, viewModel.localeManager),
                         enabled = !uiState.isLoading
                     )
                 }
@@ -170,7 +183,7 @@ fun CustomerRegistrationScreen(
             CustomTextField(
                 value = uiState.contactName,
                 onValueChange = viewModel::updateContactName,
-                label = "Nombre del contacto (Opcional)",
+                label = localizedStringResource(R.string.registration_contact_name, viewModel.localeManager),
                 enabled = !uiState.isLoading
             )
             
@@ -182,7 +195,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.address,
                     onValueChange = viewModel::updateAddress,
-                    label = "Dirección",
+                    label = localizedStringResource(R.string.registration_address, viewModel.localeManager),
                     error = uiState.addressError,
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
@@ -191,7 +204,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.neighborhood,
                     onValueChange = viewModel::updateNeighborhood,
-                    label = "Barrio",
+                    label = localizedStringResource(R.string.registration_neighborhood, viewModel.localeManager),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
@@ -205,7 +218,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.city,
                     onValueChange = viewModel::updateCity,
-                    label = "Ciudad",
+                    label = localizedStringResource(R.string.registration_city, viewModel.localeManager),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
@@ -213,7 +226,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.department,
                     onValueChange = viewModel::updateDepartment,
-                    label = "Departamento",
+                    label = localizedStringResource(R.string.registration_department, viewModel.localeManager),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
@@ -223,7 +236,7 @@ fun CustomerRegistrationScreen(
             CustomTextField(
                 value = uiState.country,
                 onValueChange = viewModel::updateCountry,
-                label = "País",
+                label = localizedStringResource(R.string.registration_country, viewModel.localeManager),
                 enabled = !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -236,7 +249,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.contactPhone,
                     onValueChange = viewModel::updateContactPhone,
-                    label = "Teléfono",
+                    label = localizedStringResource(R.string.registration_phone, viewModel.localeManager),
                     error = uiState.contactPhoneError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     enabled = !uiState.isLoading,
@@ -246,7 +259,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.contactEmail,
                     onValueChange = viewModel::updateContactEmail,
-                    label = "Correo",
+                    label = localizedStringResource(R.string.registration_email, viewModel.localeManager),
                     error = uiState.contactEmailError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     enabled = !uiState.isLoading,
@@ -255,7 +268,7 @@ fun CustomerRegistrationScreen(
             }
             
             // Coordinates Section (Optional)
-            SectionTitle("Ubicación GPS (Opcional)")
+            SectionTitle(localizedStringResource(R.string.registration_gps_location, viewModel.localeManager))
             
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -264,7 +277,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.latitude,
                     onValueChange = viewModel::updateLatitude,
-                    label = "Latitud",
+                    label = localizedStringResource(R.string.registration_latitude, viewModel.localeManager),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
@@ -273,7 +286,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.longitude,
                     onValueChange = viewModel::updateLongitude,
-                    label = "Longitud",
+                    label = localizedStringResource(R.string.registration_longitude, viewModel.localeManager),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
@@ -283,7 +296,7 @@ fun CustomerRegistrationScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             // Access Data Section
-            SectionTitle("Datos de acceso")
+            SectionTitle(localizedStringResource(R.string.registration_access_data, viewModel.localeManager))
             
             // Username and Password Row
             Row(
@@ -293,7 +306,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.username,
                     onValueChange = viewModel::updateUsername,
-                    label = "Usuario",
+                    label = localizedStringResource(R.string.registration_username, viewModel.localeManager),
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 )
@@ -301,7 +314,7 @@ fun CustomerRegistrationScreen(
                 CustomTextField(
                     value = uiState.password,
                     onValueChange = viewModel::updatePassword,
-                    label = "Contraseña",
+                    label = localizedStringResource(R.string.registration_password, viewModel.localeManager),
                     enabled = !uiState.isLoading,
                     isPassword = true,
                     modifier = Modifier.weight(1f)
@@ -338,7 +351,7 @@ fun CustomerRegistrationScreen(
                     enabled = !uiState.isLoading,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Cancelar")
+                    Text(localizedStringResource(R.string.registration_cancel, viewModel.localeManager))
                 }
                 
                 // Register Button
@@ -357,7 +370,7 @@ fun CustomerRegistrationScreen(
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     } else {
-                        Text("Guardar")
+                        Text(localizedStringResource(R.string.registration_save, viewModel.localeManager))
                     }
                 }
             }
@@ -365,6 +378,7 @@ fun CustomerRegistrationScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
 }
 
 /**
@@ -394,7 +408,8 @@ private fun CustomTextField(
     enabled: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    viewModel: CustomerRegistrationViewModel? = null
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     
@@ -420,7 +435,7 @@ private fun CustomTextField(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
                         )
                     }
                 }

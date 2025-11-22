@@ -7,6 +7,8 @@ import java.util.Date
  * Domain model representing a Customer
  * This model is used across the application and is independent of data sources
  */
+import com.misw.medisupply.R
+
 data class Customer(
     val id: Int,
     val documentType: DocumentType,
@@ -78,6 +80,20 @@ enum class CustomerType(val displayName: String) {
     DISTRIBUIDOR("Distribuidor"),
     IPS("IPS"),
     EPS("EPS");
+    
+    /**
+     * Get localized display name using LocaleManager
+     */
+    fun getLocalizedDisplayName(localeManager: com.misw.medisupply.core.i18n.LocaleManager): String {
+        return when (this) {
+            HOSPITAL -> localeManager.getLocalizedString(R.string.customer_type_hospital)
+            CLINICA -> localeManager.getLocalizedString(R.string.customer_type_clinica)
+            FARMACIA -> localeManager.getLocalizedString(R.string.customer_type_farmacia)
+            DISTRIBUIDOR -> localeManager.getLocalizedString(R.string.customer_type_distribuidor)
+            IPS -> localeManager.getLocalizedString(R.string.customer_type_ips)
+            EPS -> localeManager.getLocalizedString(R.string.customer_type_eps)
+        }
+    }
     
     companion object {
         /**

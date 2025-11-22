@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.repository.order.OrderRepository
+import com.misw.medisupply.core.i18n.LocaleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CustomerShopViewModel @Inject constructor(
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    val localeManager: LocaleManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(CustomerShopUiState())
@@ -86,7 +88,11 @@ class CustomerShopViewModel @Inject constructor(
      * Get the display text for page size
      */
     fun getPageSizeDisplayText(size: Int): String {
-        return if (size == -1) "Todas" else size.toString()
+        return if (size == -1) {
+            localeManager.getLocalizedString(com.misw.medisupply.R.string.label_all_items)
+        } else {
+            size.toString()
+        }
     }
 }
 

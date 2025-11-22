@@ -26,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.misw.medisupply.R
+import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 
 /**
@@ -36,6 +38,7 @@ import com.misw.medisupply.domain.model.customer.Customer
 fun CustomerItem(
     customer: Customer,
     onClick: (Customer) -> Unit,
+    localeManager: LocaleManager,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -156,7 +159,7 @@ fun CustomerItem(
                 modifier = Modifier.align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "Perfil",
+                    text = localeManager.getLocalizedString(R.string.customer_item_profile_button),
                     fontWeight = FontWeight.Bold
                 )
             }

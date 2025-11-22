@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,12 +45,15 @@ import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.components.localizedStringResource
+import com.misw.medisupply.R
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.OrderReviewScreen
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrderViewModel
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CartItemCard
 import com.misw.medisupply.presentation.salesforce.screens.orders.review.components.CustomerSummaryCard
@@ -111,42 +115,212 @@ fun CustomerOrderReviewScreen(
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = "Revisar pedido",
-                subtitle = "Compras - Medisupply",
+                title = localizedStringResource(R.string.order_review_title, viewModel.localeManager),
+                subtitle = localizedStringResource(R.string.order_review_subtitle, viewModel.localeManager),
                 onNavigateBack = onNavigateBack
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Sección específica para clientes: Selección de fecha de entrega
-            CustomerDeliveryDateSection(
-                selectedDate = selectedDeliveryDate,
-                onDateSelected = { selectedDeliveryDate = it }
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // SOLUCIÓN TEMPORAL: Extraer el contenido de OrderReviewScreen sin su Scaffold
-            // Para evitar el AppBar duplicado, creamos el contenido directamente aquí
-            OrderReviewContent(
-                customer = staticCustomer,
-                cartItems = cartItems,
-                onOrderSuccess = { orderNumber ->
-                    println("DEBUG: Orden $orderNumber creada con fecha de entrega preferida: $selectedDeliveryDate")
-                    // TODO: En versiones futuras, enviar la fecha al backend
-                    onOrderSuccess(orderNumber)
-                },
-                viewModel = viewModel
-            )
-        }
+        CustomerOrderReviewContent(
+            customer = staticCustomer,
+            cartItems = cartItems,
+            selectedDeliveryDate = selectedDeliveryDate,
+            onDateSelected = { selectedDeliveryDate = it },
+            onOrderSuccess = { orderNumber ->
+                println("DEBUG: Orden $orderNumber creada con fecha de entrega preferida: $selectedDeliveryDate")
+                onOrderSuccess(orderNumber)
+            },
+            viewModel = viewModel,
+            paddingValues = paddingValues
+        )
     }
 }
 
+/**
+ * Contenido combinado del review del pedido con selección de fecha de entrega
+ */
+@Composable
+private fun CustomerOrderReviewContent(
+    customer: Customer,
+    cartItems: Map<String, CartItem>,
+    selectedDeliveryDate: String,
+    onDateSelected: (String) -> Unit,
+    onOrderSuccess: (String) -> Unit,
+    viewModel: OrderViewModel,
+    paddingValues: PaddingValues
+) {
+    val state by viewModel.state.collectAsState()
+    
+    // Pre-calculate localized strings for dialogs
+    val localeManager = viewModel.localeManager
+    val notAvailableText = localizedStringResource(R.string.label_not_available, localeManager)
+    val orderSuccessText = localizedStringResource(R.string.order_created_success, localeManager)
+    val unknownErrorText = localizedStringResource(R.string.error_unknown, localeManager)
+    
+    // Dialog states
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
+    // Calculate totals
+    val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
+    val itemCount = cartItems.values.sumOf { it.quantity }
+
+    // Handle order success result
+    LaunchedEffect(state.createdOrder) {
+        if (state.createdOrder != null && !showSuccessDialog) {
+            showSuccessDialog = true
+        }
+    }
+
+    // Handle error result
+    LaunchedEffect(state.error) {
+        if (state.error != null && !showErrorDialog) {
+            showErrorDialog = true
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp)
+    ) {
+        // Customer Delivery Date Section
+        item {
+            SectionTitle(text = localizedStringResource(R.string.delivery_date_title, viewModel.localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomerDeliveryDateSection(
+                selectedDate = selectedDeliveryDate,
+                onDateSelected = onDateSelected,
+                viewModel = viewModel
+            )
+        }
+        
+        // Customer Information Section
+        item {
+            SectionTitle(text = localizedStringResource(R.string.customer_info_section, viewModel.localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomerSummaryCard(customer = customer)
+        }
+
+        // Order Items Section
+        item {
+            val itemText = if (itemCount == 1) {
+                localizedStringResource(R.string.product_item, viewModel.localeManager)
+            } else {
+                localizedStringResource(R.string.product_items, viewModel.localeManager)
+            }
+            SectionTitle(
+                text = String.format(
+                    localizedStringResource(R.string.products_section, viewModel.localeManager),
+                    itemCount,
+                    itemText
+                )
+            )
+        }
+
+        items(cartItems.values.toList()) { cartItem ->
+            CartItemCard(cartItem = cartItem)
+        }
+
+        // Order Summary Section
+        item {
+            SectionTitle(text = localizedStringResource(R.string.order_summary_section, viewModel.localeManager))
+            Spacer(modifier = Modifier.height(8.dp))
+            OrderSummaryCard(
+                subtotal = subtotal,
+                tax = 0f,
+                total = subtotal
+            )
+        }
+
+        // Create Order Button
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Button(
+                onClick = {
+                    showConfirmDialog = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                enabled = !state.isLoading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White
+                )
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(localizedStringResource(R.string.creating_order, viewModel.localeManager))
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = localizedStringResource(R.string.button_confirm_order, viewModel.localeManager),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+    
+    // Dialogs
+    if (showConfirmDialog) {
+        ConfirmOrderDialog(
+            isEditMode = false,
+            localeManager = localeManager,
+            onConfirm = {
+                showConfirmDialog = false
+                viewModel.createOrder(
+                    customer = customer,
+                    cartItems = cartItems
+                )
+            },
+            onDismiss = { showConfirmDialog = false }
+        )
+    }
+    
+    if (showSuccessDialog) {
+        state.createdOrder?.let { order ->
+            SuccessDialog(
+                orderNumber = order.orderNumber ?: notAvailableText,
+                message = orderSuccessText,
+                localeManager = localeManager,
+                onDismiss = { 
+                    showSuccessDialog = false
+                    order.orderNumber?.let { orderNumber ->
+                        onOrderSuccess(orderNumber)
+                    }
+                }
+            )
+        }
+    }
+    
+    if (showErrorDialog) {
+        ErrorDialog(
+            errorMessage = state.error ?: unknownErrorText,
+            onDismiss = { 
+                showErrorDialog = false 
+                viewModel.clearError()
+            }
+        )
+    }
+}
 
 /**
  * Sección específica para clientes para seleccionar fecha de entrega
@@ -156,7 +330,8 @@ fun CustomerOrderReviewScreen(
 @Composable
 private fun CustomerDeliveryDateSection(
     selectedDate: String,
-    onDateSelected: (String) -> Unit
+    onDateSelected: (String) -> Unit,
+    viewModel: OrderViewModel
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     
@@ -197,24 +372,13 @@ private fun CustomerDeliveryDateSection(
     )
     
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = "Fecha de Entrega Preferida",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = androidx.compose.ui.graphics.Color(0xFF1565C0)
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
             // Mensaje informativo con el mismo estilo que CreateVisitScreen
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -223,7 +387,7 @@ private fun CustomerDeliveryDateSection(
                 )
             ) {
                 Text(
-                    text = "📦 Selecciona tu fecha de entrega preferida. La confirmación está sujeta a disponibilidad y políticas de distribución.",
+                    text = localizedStringResource(R.string.delivery_date_info, viewModel.localeManager),
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = androidx.compose.ui.graphics.Color(0xFF1565C0)
@@ -244,11 +408,11 @@ private fun CustomerDeliveryDateSection(
                 OutlinedTextField(
                     value = selectedDate,
                     onValueChange = { },
-                    label = { Text("Fecha de entrega") },
+                    label = { Text(localizedStringResource(R.string.delivery_date_label, viewModel.localeManager)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Seleccionar fecha",
+                            contentDescription = localizedStringResource(R.string.delivery_date_select, viewModel.localeManager),
                             tint = androidx.compose.ui.graphics.Color(0xFF1565C0)
                         )
                     },
@@ -292,7 +456,8 @@ private fun CustomerDeliveryDateSection(
                 showDatePicker = false
             },
             onDismiss = { showDatePicker = false },
-            datePickerState = datePickerState
+            datePickerState = datePickerState,
+            viewModel = viewModel
         )
     }
 }
@@ -305,170 +470,23 @@ private fun CustomerDeliveryDateSection(
 private fun CustomDatePickerDialog(
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit,
-    datePickerState: androidx.compose.material3.DatePickerState
+    datePickerState: androidx.compose.material3.DatePickerState,
+    viewModel: OrderViewModel
 ) {
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = { onDateSelected(datePickerState.selectedDateMillis) }) {
-                Text("OK")
+                Text(localizedStringResource(R.string.button_ok, viewModel.localeManager))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(localizedStringResource(R.string.button_cancel, viewModel.localeManager))
             }
         }
     ) {
         DatePicker(state = datePickerState)
-    }
-}
-
-/**
- * Contenido de OrderReview sin el Scaffold para evitar AppBar duplicado
- */
-@Composable
-private fun OrderReviewContent(
-    customer: Customer,
-    cartItems: Map<String, CartItem>,
-    onOrderSuccess: (String) -> Unit,
-    viewModel: OrderViewModel
-) {
-    val state by viewModel.state.collectAsState()
-    
-    // Dialog states
-    var showConfirmDialog by remember { mutableStateOf(false) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-
-    // Calculate totals
-    val subtotal = cartItems.values.sumOf { it.calculateSubtotal().toDouble() }.toFloat()
-    val itemCount = cartItems.values.sumOf { it.quantity }
-
-    // Handle order success result
-    LaunchedEffect(state.createdOrder) {
-        if (state.createdOrder != null && !showSuccessDialog) {
-            showSuccessDialog = true
-        }
-    }
-
-    // Handle error result
-    LaunchedEffect(state.error) {
-        if (state.error != null && !showErrorDialog) {
-            showErrorDialog = true
-        }
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Customer Information Section
-        item {
-            SectionTitle(text = "Información del Cliente")
-            CustomerSummaryCard(customer = customer)
-        }
-
-        // Order Items Section
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionTitle(text = "Productos ($itemCount ${if (itemCount == 1) "item" else "items"})")
-        }
-
-        items(cartItems.values.toList()) { cartItem ->
-            CartItemCard(cartItem = cartItem)
-        }
-
-        // Order Summary Section
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionTitle(text = "Resumen del Pedido")
-            OrderSummaryCard(
-                subtotal = subtotal,
-                tax = 0f,
-                total = subtotal
-            )
-        }
-
-        // Create Order Button
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Button(
-                onClick = {
-                    showConfirmDialog = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                enabled = !state.isLoading
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Creando pedido...")
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Confirmar y Crear Pedido",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(80.dp))
-        }
-    }
-    
-    // Dialogs
-    if (showConfirmDialog) {
-        ConfirmOrderDialog(
-            isEditMode = false,
-            onConfirm = {
-                showConfirmDialog = false
-                viewModel.createOrder(
-                    customer = customer,
-                    cartItems = cartItems
-                )
-            },
-            onDismiss = { showConfirmDialog = false }
-        )
-    }
-    
-    if (showSuccessDialog) {
-        state.createdOrder?.let { order ->
-            SuccessDialog(
-                orderNumber = order.orderNumber ?: "N/A",
-                message = "Su pedido ha sido creado correctamente.",
-                onDismiss = { 
-                    showSuccessDialog = false
-                    order.orderNumber?.let { orderNumber ->
-                        onOrderSuccess(orderNumber)
-                    }
-                }
-            )
-        }
-    }
-    
-    if (showErrorDialog) {
-        ErrorDialog(
-            errorMessage = state.error ?: "Error desconocido",
-            onDismiss = { 
-                showErrorDialog = false 
-                viewModel.clearError()
-            }
-        )
     }
 }
 
