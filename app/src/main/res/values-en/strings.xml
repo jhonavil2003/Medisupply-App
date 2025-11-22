@@ -65,13 +65,13 @@
     <string name="registration_longitude">Longitude</string>
     <string name="registration_access_data">Access Information</string>
     <string name="registration_username">Username</string>
-    <string name="registration_password">Password</string>
+    <string name="registration_password">Access Key</string>
     <string name="registration_cancel">Cancel</string>
     <string name="registration_save">Save</string>
     <string name="registration_valid">Valid</string>
     <string name="registration_error">Error</string>
-    <string name="registration_show_password">Show password</string>
-    <string name="registration_hide_password">Hide password</string>
+    <string name="registration_show_password">Show access key</string>
+    <string name="registration_hide_password">Hide access key</string>
     
     <!-- Shop Screen -->
     <string name="shop_create_order_description">Create order</string>
