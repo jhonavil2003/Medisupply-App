@@ -147,7 +147,7 @@ fun CreateVisitScreen(
         // Obtener strings localizadas fuera de LaunchedEffect
         val visitSavedSuccessMessage = localizedStringResource(R.string.visit_saved_success, localeManager)
         
-        // Manejar éxito del guardado
+        // Manejar éxito del guardado (sin cambiar de pestaña)
         LaunchedEffect(uiState.saveSuccess) {
             if (uiState.saveSuccess) {
                 // Mostrar mensaje de éxito
@@ -155,13 +155,11 @@ fun CreateVisitScreen(
                     message = visitSavedSuccessMessage,
                     duration = SnackbarDuration.Long
                 )
-                // Cambiar al tab de ubicación automáticamente después de guardar
-                selectedTabIndex = 1
                 viewModel.clearSuccess()
             }
         }
         
-        // Manejar mensajes de éxito personalizados
+        // Manejar mensajes de éxito personalizados (sin cambiar de pestaña)
         uiState.successMessage?.let { successMessage ->
             LaunchedEffect(successMessage) {
                 snackbarHostState.showSnackbar(
@@ -169,6 +167,7 @@ fun CreateVisitScreen(
                     duration = SnackbarDuration.Long
                 )
                 viewModel.clearSuccess()
+                // NO cambiar de pestaña aquí - el usuario debe permanecer donde está
             }
         }
 

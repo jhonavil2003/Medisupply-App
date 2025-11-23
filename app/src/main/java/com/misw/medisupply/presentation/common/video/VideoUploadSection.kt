@@ -30,6 +30,8 @@ fun VideoUploadSection(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var selectedVideoFile by remember { mutableStateOf<File?>(null) }
     
     // Launcher para seleccionar video de galería
     val selectVideoLauncher = rememberLauncherForActivityResult(
@@ -38,7 +40,8 @@ fun VideoUploadSection(
         uri?.let {
             val videoFile = VideoFileHelper.uriToFile(context, it)
             if (videoFile != null) {
-                onVideoSelected(videoFile)
+                selectedVideoFile = videoFile
+                showConfirmDialog = true
             }
         }
     }
@@ -224,4 +227,72 @@ fun VideoUploadSection(
             }
         }
     }
+    
+    // Modal de confirmación
+    if (showConfirmDialog && selectedVideoFile != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showConfirmDialog = false
+                selectedVideoFile = null
+            },
+            icon = {
+                Icon(
+                    Icons.Default.CloudUpload,
+                    contentDescription = "Subir",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text("Confirmar Subida de Video")
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("¿Deseas subir este video?")
+                    
+                    selectedVideoFile?.let { file ->
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Archivo: ${file.name}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF616161)
+                        )
+                        Text(
+                            text = "Tamaño: ${"%.2f".format(file.length() / (1024f * 1024f))} MB",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF616161)
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "⚠️ El video se subirá inmediatamente a AWS S3",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFFE65100)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        selectedVideoFile?.let { onVideoSelected(it) }
+                        showConfirmDialog = false
+                        selectedVideoFile = null
+                    }
+                ) {
+                    Text("Subir Video")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        selectedVideoFile = null
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
+
