@@ -19,27 +19,15 @@ import com.misw.medisupply.R
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
 import com.misw.medisupply.presentation.components.localizedStringResource
 import com.misw.medisupply.presentation.salesforce.screens.visits.components.VisitCard
+import com.misw.medisupply.presentation.salesforce.screens.visits.state.Visit
 import com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel.VisitListViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-// Modelo de datos mockeado
- data class MockVisit(
-    val id: Int,
-    val customerName: String,
-    val dateTime: LocalDateTime
-)
-
-private val mockVisits = listOf(
-    MockVisit(1, "Clínica Santa Fe", LocalDateTime.of(2025, 10, 24, 9, 30)),
-    MockVisit(2, "Hospital San José", LocalDateTime.of(2025, 10, 24, 11, 0)),
-    MockVisit(3, "IPS Salud Total", LocalDateTime.of(2025, 10, 25, 14, 15)),
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VisitListScreen(
-    onEditVisit: (MockVisit) -> Unit = {},
+    onEditVisit: (Visit) -> Unit = {},
     onNavigateBack: (() -> Unit)? = null,
     onNavigateToCreateVisit: (() -> Unit)? = null,
     viewModel: VisitListViewModel = hiltViewModel()
@@ -47,6 +35,8 @@ fun VisitListScreen(
     // Obtener LocaleManager del ViewModel
     val localeManager = viewModel.localeManager
     val currentLanguage = localeManager.currentLanguage.collectAsState().value
+    val uiState = viewModel.uiState.collectAsState().value
+    
     Scaffold(
         topBar = {
             MedisupplyAppBar(
@@ -74,14 +64,71 @@ fun VisitListScreen(
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp)
         ) {
-            CustomerSearchBar(localeManager = localeManager)
+            CustomerSearchBar(
+                localeManager = localeManager,
+                searchQuery = uiState.searchQuery,
+                onSearchChange = { query -> viewModel.searchVisits(query) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(mockVisits) { visit ->
-                    VisitCard(visit = visit, onEdit = { onEditVisit(visit) })
+            
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                uiState.error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "Error al cargar visitas",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = uiState.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Button(onClick = { viewModel.refreshVisits() }) {
+                                Text("Reintentar")
+                            }
+                        }
+                    }
+                }
+                uiState.filteredVisits.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (uiState.searchQuery.isNotBlank()) {
+                                "No se encontraron visitas"
+                            } else {
+                                "No hay visitas registradas"
+                            },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(uiState.filteredVisits) { visit ->
+                            VisitCard(visit = visit, onEdit = { onEditVisit(visit) })
+                        }
+                    }
                 }
             }
         }
@@ -91,17 +138,18 @@ fun VisitListScreen(
 @Composable
 private fun CustomerSearchBar(
     localeManager: com.misw.medisupply.core.i18n.LocaleManager,
+    searchQuery: String,
+    onSearchChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
-        value = "",
-        onValueChange = {},
+        value = searchQuery,
+        onValueChange = onSearchChange,
         modifier = modifier
             .fillMaxWidth(),
         placeholder = { 
             Text(localizedStringResource(R.string.search_customer_placeholder, localeManager))
         },
-        enabled = false,
         singleLine = true
     )
 }

@@ -190,27 +190,29 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
-
-
-    override suspend fun uploadFile(visitId: Int, file: File, originalFileName: String?): Result<VisitFile> {
+    override suspend fun registerVideoUrl(
+        visitId: Int,
+        videoUrl: String,
+        fileName: String,
+        fileSize: Long?,
+        mimeType: String?
+    ): Result<VisitFile> {
         return try {
-            // Determinar el tipo MIME usando el nombre original si está disponible
-            val fileNameToUse = originalFileName ?: file.name
-            val extension = fileNameToUse.substringAfterLast('.', "").lowercase()
-            val mimeType = getMimeType(extension)
+            val request = com.misw.medisupply.data.network.dto.visit.RegisterVideoUrlRequest(
+                fileUrl = videoUrl,
+                fileName = fileName,
+                fileSize = fileSize,
+                mimeType = mimeType
+            )
             
-            // Crear RequestBody para el archivo
-            val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
-            val multipartBody = MultipartBody.Part.createFormData("file", fileNameToUse, requestFile)
-
-            val response = visitApiService.uploadFile(visitId, multipartBody)
+            val response = visitApiService.registerVideoUrl(visitId, request)
             
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null && responseBody.success && responseBody.file != null) {
                     Result.success(responseBody.file)
                 } else {
-                    val errorMsg = responseBody?.message ?: "Error uploading file"
+                    val errorMsg = responseBody?.message ?: "Error registrando URL de video"
                     Result.failure(Exception(errorMsg))
                 }
             } else {

@@ -38,6 +38,17 @@ data class CreateVisitUiState(
     val fileError: String? = null,
     val uploadProgress: Float = 0f,
     
+    // Video upload to S3
+    val videoUrl: String? = null,
+    val isUploadingVideoToS3: Boolean = false,
+    val videoUploadProgress: Float = 0f,
+    val videoUploadError: String? = null,
+    
+    // Video analysis
+    val isAnalyzingVideo: Boolean = false,
+    val videoAnalysisResult: com.misw.medisupply.domain.model.video.VideoAnalysisResult? = null,
+    val videoAnalysisError: String? = null,
+    
     // Form state and flow control
     val isFormValid: Boolean = false,
     val isSaving: Boolean = false,

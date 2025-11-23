@@ -9,7 +9,7 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
-// Leer Google Maps API Key desde local.properties o variable de entorno
+// Leer propiedades desde local.properties o variables de entorno
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -19,6 +19,23 @@ if (localPropertiesFile.exists()) {
 val googleMapsApiKey: String = localProperties.getProperty("GOOGLE_MAPS_API_KEY") 
     ?: System.getenv("GOOGLE_MAPS_API_KEY") 
     ?: "" // Fallback vacío si no está configurado
+
+// AWS S3 Credentials
+val awsAccessKeyId: String = localProperties.getProperty("AWS_ACCESS_KEY_ID")
+    ?: System.getenv("AWS_ACCESS_KEY_ID")
+    ?: ""
+
+val awsSecretAccessKey: String = localProperties.getProperty("AWS_SECRET_ACCESS_KEY")
+    ?: System.getenv("AWS_SECRET_ACCESS_KEY")
+    ?: ""
+
+val awsS3BucketName: String = localProperties.getProperty("AWS_S3_BUCKET_NAME")
+    ?: System.getenv("AWS_S3_BUCKET_NAME")
+    ?: "medisupply-videos"
+
+val awsS3Region: String = localProperties.getProperty("AWS_S3_REGION")
+    ?: System.getenv("AWS_S3_REGION")
+    ?: "us-east-1"
 
 android {
     namespace = "com.misw.medisupply"
@@ -38,6 +55,12 @@ android {
         
         // Agregar API Key a BuildConfig para uso en código
         buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"$googleMapsApiKey\"")
+        
+        // AWS S3 Credentials
+        buildConfigField("String", "AWS_ACCESS_KEY_ID", "\"$awsAccessKeyId\"")
+        buildConfigField("String", "AWS_SECRET_ACCESS_KEY", "\"$awsSecretAccessKey\"")
+        buildConfigField("String", "AWS_S3_BUCKET_NAME", "\"$awsS3BucketName\"")
+        buildConfigField("String", "AWS_S3_REGION", "\"$awsS3Region\"")
     }
 
     buildTypes {
@@ -148,6 +171,11 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    
+    // AWS SDK para S3
+    implementation("com.amazonaws:aws-android-sdk-s3:2.77.0")
+    implementation("com.amazonaws:aws-android-sdk-core:2.77.0")
+    implementation("com.amazonaws:aws-android-sdk-mobile-client:2.77.0")
     
     // Room Database (opcional para cache local)
     implementation("androidx.room:room-runtime:2.6.1")
