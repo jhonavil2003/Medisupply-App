@@ -4,6 +4,7 @@ import com.misw.medisupply.data.network.dto.visit.CreateVisitRequest
 import com.misw.medisupply.data.network.dto.visit.CreateVisitResponse
 import com.misw.medisupply.data.network.dto.visit.CreateVisitApiResponse
 import com.misw.medisupply.data.network.dto.visit.GetVisitsResponse
+import com.misw.medisupply.data.network.dto.visit.RegisterVideoUrlRequest
 import com.misw.medisupply.data.network.dto.visit.UpdateVisitRequest
 import com.misw.medisupply.domain.model.visit.*
 import okhttp3.MultipartBody
@@ -53,14 +54,14 @@ interface VisitApiService {
     // ================================
     
     /**
-     * Subir archivo a una visita
+     * Registrar URL de video S3 como archivo de visita
      * POST /visits/{visit_id}/files
+     * Content-Type: application/json
      */
-    @Multipart
     @POST("visits/{visit_id}/files")
-    suspend fun uploadFile(
+    suspend fun registerVideoUrl(
         @Path("visit_id") visitId: Int,
-        @Part file: MultipartBody.Part
+        @Body request: RegisterVideoUrlRequest
     ): Response<UploadFileResponse>
     
     /**

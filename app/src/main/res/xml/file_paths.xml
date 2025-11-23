@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Directorio de cache para videos temporales -->
+    <cache-path name="video_cache" path="." />
+    
+    <!-- Directorio de archivos externos -->
+    <external-path name="external_files" path="." />
+    
+    <!-- Directorio de archivos internos -->
+    <files-path name="internal_files" path="." />
+</paths>
