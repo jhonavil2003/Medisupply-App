@@ -212,6 +212,20 @@ class CreateVisitViewModel @Inject constructor(
             android.util.Log.d("CreateVisitViewModel", "Not auto-saving address - isVisitSaved: ${_uiState.value.isVisitSaved}, createdVisitId: ${_uiState.value.createdVisitId}")
         }
     }
+    
+    fun updateLocation(latitude: Double, longitude: Double) {
+        android.util.Log.d("CreateVisitViewModel", "updateLocation() called with: lat=$latitude, lng=$longitude")
+        _uiState.value = _uiState.value.copy(
+            latitude = latitude,
+            longitude = longitude
+        )
+        
+        // Auto-actualizar con debounce si ya existe una visita guardada
+        if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            android.util.Log.d("CreateVisitViewModel", "Triggering auto-save for location")
+            scheduleAutoSave()
+        }
+    }
 
     private fun validateForm() {
         val state = _uiState.value
@@ -436,27 +450,40 @@ class CreateVisitViewModel @Inject constructor(
      */
     fun completeVisit() {
         val state = _uiState.value
-        val visitId = state.visitId ?: return
+        val visitId = state.createdVisitId
+        
+        if (visitId == null) {
+            _uiState.value = _uiState.value.copy(
+                error = "No se puede completar la visita. Primero debes guardar la visita."
+            )
+            return
+        }
         
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isSaving = true)
                 
+                android.util.Log.d("CreateVisitViewModel", "Completando visita ID: $visitId")
+                
                 val result = completeVisitUseCase(visitId)
                 
                 if (result.isSuccess) {
+                    android.util.Log.d("CreateVisitViewModel", "Visita completada exitosamente")
                     _uiState.value = _uiState.value.copy(
                         isSaving = false,
                         saveSuccess = true,
-                        successMessage = "Visita completada exitosamente"
+                        successMessage = "✅ Visita completada exitosamente"
                     )
                 } else {
+                    val errorMessage = result.exceptionOrNull()?.message ?: "Error desconocido"
+                    android.util.Log.e("CreateVisitViewModel", "Error al completar visita: $errorMessage")
                     _uiState.value = _uiState.value.copy(
                         isSaving = false,
-                        error = "Error al completar visita: ${result.exceptionOrNull()?.message}"
+                        error = "Error al completar visita: $errorMessage"
                     )
                 }
             } catch (e: Exception) {
+                android.util.Log.e("CreateVisitViewModel", "Exception al completar visita", e)
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     error = "Error al completar visita: ${e.message}"

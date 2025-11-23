@@ -254,10 +254,10 @@ fun CreateVisitScreen(
                         onClinicalFindingsChange = viewModel::updateClinicalFindings,
                         onAdditionalNotesChange = viewModel::updateAdditionalNotes
                     )
-                    1 -> UbicacionTabContent(
+                    1 -> com.misw.medisupply.presentation.salesforce.screens.visits.components.UbicacionTabContent(
                         uiState = uiState,
-                        localeManager = localeManager,
-                        onAddressChange = viewModel::updateAddress
+                        viewModel = viewModel,
+                        localeManager = localeManager
                     )
                     2 -> com.misw.medisupply.presentation.salesforce.screens.visits.components.ArchivosTabContent(
                         uiState = uiState,
@@ -657,148 +657,6 @@ private fun DatosTabContent(
         }
     }
 }
-
-@Composable
-private fun UbicacionTabContent(
-    uiState: com.misw.medisupply.presentation.salesforce.screens.visits.state.CreateVisitUiState,
-    localeManager: com.misw.medisupply.core.i18n.LocaleManager,
-    onAddressChange: (String) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(
-                localizedStringResource(R.string.visit_location_title, localeManager), 
-                style = MaterialTheme.typography.titleMedium, 
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1565C0)
-            )
-            
-            // Mensaje informativo
-            Spacer(Modifier.height(8.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (uiState.isVisitSaved) Color(0xFFE8F5E8) else Color(0xFFE3F2FD)
-                )
-            ) {
-                Column(Modifier.padding(12.dp)) {
-                    Text(
-                        text = if (uiState.isVisitSaved) {
-                            localizedStringResource(R.string.address_auto_save, localeManager)
-                        } else {
-                            localizedStringResource(R.string.save_visit_first, localeManager)
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (uiState.isVisitSaved) Color(0xFF2E7D32) else Color(0xFF1565C0)
-                    )
-                    
-                    // Indicador de guardado
-                    if (uiState.isSaving && uiState.isVisitSaved) {
-                        Spacer(Modifier.height(4.dp))
-                        Row(
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(12.dp),
-                                color = Color(0xFF2E7D32),
-                                strokeWidth = 1.5.dp
-                            )
-                            Spacer(Modifier.width(6.dp))
-                            Text(
-                                text = localizedStringResource(R.string.saving_location, localeManager),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF2E7D32)
-                            )
-                        }
-                    }
-                }
-            }
-            
-            Spacer(Modifier.height(16.dp))
-            
-            OutlinedTextField(
-                value = uiState.address,
-                onValueChange = onAddressChange,
-                label = { Text(localizedStringResource(R.string.visit_address_label, localeManager)) },
-                placeholder = { Text(localizedStringResource(R.string.address_placeholder, localeManager)) },
-                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = localizedStringResource(R.string.address_label, localeManager), tint = Color(0xFF1565C0)) },
-                enabled = uiState.isVisitSaved, // Solo habilitado después de guardar la visita
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1565C0),
-                    unfocusedBorderColor = if (uiState.isVisitSaved) Color(0xFFB6C6E3) else Color(0xFFE0E0E0),
-                    focusedLabelColor = Color(0xFF1565C0),
-                    unfocusedLabelColor = if (uiState.isVisitSaved) Color(0xFF1565C0) else Color(0xFFBDBDBD),
-                    disabledBorderColor = Color(0xFFE0E0E0),
-                    disabledLabelColor = Color(0xFFBDBDBD),
-                    disabledTextColor = Color(0xFFBDBDBD)
-                )
-            )
-            
-            Spacer(Modifier.height(16.dp))
-            
-            // Mapa placeholder con mejor diseño
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F7FF))
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = localizedStringResource(R.string.map_description, localeManager),
-                            tint = Color(0xFF1565C0),
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = localizedStringResource(R.string.map_view, localeManager),
-                            color = Color(0xFF1565C0),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = localizedStringResource(R.string.integration_coming_soon, localeManager),
-                            color = Color(0xFF757575),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-            
-            Spacer(Modifier.height(16.dp))
-            
-            OutlinedButton(
-                onClick = { /* Seleccionar ubicación */ },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFF1565C0)
-                )
-            ) {
-                Icon(
-                    Icons.Default.LocationOn, 
-                    contentDescription = localizedStringResource(R.string.select_location_button, localeManager),
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(localizedStringResource(R.string.select_location_button, localeManager))
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
