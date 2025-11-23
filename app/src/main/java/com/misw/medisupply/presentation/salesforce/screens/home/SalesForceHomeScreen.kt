@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SalesForceHomeScreen(
     onNavigateToVisits: () -> Unit = {},
-    onNavigateToRoleSelection: () -> Unit = {}
+//    onNavigateToRoleSelection: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -108,7 +108,7 @@ fun SalesForceHomeScreen(
         Spacer(modifier = Modifier.height(32.dp))
         
         // Botón provisional para volver a selección de roles
-        OutlinedButton(
+        /*OutlinedButton(
             onClick = onNavigateToRoleSelection,
             modifier = Modifier.fillMaxWidth(0.8f),
             colors = ButtonDefaults.outlinedButtonColors(
@@ -122,6 +122,6 @@ fun SalesForceHomeScreen(
             )
             Spacer(modifier = Modifier.size(8.dp))
             Text("🔧 Cambiar Rol (Provisional)")
-        }
+        }*/
     }
 }

@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.misw.medisupply.domain.model.customer.Customer
@@ -44,9 +45,8 @@ import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewMo
  */
 @Composable
 fun SalesForceNavGraph(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
-    onNavigateToRoleSelection: () -> Unit = {}
+    navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
@@ -58,8 +58,7 @@ fun SalesForceNavGraph(
             SalesForceHomeScreen(
                 onNavigateToVisits = {
                     navController.navigate(SalesForceRoutes.VISITS)
-                },
-                onNavigateToRoleSelection = onNavigateToRoleSelection
+                }
             )
         }
         

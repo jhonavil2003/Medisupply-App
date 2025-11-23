@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun CustomerHomeScreen(
-    onNavigateToRoleSelection: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -100,20 +99,6 @@ fun CustomerHomeScreen(
         Spacer(modifier = Modifier.height(32.dp))
         
         // Botón provisional para volver a selección de roles
-        OutlinedButton(
-            onClick = onNavigateToRoleSelection,
-            modifier = Modifier.fillMaxWidth(0.8f),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color(0xFFE53935)
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Default.ExitToApp,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            Text("🔧 Cambiar Rol (Provisional)")
-        }
+
     }
 }

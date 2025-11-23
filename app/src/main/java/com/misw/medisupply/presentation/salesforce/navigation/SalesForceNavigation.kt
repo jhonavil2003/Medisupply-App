@@ -51,8 +51,7 @@ fun SalesForceNavigation(
     ) { paddingValues ->
         SalesForceNavGraph(
             navController = navController,
-            modifier = Modifier.padding(paddingValues),
-            onNavigateToRoleSelection = onNavigateToRoleSelection
+            modifier = Modifier.padding(paddingValues)
         )
     }
 }

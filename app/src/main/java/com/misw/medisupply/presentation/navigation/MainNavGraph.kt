@@ -34,7 +34,7 @@ fun MainNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = MainRoutes.ROLE_SELECTION,
+        startDestination = MainRoutes.SALES_FORCE_FLOW,
         modifier = modifier
     ) {
         // Role Selection Screen
@@ -94,14 +94,7 @@ fun MainNavGraph(
         // Customer Management Flow - Complete navigation for clients
         composable(MainRoutes.CUSTOMER_MANAGEMENT_FLOW) {
             CustomerManagementNavigation(
-                onNavigateToRoleSelection = {
-                    navController.navigate(MainRoutes.ROLE_SELECTION) {
-                        popUpTo(MainRoutes.CUSTOMER_MANAGEMENT_FLOW) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
+
             )
         }
     }
