@@ -2,7 +2,9 @@ package com.misw.medisupply.di
 
 import android.content.Context
 import com.misw.medisupply.data.aws.S3UploadService
+import com.misw.medisupply.data.repository.VideoAnalysisRepositoryImpl
 import com.misw.medisupply.data.repository.VisitRepositoryImpl
+import com.misw.medisupply.domain.repository.VideoAnalysisRepository
 import com.misw.medisupply.domain.repository.VisitRepository
 import dagger.Binds
 import dagger.Module
@@ -21,6 +23,12 @@ abstract class VisitModule {
     abstract fun bindVisitRepository(
         visitRepositoryImpl: VisitRepositoryImpl
     ): VisitRepository
+    
+    @Binds
+    @Singleton
+    abstract fun bindVideoAnalysisRepository(
+        videoAnalysisRepositoryImpl: VideoAnalysisRepositoryImpl
+    ): VideoAnalysisRepository
     
     companion object {
         @Provides

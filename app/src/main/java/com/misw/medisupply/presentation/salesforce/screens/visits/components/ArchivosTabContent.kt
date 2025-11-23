@@ -64,6 +64,28 @@ fun ArchivosTabContent(
             }
         }
         
+        // ================================
+        // SECCIÓN DE ANÁLISIS DE VIDEO CON IA
+        // ================================
+        if (uiState.videoUrl != null || uiState.isAnalyzingVideo || uiState.videoAnalysisResult != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    com.misw.medisupply.presentation.common.video.VideoAnalysisResultsSection(
+                        analysisResult = uiState.videoAnalysisResult,
+                        isAnalyzing = uiState.isAnalyzingVideo,
+                        error = uiState.videoAnalysisError,
+                        onDismissError = {
+                            viewModel.clearVideoAnalysis()
+                        }
+                    )
+                }
+            }
+        }
+        
         // Card separado para completar visita - Solo visible cuando la visita está guardada
         if (uiState.isVisitSaved) {
             Card(

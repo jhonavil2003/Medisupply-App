@@ -28,6 +28,7 @@ class CreateVisitViewModel @Inject constructor(
     private val deleteFileUseCase: com.misw.medisupply.domain.usecase.visit.DeleteFileUseCase,
     private val uploadVideoToS3UseCase: com.misw.medisupply.domain.usecase.video.UploadVideoToS3UseCase,
     private val saveVideoUrlAsFileUseCase: com.misw.medisupply.domain.usecase.visit.SaveVideoUrlAsFileUseCase,
+    private val analyzeVideoUseCase: com.misw.medisupply.domain.usecase.video.AnalyzeVideoUseCase,
     val localeManager: LocaleManager
 ) : ViewModel() {
 
@@ -616,12 +617,15 @@ class CreateVisitViewModel @Inject constructor(
                             isUploadingVideoToS3 = false,
                             videoUploadProgress = 100f,
                             videoUploadError = null,
-                            successMessage = "Video guardado exitosamente en la visita"
+                            successMessage = "Video guardado exitosamente. Iniciando análisis con IA..."
                         )
                         android.util.Log.d("CreateVisitViewModel", "URL del video guardada en backend")
                         
                         // Recargar archivos de la visita para mostrar el video
                         loadVisitFiles()
+                        
+                        // Iniciar análisis del video automáticamente
+                        analyzeVideo(videoUrl)
                     }
                     is com.misw.medisupply.core.base.Resource.Error -> {
                         _uiState.value = _uiState.value.copy(
@@ -653,5 +657,54 @@ class CreateVisitViewModel @Inject constructor(
      */
     fun clearVideoError() {
         _uiState.value = _uiState.value.copy(videoUploadError = null)
+    }
+    
+    /**
+     * Analizar video con IA después de subirlo a S3
+     */
+    fun analyzeVideo(videoUrl: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isAnalyzingVideo = true,
+                videoAnalysisError = null
+            )
+            
+            analyzeVideoUseCase(videoUrl, useRag = true).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAnalyzingVideo = true
+                        )
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAnalyzingVideo = false,
+                            videoAnalysisResult = resource.data,
+                            videoAnalysisError = null,
+                            successMessage = "Análisis de video completado exitosamente"
+                        )
+                        android.util.Log.d("CreateVisitViewModel", "Análisis completado: ${resource.data?.videoAnalysis?.detectedProducts?.size ?: 0} productos detectados")
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAnalyzingVideo = false,
+                            videoAnalysisError = resource.message
+                        )
+                        android.util.Log.e("CreateVisitViewModel", "Error analizando video: ${resource.message}")
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Limpiar resultados del análisis de video
+     */
+    fun clearVideoAnalysis() {
+        _uiState.value = _uiState.value.copy(
+            videoAnalysisResult = null,
+            videoAnalysisError = null,
+            isAnalyzingVideo = false
+        )
     }
 }
