@@ -2,7 +2,10 @@ package com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.domain.usecase.customer.GetCustomersByIdsUseCase
+import com.misw.medisupply.domain.usecase.visit.GetVisitsUseCase
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.VisitListUiState
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.Visit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,11 +17,13 @@ import javax.inject.Inject
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @HiltViewModel
 class VisitListViewModel @Inject constructor(
-    val localeManager: LocaleManager
-    // Inject repository when created
+    val localeManager: LocaleManager,
+    private val getVisitsUseCase: GetVisitsUseCase,
+    private val getCustomersByIdsUseCase: GetCustomersByIdsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VisitListUiState())
@@ -28,36 +33,87 @@ class VisitListViewModel @Inject constructor(
         loadVisits()
     }
 
-    fun loadVisits() {
+    fun loadVisits(customerId: Int? = null, salespersonId: Int? = null, status: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
-                // TODO: Load visits from repository - Using mock data for now
-                val mockVisits = listOf(
-                    Visit(
-                        id = 1,
-                        customerName = "Clínica Santa Fe",
-                        visitDate = LocalDate.of(2025, 10, 24),
-                        visitTime = LocalTime.of(9, 30),
-                        contactedPersons = "Dr. Rodriguez",
-                        clinicalFindings = "Revisión de equipos",
-                        location = "Cra 7 #123-45, Bogotá"
-                    ),
-                    Visit(
-                        id = 2,
-                        customerName = "Hospital San José",
-                        visitDate = LocalDate.of(2025, 10, 24),
-                        visitTime = LocalTime.of(11, 0),
-                        contactedPersons = "Dra. Martinez",
-                        clinicalFindings = "Capacitación de personal",
-                        location = "Cra 10 #456-78, Bogotá"
-                    )
+                val result = getVisitsUseCase(
+                    customerId = customerId,
+                    salespersonId = salespersonId,
+                    status = status
                 )
                 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    visits = mockVisits,
-                    filteredVisits = mockVisits
+                result.fold(
+                    onSuccess = { domainVisits ->
+                        // Obtener IDs únicos de clientes
+                        val customerIds = domainVisits.map { it.customerId }.distinct()
+                        
+                        // Obtener información de clientes
+                        getCustomersByIdsUseCase(customerIds).collect { customersResource ->
+                            when (customersResource) {
+                                is Resource.Success -> {
+                                    val customersMap = customersResource.data ?: emptyMap()
+                                    
+                                    val visits = domainVisits.map { domainVisit ->
+                                        val customer = customersMap[domainVisit.customerId]
+                                        Visit(
+                                            id = domainVisit.id,
+                                            customerName = customer?.getDisplayName() 
+                                                ?: "Cliente ${domainVisit.customerId}",
+                                            visitDate = domainVisit.visitDate,
+                                            visitTime = domainVisit.visitTime,
+                                            contactedPersons = domainVisit.contactedPersons ?: "",
+                                            clinicalFindings = domainVisit.clinicalFindings ?: "",
+                                            additionalNotes = domainVisit.additionalNotes ?: "",
+                                            location = domainVisit.address ?: "",
+                                            attachments = emptyList(),
+                                            createdAt = parseDateTime(domainVisit.createdAt),
+                                            updatedAt = parseDateTime(domainVisit.updatedAt)
+                                        )
+                                    }
+                                    
+                                    _uiState.value = _uiState.value.copy(
+                                        isLoading = false,
+                                        visits = visits,
+                                        filteredVisits = visits
+                                    )
+                                }
+                                is Resource.Error -> {
+                                    // Si falla la carga de clientes, mostrar visitas con IDs
+                                    val visits = domainVisits.map { domainVisit ->
+                                        Visit(
+                                            id = domainVisit.id,
+                                            customerName = "Cliente ${domainVisit.customerId}",
+                                            visitDate = domainVisit.visitDate,
+                                            visitTime = domainVisit.visitTime,
+                                            contactedPersons = domainVisit.contactedPersons ?: "",
+                                            clinicalFindings = domainVisit.clinicalFindings ?: "",
+                                            additionalNotes = domainVisit.additionalNotes ?: "",
+                                            location = domainVisit.address ?: "",
+                                            attachments = emptyList(),
+                                            createdAt = parseDateTime(domainVisit.createdAt),
+                                            updatedAt = parseDateTime(domainVisit.updatedAt)
+                                        )
+                                    }
+                                    
+                                    _uiState.value = _uiState.value.copy(
+                                        isLoading = false,
+                                        visits = visits,
+                                        filteredVisits = visits
+                                    )
+                                }
+                                is Resource.Loading -> {
+                                    // Mantener estado de carga
+                                }
+                            }
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = error.message ?: "Error desconocido al cargar visitas"
+                        )
+                    }
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -65,6 +121,19 @@ class VisitListViewModel @Inject constructor(
                     error = e.message ?: "Error desconocido"
                 )
             }
+        }
+    }
+    
+    private fun parseDateTime(dateTimeString: String?): LocalDateTime {
+        return try {
+            if (dateTimeString.isNullOrBlank()) {
+                LocalDateTime.now()
+            } else {
+                // Try ISO format first
+                LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_DATE_TIME)
+            }
+        } catch (e: Exception) {
+            LocalDateTime.now()
         }
     }
 
