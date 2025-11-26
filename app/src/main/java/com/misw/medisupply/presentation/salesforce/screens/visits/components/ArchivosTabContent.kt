@@ -33,129 +33,56 @@ fun ArchivosTabContent(
     viewModel: CreateVisitViewModel,
     localeManager: com.misw.medisupply.core.i18n.LocaleManager
 ) {
-    val context = LocalContext.current
-    
-    // File picker launcher
-    val filePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { 
-            handleFileSelection(uri, context, viewModel)
-        }
-    }
-    
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Card de archivos adjuntos
+        // ================================
+        // SECCIÓN DE VIDEO S3
+        // ================================
         Card(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(Modifier.padding(16.dp)) {
-            Text(
-                localizedStringResource(R.string.files_attached_title, localeManager), 
-                style = MaterialTheme.typography.titleMedium, 
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1565C0)
-            )
-            
-            // Mensaje informativo
-            Spacer(Modifier.height(8.dp))
+                com.misw.medisupply.presentation.common.video.VideoUploadSection(
+                    videoUrl = uiState.videoUrl,
+                    isUploading = uiState.isUploadingVideoToS3,
+                    uploadProgress = uiState.videoUploadProgress,
+                    error = uiState.videoUploadError,
+                    onVideoSelected = { videoFile ->
+                        viewModel.uploadVideoToS3(videoFile)
+                    },
+                    onClearVideo = {
+                        viewModel.clearVideoState()
+                    },
+                    onClearError = {
+                        viewModel.clearVideoError()
+                    }
+                )
+            }
+        }
+        
+        // ================================
+        // SECCIÓN DE ANÁLISIS DE VIDEO CON IA
+        // ================================
+        if (uiState.videoUrl != null || uiState.isAnalyzingVideo || uiState.videoAnalysisResult != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                Text(
-                    text = localizedStringResource(R.string.files_info_message, localeManager),
-                    modifier = Modifier.padding(12.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF2E7D32)
-                )
-            }
-            
-            Spacer(Modifier.height(16.dp))
-            
-            // Mostrar error si hay alguno
-            uiState.fileError?.let { error ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Error,
-                            contentDescription = null,
-                            tint = Color(0xFFD32F2F),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = error,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFD32F2F)
-                        )
-                        Spacer(Modifier.weight(1f))
-                        IconButton(onClick = { viewModel.clearFileError() }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = localizedStringResource(R.string.close_button, localeManager),
-                                tint = Color(0xFFD32F2F),
-                                modifier = Modifier.size(16.dp)
-                            )
+                Column(Modifier.padding(16.dp)) {
+                    com.misw.medisupply.presentation.common.video.VideoAnalysisResultsSection(
+                        analysisResult = uiState.videoAnalysisResult,
+                        isAnalyzing = uiState.isAnalyzingVideo,
+                        error = uiState.videoAnalysisError,
+                        onDismissError = {
+                            viewModel.clearVideoAnalysis()
                         }
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-            
-            // Botón para seleccionar archivo
-            OutlinedButton(
-                onClick = { filePicker.launch("*/*") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !uiState.isUploadingFile,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFF1565C0)
-                )
-            ) {
-                if (uiState.isUploadingFile) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        color = Color(0xFF1565C0),
-                        strokeWidth = 2.dp
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text(localizedStringResource(R.string.uploading_file, localeManager))
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.AttachFile,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(localizedStringResource(R.string.select_file_button, localeManager))
                 }
-            }
-            
-            Spacer(Modifier.height(16.dp))
-            
-            // Lista de archivos
-            if (uiState.isLoadingFiles) {
-                LoadingFilesCard(localeManager)
-            } else if (uiState.visitFiles.isEmpty()) {
-                EmptyFilesCard(localeManager)
-            } else {
-                FilesListCard(
-                    files = uiState.visitFiles,
-                    onDeleteFile = { fileId -> viewModel.deleteFile(fileId) },
-                    isDeleting = uiState.isDeletingFile
-                )
-            }
             }
         }
         
@@ -454,117 +381,5 @@ private fun getFileIconColor(fileName: String?): Color {
         extension in listOf(".xlsx", ".xls", ".csv") -> Color(0xFF388E3C) // Verde
         extension in listOf(".zip", ".rar") -> Color(0xFF6A1B9A) // Morado
         else -> Color(0xFF757575) // Gris
-    }
-}
-
-/**
- * Maneja la selección de archivo y lo sube
- */
-private fun handleFileSelection(uri: Uri, context: Context, viewModel: CreateVisitViewModel) {
-    try {
-        val contentResolver = context.contentResolver
-        var fileName = "archivo_${System.currentTimeMillis()}"
-        var fileSize = 0L
-        
-        // Intentar obtener metadatos del archivo de forma segura
-        try {
-            contentResolver.query(
-                uri,
-                arrayOf(
-                    android.provider.OpenableColumns.DISPLAY_NAME,
-                    android.provider.OpenableColumns.SIZE
-                ),
-                null,
-                null,
-                null
-            )?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    // Obtener nombre del archivo
-                    val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-                    if (nameIndex >= 0 && !cursor.isNull(nameIndex)) {
-                        val displayName = cursor.getString(nameIndex)
-                        if (!displayName.isNullOrBlank()) {
-                            fileName = displayName
-                        }
-                    }
-                    
-                    // Obtener tamaño del archivo
-                    val sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE)
-                    if (sizeIndex >= 0 && !cursor.isNull(sizeIndex)) {
-                        fileSize = cursor.getLong(sizeIndex)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            // Si falla obtener metadatos, continúa con valores por defecto
-            android.util.Log.w("FileSelection", "No se pudieron obtener metadatos: ${e.message}")
-        }
-        
-        // Si no se pudo obtener el tamaño, intentar obtenerlo del InputStream
-        if (fileSize == 0L) {
-            try {
-                contentResolver.openInputStream(uri)?.use { inputStream ->
-                    fileSize = inputStream.available().toLong()
-                }
-            } catch (e: Exception) {
-                android.util.Log.w("FileSelection", "No se pudo obtener tamaño del archivo: ${e.message}")
-            }
-        }
-        
-        // Validar extensión
-        val extension = AllowedFileExtensions.getExtension(fileName)
-        if (!AllowedFileExtensions.isAllowed(extension)) {
-            viewModel.clearFileError() // Limpiar error anterior
-            // Usar un handler para mostrar el error después de un pequeño delay
-            android.os.Handler(android.os.Looper.getMainLooper()).post {
-                // El error será manejado por el ViewModel cuando se llame uploadFile
-            }
-            return
-        }
-        
-        // Validar tamaño (solo si se pudo obtener)
-        if (fileSize > 0 && !FileValidation.isValidSize(fileSize)) {
-            viewModel.clearFileError()
-            android.os.Handler(android.os.Looper.getMainLooper()).post {
-                // El error será manejado por el ViewModel cuando se llame uploadFile  
-            }
-            return
-        }
-        
-        // Crear archivo temporal con nombre único para evitar conflictos
-        val sanitizedFileName = fileName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
-        val tempFile = File(context.cacheDir, "temp_${System.currentTimeMillis()}_$sanitizedFileName")
-        
-        // Copiar contenido del URI al archivo temporal
-        contentResolver.openInputStream(uri)?.use { inputStream ->
-            tempFile.outputStream().use { outputStream ->
-                inputStream.copyTo(outputStream)
-            }
-        }
-        
-        // Verificar que el archivo se creó correctamente
-        if (tempFile.exists() && tempFile.length() > 0) {
-            // Subir archivo usando el archivo temporal con el nombre original
-            viewModel.uploadFile(tempFile, fileName)
-            
-            // Programar limpieza del archivo temporal después de 30 segundos
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                try {
-                    if (tempFile.exists()) {
-                        tempFile.delete()
-                    }
-                } catch (e: Exception) {
-                    android.util.Log.w("FileSelection", "Error limpiando archivo temporal: ${e.message}")
-                }
-            }, 30000) // 30 segundos
-            
-        } else {
-            android.util.Log.e("FileSelection", "Error: No se pudo crear archivo temporal")
-        }
-        
-    } catch (e: Exception) {
-        android.util.Log.e("FileSelection", "Error procesando archivo: ${e.message}", e)
-        // Mostrar error genérico en el ViewModel
-        viewModel.clearFileError()
     }
 }

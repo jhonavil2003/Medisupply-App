@@ -12,7 +12,19 @@ sdk.dir=/ruta/a/tu/Android/Sdk
 ## 4. Restringe la API key a tu package name: com.misw.medisupply
 GOOGLE_MAPS_API_KEY=TU_GOOGLE_MAPS_API_KEY_AQUI
 
+## AWS S3 Credentials
+## Para subir videos de visitas a S3
+## 1. Crea usuario IAM en AWS Console: https://console.aws.amazon.com/iam/
+## 2. Asigna permisos: AmazonS3FullAccess (o permisos específicos del bucket)
+## 3. Genera Access Key ID y Secret Access Key
+## 4. Copia las credenciales aquí
+AWS_ACCESS_KEY_ID=TU_AWS_ACCESS_KEY_ID_AQUI
+AWS_SECRET_ACCESS_KEY=TU_AWS_SECRET_ACCESS_KEY_AQUI
+AWS_S3_BUCKET_NAME=medisupply-videos
+AWS_S3_REGION=us-east-1
+
 ## NOTAS IMPORTANTES:
 ## - Este archivo (local.properties) NO se sube a Git (está en .gitignore)
 ## - Cada desarrollador debe tener su propia API key
 ## - Para producción, usa GitHub Secrets en el repositorio
+## - NUNCA subas credenciales a Git o repositorios públicos

@@ -24,9 +24,11 @@ class CreateVisitViewModel @Inject constructor(
     private val completeVisitUseCase: com.misw.medisupply.domain.usecase.visit.CompleteVisitUseCase,
     private val getCustomersUseCase: com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase,
     private val userSessionManager: com.misw.medisupply.core.session.UserSessionManager,
-    private val uploadFileUseCase: com.misw.medisupply.domain.usecase.visit.UploadFileUseCase,
     private val getVisitFilesUseCase: com.misw.medisupply.domain.usecase.visit.GetVisitFilesUseCase,
     private val deleteFileUseCase: com.misw.medisupply.domain.usecase.visit.DeleteFileUseCase,
+    private val uploadVideoToS3UseCase: com.misw.medisupply.domain.usecase.video.UploadVideoToS3UseCase,
+    private val saveVideoUrlAsFileUseCase: com.misw.medisupply.domain.usecase.visit.SaveVideoUrlAsFileUseCase,
+    private val analyzeVideoUseCase: com.misw.medisupply.domain.usecase.video.AnalyzeVideoUseCase,
     val localeManager: LocaleManager
 ) : ViewModel() {
 
@@ -208,6 +210,20 @@ class CreateVisitViewModel @Inject constructor(
             scheduleAutoSave()
         } else {
             android.util.Log.d("CreateVisitViewModel", "Not auto-saving address - isVisitSaved: ${_uiState.value.isVisitSaved}, createdVisitId: ${_uiState.value.createdVisitId}")
+        }
+    }
+    
+    fun updateLocation(latitude: Double, longitude: Double) {
+        android.util.Log.d("CreateVisitViewModel", "updateLocation() called with: lat=$latitude, lng=$longitude")
+        _uiState.value = _uiState.value.copy(
+            latitude = latitude,
+            longitude = longitude
+        )
+        
+        // Auto-actualizar con debounce si ya existe una visita guardada
+        if (_uiState.value.isVisitSaved && _uiState.value.createdVisitId != null) {
+            android.util.Log.d("CreateVisitViewModel", "Triggering auto-save for location")
+            scheduleAutoSave()
         }
     }
 
@@ -434,27 +450,40 @@ class CreateVisitViewModel @Inject constructor(
      */
     fun completeVisit() {
         val state = _uiState.value
-        val visitId = state.visitId ?: return
+        val visitId = state.createdVisitId
+        
+        if (visitId == null) {
+            _uiState.value = _uiState.value.copy(
+                error = "No se puede completar la visita. Primero debes guardar la visita."
+            )
+            return
+        }
         
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isSaving = true)
                 
+                android.util.Log.d("CreateVisitViewModel", "Completando visita ID: $visitId")
+                
                 val result = completeVisitUseCase(visitId)
                 
                 if (result.isSuccess) {
+                    android.util.Log.d("CreateVisitViewModel", "Visita completada exitosamente")
                     _uiState.value = _uiState.value.copy(
                         isSaving = false,
                         saveSuccess = true,
-                        successMessage = "Visita completada exitosamente"
+                        successMessage = "✅ Visita completada exitosamente"
                     )
                 } else {
+                    val errorMessage = result.exceptionOrNull()?.message ?: "Error desconocido"
+                    android.util.Log.e("CreateVisitViewModel", "Error al completar visita: $errorMessage")
                     _uiState.value = _uiState.value.copy(
                         isSaving = false,
-                        error = "Error al completar visita: ${result.exceptionOrNull()?.message}"
+                        error = "Error al completar visita: $errorMessage"
                     )
                 }
             } catch (e: Exception) {
+                android.util.Log.e("CreateVisitViewModel", "Exception al completar visita", e)
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     error = "Error al completar visita: ${e.message}"
@@ -500,42 +529,6 @@ class CreateVisitViewModel @Inject constructor(
     }
     
     /**
-     * Subir archivo a la visita
-     */
-    fun uploadFile(file: java.io.File, originalFileName: String? = null) {
-        val visitId = _uiState.value.createdVisitId ?: return
-        val displayName = originalFileName ?: file.name
-        
-        android.util.Log.d("CreateVisitViewModel", "Subiendo archivo: $displayName (temp: ${file.name}), tamaño: ${file.length()} bytes, visitId: $visitId")
-        
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isUploadingFile = true, fileError = null)
-            
-            uploadFileUseCase(visitId, file, originalFileName).collect { resource ->
-                when (resource) {
-                    is com.misw.medisupply.core.base.Resource.Loading -> {
-                        _uiState.value = _uiState.value.copy(isUploadingFile = true)
-                    }
-                    is com.misw.medisupply.core.base.Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isUploadingFile = false,
-                            fileError = null
-                        )
-                        // Recargar la lista de archivos después de subir
-                        loadVisitFiles()
-                    }
-                    is com.misw.medisupply.core.base.Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isUploadingFile = false,
-                            fileError = resource.message
-                        )
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
      * Eliminar archivo de la visita
      */
     fun deleteFile(fileId: Int) {
@@ -571,5 +564,174 @@ class CreateVisitViewModel @Inject constructor(
      */
     fun clearFileError() {
         _uiState.value = _uiState.value.copy(fileError = null)
+    }
+    
+    // ================================
+    // MÉTODOS PARA VIDEOS S3
+    // ================================
+    
+    /**
+     * Subir video a S3
+     */
+    fun uploadVideoToS3(videoFile: java.io.File) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isUploadingVideoToS3 = true,
+                videoUploadError = null,
+                videoUploadProgress = 0f
+            )
+            
+            // Obtener ID del cliente y de la visita
+            val customerId = _uiState.value.selectedCustomer?.id
+            val visitId = _uiState.value.createdVisitId
+            
+            uploadVideoToS3UseCase(videoFile, customerId, visitId).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            isUploadingVideoToS3 = true,
+                            videoUploadProgress = 50f // Progreso intermedio
+                        )
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        val videoUrl = resource.data ?: ""
+                        _uiState.value = _uiState.value.copy(
+                            videoUrl = videoUrl,
+                            videoUploadProgress = 75f,
+                            successMessage = "Video subido a S3, guardando en visita..."
+                        )
+                        android.util.Log.d("CreateVisitViewModel", "Video subido a S3: $videoUrl")
+                        
+                        // Guardar la URL del video en el backend
+                        val visitId = _uiState.value.createdVisitId
+                        if (visitId != null) {
+                            saveVideoUrlToBackend(visitId, videoUrl)
+                        } else {
+                            _uiState.value = _uiState.value.copy(
+                                isUploadingVideoToS3 = false,
+                                videoUploadProgress = 100f,
+                                videoUploadError = "No se encontró ID de visita para guardar el video"
+                            )
+                        }
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isUploadingVideoToS3 = false,
+                            videoUploadProgress = 0f,
+                            videoUploadError = resource.message
+                        )
+                        android.util.Log.e("CreateVisitViewModel", "Error subiendo video: ${resource.message}")
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Guardar URL del video en el backend
+     */
+    private fun saveVideoUrlToBackend(visitId: Int, videoUrl: String) {
+        viewModelScope.launch {
+            saveVideoUrlAsFileUseCase(visitId, videoUrl).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            videoUploadProgress = 85f
+                        )
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isUploadingVideoToS3 = false,
+                            videoUploadProgress = 100f,
+                            videoUploadError = null,
+                            successMessage = "Video guardado exitosamente. Iniciando análisis con IA..."
+                        )
+                        android.util.Log.d("CreateVisitViewModel", "URL del video guardada en backend")
+                        
+                        // Recargar archivos de la visita para mostrar el video
+                        loadVisitFiles()
+                        
+                        // Iniciar análisis del video automáticamente
+                        analyzeVideo(videoUrl)
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isUploadingVideoToS3 = false,
+                            videoUploadProgress = 0f,
+                            videoUploadError = "Video subido a S3, pero error guardando en visita: ${resource.message}"
+                        )
+                        android.util.Log.e("CreateVisitViewModel", "Error guardando URL en backend: ${resource.message}")
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Limpiar estado de video
+     */
+    fun clearVideoState() {
+        _uiState.value = _uiState.value.copy(
+            videoUrl = null,
+            isUploadingVideoToS3 = false,
+            videoUploadProgress = 0f,
+            videoUploadError = null
+        )
+    }
+    
+    /**
+     * Limpiar error de video
+     */
+    fun clearVideoError() {
+        _uiState.value = _uiState.value.copy(videoUploadError = null)
+    }
+    
+    /**
+     * Analizar video con IA después de subirlo a S3
+     */
+    fun analyzeVideo(videoUrl: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isAnalyzingVideo = true,
+                videoAnalysisError = null
+            )
+            
+            analyzeVideoUseCase(videoUrl, useRag = true).collect { resource ->
+                when (resource) {
+                    is com.misw.medisupply.core.base.Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAnalyzingVideo = true
+                        )
+                    }
+                    is com.misw.medisupply.core.base.Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAnalyzingVideo = false,
+                            videoAnalysisResult = resource.data,
+                            videoAnalysisError = null,
+                            successMessage = "Análisis de video completado exitosamente"
+                        )
+                        android.util.Log.d("CreateVisitViewModel", "Análisis completado: ${resource.data?.videoAnalysis?.detectedProducts?.size ?: 0} productos detectados")
+                    }
+                    is com.misw.medisupply.core.base.Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAnalyzingVideo = false,
+                            videoAnalysisError = resource.message
+                        )
+                        android.util.Log.e("CreateVisitViewModel", "Error analizando video: ${resource.message}")
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Limpiar resultados del análisis de video
+     */
+    fun clearVideoAnalysis() {
+        _uiState.value = _uiState.value.copy(
+            videoAnalysisResult = null,
+            videoAnalysisError = null,
+            isAnalyzingVideo = false
+        )
     }
 }

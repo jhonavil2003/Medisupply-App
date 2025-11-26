@@ -25,9 +25,15 @@ interface VisitRepository {
     // ================================
     
     /**
-     * Subir archivo a una visita
+     * Registrar URL de video S3 como archivo de visita
      */
-    suspend fun uploadFile(visitId: Int, file: File, originalFileName: String? = null): Result<VisitFile>
+    suspend fun registerVideoUrl(
+        visitId: Int, 
+        videoUrl: String, 
+        fileName: String, 
+        fileSize: Long? = null,
+        mimeType: String? = null
+    ): Result<VisitFile>
     
     /**
      * Obtener lista de archivos de una visita

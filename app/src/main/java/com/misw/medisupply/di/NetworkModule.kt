@@ -245,4 +245,31 @@ object NetworkModule {
     fun provideRouteApiService(@LogisticsRetrofit retrofit: Retrofit): RouteApiService {
         return retrofit.create(RouteApiService::class.java)
     }
+    
+    /**
+     * Provides VideoAnalysisApiService with extended timeout for long-running analysis
+     */
+    @Provides
+    @Singleton
+    fun provideVideoAnalysisApiService(
+        loggingInterceptor: HttpLoggingInterceptor,
+        gson: Gson
+    ): com.misw.medisupply.data.network.api.VideoAnalysisApiService {
+        // Cliente HTTP con timeout extendido para análisis de video (60 segundos)
+        val videoAnalysisClient = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)  // Análisis puede tomar 10-30 segundos
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .build()
+        
+        val videoAnalysisRetrofit = Retrofit.Builder()
+            .baseUrl("http://medisupply-alb-590358283.us-east-1.elb.amazonaws.com")
+            .client(videoAnalysisClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+        
+        return videoAnalysisRetrofit.create(com.misw.medisupply.data.network.api.VideoAnalysisApiService::class.java)
+    }
 }
