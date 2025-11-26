@@ -3,18 +3,21 @@ package com.misw.medisupply.presentation.salesforce.viewmodel.orders
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.misw.medisupply.R
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.customer.CustomerType
 import com.misw.medisupply.domain.model.order.CartItem
 import com.misw.medisupply.domain.model.order.PaymentTerms
-import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
+import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.customer.GetCustomersBySalespersonUseCase
+import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
 import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrderByIdUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
 import com.misw.medisupply.domain.usecase.order.UpdateOrderUseCase
-import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +27,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.misw.medisupply.core.i18n.LocaleManager
-import com.misw.medisupply.R
 
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
@@ -35,7 +36,8 @@ class OrdersViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
     private val updateOrderUseCase: UpdateOrderUseCase,
     private val deleteOrderUseCase: DeleteOrderUseCase,
-    private val localeManager: LocaleManager
+    private val localeManager: LocaleManager,
+    private val userSessionManager: UserSessionManager,
 ) : ViewModel() {
     
     companion object {
@@ -74,7 +76,7 @@ class OrdersViewModel @Inject constructor(
         // TODO: Usar vendedor de la sesión cuando se implemente login
         // Por ahora usa TEMP_SALESPERSON_ID = 2
         getCustomersBySalespersonUseCase(
-            salespersonId = TEMP_SALESPERSON_ID,
+            salespersonId = userSessionManager.getSalespersonId(),
             isActive = isActive
         )
             .onEach { resource ->

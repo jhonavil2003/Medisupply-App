@@ -25,8 +25,7 @@ import com.misw.medisupply.presentation.customermanagement.screens.shop.createor
 @Composable
 fun CustomerManagementNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
-    onNavigateToRoleSelection: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
@@ -36,7 +35,7 @@ fun CustomerManagementNavGraph(
         // Home Screen - Bienvenida
         composable(route = CustomerManagementRoutes.HOME) {
             CustomerHomeScreen(
-                onNavigateToRoleSelection = onNavigateToRoleSelection
+
             )
         }
         

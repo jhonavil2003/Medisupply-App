@@ -1,8 +1,14 @@
+// kotlin
 package com.misw.medisupply.presentation.salesforce.screens.orders.list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.data.repository.auth.AuthRepository
+import com.misw.medisupply.domain.model.order.Order
+import com.misw.medisupply.domain.model.order.OrderStatus
+import com.misw.medisupply.domain.usecase.customer.GetCustomersBySalespersonEployeeIdUseCase
 import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
 import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
 import com.misw.medisupply.domain.usecase.order.GetOrdersUseCase
@@ -14,64 +20,86 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel for My Orders Screen
- * Manages the state and business logic for displaying seller's orders with advanced filtering
- */
 @HiltViewModel
 class MyOrdersViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
     private val getCustomersUseCase: GetCustomersUseCase,
+    private val getCustomersBySalespersonEployeeIdUseCase: GetCustomersBySalespersonEployeeIdUseCase,
     private val deleteOrderUseCase: DeleteOrderUseCase
 ) : ViewModel() {
-    
+
+    companion object {
+        private const val TAG = "MyOrdersViewModel"
+    }
+
     private val _state = MutableStateFlow(MyOrdersState())
     val state: StateFlow<MyOrdersState> = _state.asStateFlow()
-    
-    /**
-     * ID del vendedor actual
-     * TODO: Obtener del UserSession cuando esté disponible
-     */
+
     private val currentSellerId: String = "SELLER-001"
-    
-    /**
-     * Obtener todos los resultados sin paginación
-     */
     private val maxResults: Int = 1000
-    
+
     init {
+        Log.d(TAG, "init - starting loadOrders & loadCustomers")
         loadOrders()
         loadCustomers()
     }
-    
-    /**
-     * Handle events from the UI
-     */
+
     fun onEvent(event: MyOrdersEvent) {
         when (event) {
-            is MyOrdersEvent.LoadOrders -> loadOrders()
-            is MyOrdersEvent.LoadCustomers -> loadCustomers()
-            is MyOrdersEvent.RefreshOrders -> refreshOrders()
-            is MyOrdersEvent.FilterByStatus -> filterByStatus(event.status)
-            is MyOrdersEvent.FilterByCustomer -> filterByCustomer(event.customerId)
-            is MyOrdersEvent.FilterByDateRange -> filterByDateRange(event.dateRange)
-            is MyOrdersEvent.ClearFilters -> clearAllFilters()
-            is MyOrdersEvent.SelectOrder -> selectOrder(event.order)
-            is MyOrdersEvent.ClearError -> clearError()
-            is MyOrdersEvent.DeleteOrder -> deleteOrder(event.orderId)
-            is MyOrdersEvent.ClearSuccessMessage -> clearSuccessMessage()
+            is MyOrdersEvent.LoadOrders -> {
+                Log.d(TAG, "Event: LoadOrders")
+                loadOrders()
+            }
+            is MyOrdersEvent.LoadCustomers -> {
+                Log.d(TAG, "Event: LoadCustomers")
+                loadCustomers()
+            }
+            is MyOrdersEvent.RefreshOrders -> {
+                Log.d(TAG, "Event: RefreshOrders")
+                refreshOrders()
+            }
+            is MyOrdersEvent.FilterByStatus -> {
+                Log.d(TAG, "Event: FilterByStatus -> ${event.status}")
+                filterByStatus(event.status)
+            }
+            is MyOrdersEvent.FilterByCustomer -> {
+                Log.d(TAG, "Event: FilterByCustomer -> ${event.customerId}")
+                filterByCustomer(event.customerId)
+            }
+            is MyOrdersEvent.FilterByDateRange -> {
+                Log.d(TAG, "Event: FilterByDateRange -> ${event.dateRange}")
+                filterByDateRange(event.dateRange)
+            }
+            is MyOrdersEvent.ClearFilters -> {
+                Log.d(TAG, "Event: ClearFilters")
+                clearAllFilters()
+            }
+            is MyOrdersEvent.SelectOrder -> {
+                Log.d(TAG, "Event: SelectOrder -> ${event.order.id}")
+                selectOrder(event.order)
+            }
+            is MyOrdersEvent.ClearError -> {
+                Log.d(TAG, "Event: ClearError")
+                clearError()
+            }
+            is MyOrdersEvent.DeleteOrder -> {
+                Log.d(TAG, "Event: DeleteOrder -> ${event.orderId}")
+                deleteOrder(event.orderId)
+            }
+            is MyOrdersEvent.ClearSuccessMessage -> {
+                Log.d(TAG, "Event: ClearSuccessMessage")
+                clearSuccessMessage()
+            }
         }
     }
-    
-    /**
-     * Load orders from repository with current filters
-     */
+
     private fun loadOrders() {
         viewModelScope.launch {
+            Log.d(TAG, "loadOrders - start sellerId=$currentSellerId")
             _state.update { it.copy(isLoading = true, error = null) }
-            
+
             val currentState = _state.value
-            
+
             getOrdersUseCase(
                 sellerId = currentSellerId,
                 customerId = currentState.selectedCustomerId,
@@ -81,11 +109,13 @@ class MyOrdersViewModel @Inject constructor(
             ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        // Loading already set above
+                        Log.d(TAG, "loadOrders - loading")
                     }
                     is Resource.Success -> {
                         val paginatedResult = resource.data
-                        _state.update { 
+                        val count = paginatedResult?.items?.size ?: 0
+                        Log.d(TAG, "loadOrders - success items=$count")
+                        _state.update {
                             it.copy(
                                 isLoading = false,
                                 isRefreshing = false,
@@ -95,7 +125,8 @@ class MyOrdersViewModel @Inject constructor(
                         }
                     }
                     is Resource.Error -> {
-                        _state.update { 
+                        Log.e(TAG, "loadOrders - error: ${resource.message}")
+                        _state.update {
                             it.copy(
                                 isLoading = false,
                                 isRefreshing = false,
@@ -107,22 +138,33 @@ class MyOrdersViewModel @Inject constructor(
             }
         }
     }
-    
-    /**
-     * Load customers for filtering
-     */
+
     private fun loadCustomers() {
         viewModelScope.launch {
+            Log.d(TAG, "loadCustomers - start")
             _state.update { it.copy(isLoadingCustomers = true) }
-            
-            getCustomersUseCase(
-                sellerId = currentSellerId.toIntOrNull() // Convert if needed
+
+            val salespersonId = try {
+                AuthRepository.getUserId()
+            } catch (e: Exception) {
+                Log.e(TAG, "loadCustomers - error fetching userId", e)
+                null
+            }
+
+            Log.d(TAG, "loadCustomers - salespersonId=$salespersonId")
+            if (salespersonId.isNullOrBlank()) {
+                Log.w(TAG, "loadCustomers - salespersonId is null or blank, proceeding with empty id")
+            }
+
+            getCustomersBySalespersonEployeeIdUseCase(
+                salespersonId = salespersonId ?: ""
             ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        // Loading already set above
+                        Log.d(TAG, "loadCustomers - loading")
                     }
                     is Resource.Success -> {
+                        Log.d(TAG, "loadCustomers - success count=${resource.data?.size ?: 0}")
                         _state.update {
                             it.copy(
                                 isLoadingCustomers = false,
@@ -131,6 +173,7 @@ class MyOrdersViewModel @Inject constructor(
                         }
                     }
                     is Resource.Error -> {
+                        Log.e(TAG, "loadCustomers - error: ${resource.message}")
                         _state.update {
                             it.copy(
                                 isLoadingCustomers = false,
@@ -142,47 +185,34 @@ class MyOrdersViewModel @Inject constructor(
             }
         }
     }
-    
-    /**
-     * Refresh orders (pull to refresh)
-     */
+
     private fun refreshOrders() {
         viewModelScope.launch {
+            Log.d(TAG, "refreshOrders - start")
             _state.update { it.copy(isRefreshing = true) }
             loadOrders()
         }
     }
-    
-    /**
-     * Filter orders by status
-     * Reloads orders with filter applied on backend
-     */
-    private fun filterByStatus(status: com.misw.medisupply.domain.model.order.OrderStatus?) {
+
+    private fun filterByStatus(status: OrderStatus?) {
+        Log.d(TAG, "filterByStatus -> $status")
         _state.update { it.copy(selectedStatus = status) }
         loadOrders()
     }
-    
-    /**
-     * Filter orders by customer
-     * Reloads orders with filter applied on backend
-     */
+
     private fun filterByCustomer(customerId: Int?) {
+        Log.d(TAG, "filterByCustomer -> $customerId")
         _state.update { it.copy(selectedCustomerId = customerId) }
         loadOrders()
     }
-    
-    /**
-     * Filter orders by date range
-     * Applied on client-side since API doesn't support date filtering
-     */
+
     private fun filterByDateRange(dateRange: DateRange?) {
+        Log.d(TAG, "filterByDateRange -> $dateRange")
         _state.update { it.copy(selectedDateRange = dateRange) }
     }
-    
-    /**
-     * Clear all filters
-     */
+
     private fun clearAllFilters() {
+        Log.d(TAG, "clearAllFilters")
         _state.update {
             it.copy(
                 selectedStatus = null,
@@ -192,46 +222,41 @@ class MyOrdersViewModel @Inject constructor(
         }
         loadOrders()
     }
-    
-    /**
-     * Select an order to view details
-     */
-    private fun selectOrder(order: com.misw.medisupply.domain.model.order.Order) {
+
+    private fun selectOrder(order: Order) {
+        Log.d(TAG, "selectOrder -> ${order.id}")
         _state.update { it.copy(selectedOrder = order) }
     }
-    
-    /**
-     * Clear error message
-     */
+
     private fun clearError() {
+        Log.d(TAG, "clearError")
         _state.update { it.copy(error = null) }
     }
-    
-    /**
-     * Delete an order
-     */
+
     private fun deleteOrder(orderId: Int) {
         viewModelScope.launch {
+            Log.d(TAG, "deleteOrder - start orderId=$orderId")
             _state.update { it.copy(isDeleting = true, error = null) }
-            
+
             deleteOrderUseCase(orderId).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        // Loading state already set above
+                        Log.d(TAG, "deleteOrder - loading")
                     }
                     is Resource.Success -> {
-                        // Remove order from local list and show success message
+                        Log.d(TAG, "deleteOrder - success orderId=$orderId")
                         _state.update { currentState ->
                             currentState.copy(
                                 isDeleting = false,
                                 orders = currentState.orders.filter { it.id != orderId },
-                                successMessage = "order_deleted_successfully", // Resource key for internationalization
+                                successMessage = "order_deleted_successfully",
                                 error = null
                             )
                         }
                     }
                     is Resource.Error -> {
-                        _state.update { 
+                        Log.e(TAG, "deleteOrder - error: ${resource.message}")
+                        _state.update {
                             it.copy(
                                 isDeleting = false,
                                 error = resource.message
@@ -242,11 +267,9 @@ class MyOrdersViewModel @Inject constructor(
             }
         }
     }
-    
-    /**
-     * Clear success message
-     */
+
     private fun clearSuccessMessage() {
+        Log.d(TAG, "clearSuccessMessage")
         _state.update { it.copy(successMessage = null) }
     }
 }

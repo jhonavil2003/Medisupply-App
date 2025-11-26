@@ -1,7 +1,6 @@
 package com.misw.medisupply.data.repository.customer
 
 import android.util.Log
-import com.misw.medisupply.core.base.AppException
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.data.remote.api.customer.CustomerApiService
 import com.misw.medisupply.data.remote.dto.customer.CreateCustomerRequest
@@ -367,6 +366,52 @@ class CustomerRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             emit(Resource.Error(Constants.ErrorMessages.NETWORK_ERROR))
             
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
+        }
+    }
+
+    override fun getCustomersBySalespersonEmployeeId(
+        salespersonId: String
+    ): Flow<Resource<List<Customer>>> = flow {
+        try {
+            emit(Resource.Loading())
+
+            val response = apiService.getCustomersBySalespersonEmployeeId(
+                employeeId = salespersonId
+            )
+
+            if (response.isSuccessful) {
+                val customersResponse = response.body()
+                if (customersResponse != null) {
+                    val customers = customersResponse.customers.map { it.toDomain() }
+                    emit(Resource.Success(customers))
+                } else {
+                    emit(Resource.Error(Constants.ErrorMessages.NOT_FOUND))
+                }
+            } else {
+                val errorMessage = when (response.code()) {
+                    401 -> Constants.ErrorMessages.UNAUTHORIZED
+                    404 -> "Vendedor no encontrado"
+                    500 -> Constants.ErrorMessages.SERVER_ERROR
+                    else -> "${Constants.ErrorMessages.SERVER_ERROR} (${response.code()})"
+                }
+                emit(Resource.Error(errorMessage))
+            }
+
+        } catch (e: HttpException) {
+            val errorMessage = when (e.code()) {
+                401 -> Constants.ErrorMessages.UNAUTHORIZED
+                404 -> "Vendedor no encontrado"
+                408 -> Constants.ErrorMessages.TIMEOUT
+                500, 502, 503 -> Constants.ErrorMessages.SERVER_ERROR
+                else -> Constants.ErrorMessages.UNKNOWN_ERROR
+            }
+            emit(Resource.Error(errorMessage))
+
+        } catch (e: IOException) {
+            emit(Resource.Error(Constants.ErrorMessages.NETWORK_ERROR))
+
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: Constants.ErrorMessages.UNKNOWN_ERROR))
         }

@@ -89,4 +89,8 @@ interface CustomerRepository {
         salespersonId: Int,
         isActive: Boolean? = null
     ): Flow<Resource<List<Customer>>>
+
+    fun getCustomersBySalespersonEmployeeId(
+        salespersonId: String
+    ): Flow<Resource<List<Customer>>>
 }

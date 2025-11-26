@@ -41,7 +41,6 @@ import com.misw.medisupply.presentation.components.localizedStringResource
 @Composable
 fun SalesForceHomeScreen(
     onNavigateToVisits: () -> Unit = {},
-    onNavigateToRoleSelection: () -> Unit = {},
     viewModel: SalesForceHomeViewModel = hiltViewModel()
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -122,23 +121,6 @@ fun SalesForceHomeScreen(
             }
             
             Spacer(modifier = Modifier.height(32.dp))
-            
-            // Botón provisional para volver a selección de roles
-            OutlinedButton(
-                onClick = onNavigateToRoleSelection,
-                modifier = Modifier.fillMaxWidth(0.8f),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFFE53935)
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ExitToApp,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(localizedStringResource(R.string.salesforce_home_change_role, viewModel.localeManager))
-            }
         }
     }
 }

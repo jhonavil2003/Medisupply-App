@@ -21,6 +21,7 @@ object MainRoutes {
     const val SALES_FORCE_FLOW = "salesforce_flow"
     const val CUSTOMER_MANAGEMENT_FLOW = "customer_management_flow"
     const val CUSTOMER_REGISTRATION = "customer_registration"
+    const val LOGIN = "login"
 }
 
 /**
@@ -80,14 +81,7 @@ fun MainNavGraph(
         // Sales Force Flow - Complete navigation for internal staff
         composable(MainRoutes.SALES_FORCE_FLOW) {
             SalesForceNavigation(
-                onNavigateToRoleSelection = {
-                    navController.navigate(MainRoutes.ROLE_SELECTION) {
-                        popUpTo(MainRoutes.SALES_FORCE_FLOW) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
+
             )
         }
         

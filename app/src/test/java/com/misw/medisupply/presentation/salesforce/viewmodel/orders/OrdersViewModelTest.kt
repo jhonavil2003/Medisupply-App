@@ -12,7 +12,6 @@ import com.misw.medisupply.domain.model.order.OrderItem
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.domain.model.order.PaymentMethod
 import com.misw.medisupply.domain.model.order.PaymentTerms
-import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.customer.GetCustomersUseCase
 import com.misw.medisupply.domain.usecase.customer.GetCustomersBySalespersonUseCase
 import com.misw.medisupply.domain.usecase.order.DeleteOrderUseCase
@@ -35,7 +34,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever

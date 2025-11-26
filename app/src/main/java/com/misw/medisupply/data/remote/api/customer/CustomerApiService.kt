@@ -84,4 +84,13 @@ interface CustomerApiService {
         @Query("page") page: Int = 1,
         @Query("per_page") perPage: Int = 50
     ): Response<CustomersResponse>
+
+    /**
+     * Get customers assigned to a specific salesperson by employee ID
+     *
+     */
+    @GET("customers/by-salesperson/employee/{employee_id}")
+    suspend fun getCustomersBySalespersonEmployeeId(
+        @Path("employee_id") employeeId: String
+    ): Response<CustomersResponse>
 }
