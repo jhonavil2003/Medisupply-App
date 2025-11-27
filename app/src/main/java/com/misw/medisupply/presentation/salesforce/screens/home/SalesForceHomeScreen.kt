@@ -121,6 +121,23 @@ fun SalesForceHomeScreen(
             }
             
             Spacer(modifier = Modifier.height(32.dp))
+            
+            // Logout Button
+            OutlinedButton(
+                onClick = { viewModel.logout() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color.Red
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = "Logout",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.padding(4.dp))
+                Text(localizedStringResource(R.string.logout, viewModel.localeManager))
+            }
         }
     }
 }

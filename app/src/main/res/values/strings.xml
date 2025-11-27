@@ -42,6 +42,9 @@
     <string name="nav_visits">Visitas</string>
     <string name="nav_performance">Desempeño</string>
     
+    <!-- Logout -->
+    <string name="logout">Cerrar Sesión</string>
+    
     <!-- Customer Registration Screen -->
     <string name="registration_title">Registrarse</string>
     <string name="registration_back_description">Volver</string>

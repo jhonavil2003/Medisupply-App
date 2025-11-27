@@ -122,4 +122,10 @@ object AuthRepository {
             null
         }
     }
+
+    suspend fun signOut(): Unit = suspendCancellableCoroutine { cont ->
+        Amplify.Auth.signOut { result ->
+            cont.resume(Unit)
+        }
+    }
 }

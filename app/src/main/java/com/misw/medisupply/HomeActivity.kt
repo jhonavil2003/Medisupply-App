@@ -15,10 +15,15 @@ import com.misw.medisupply.presentation.customermanagement.navigation.CustomerMa
 import com.misw.medisupply.presentation.salesforce.navigation.SalesForceNavigation
 import com.misw.medisupply.ui.theme.MedisupplyTheme
 import dagger.hilt.android.AndroidEntryPoint
+import android.content.Intent
 
 private const val TAG = "Login HomeActivity"
+
 @AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
+    companion object {
+        const val ACTION_LOGOUT = "com.misw.medisupply.LOGOUT"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: HomeActivity iniciada.")
