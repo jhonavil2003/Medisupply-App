@@ -105,10 +105,19 @@ object AuthRepository {
     } catch (_: Exception) { null }
 
 
-    suspend fun getUserId(): String? {
+    suspend fun getUserDbId(): String? {
         return try {
             val attrs = fetchUserAttributesSuspend()
             attrs.firstOrNull { it.key.keyString == "custom:db_user_id" }?.value
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    suspend fun getUserId(): String? {
+        return try {
+            val attrs = fetchUserAttributesSuspend()
+            attrs.firstOrNull { it.key.keyString == "sub" }?.value
         } catch (_: Exception) {
             null
         }

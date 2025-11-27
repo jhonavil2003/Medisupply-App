@@ -8,6 +8,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,6 +28,9 @@ class UserSessionManager @Inject constructor(
     private val _currentSalesperson = MutableStateFlow<Salesperson?>(null)
     val currentSalesperson: StateFlow<Salesperson?> = _currentSalesperson.asStateFlow()
 
+    private val _currentSalespersonId = MutableStateFlow<String?>(null)
+    val currentSalespersonId: StateFlow<String?> = _currentSalespersonId.asStateFlow()
+
     private val _currentSalespersonSub = MutableStateFlow<String?>(null)
     val currentSalespersonSub: StateFlow<String?> = _currentSalespersonSub.asStateFlow()
 
@@ -37,9 +43,16 @@ class UserSessionManager @Inject constructor(
         GlobalScope.launch {
             try {
                 Log.d(TAG, "init - fetching Cognito sub from AuthRepository")
+                val userDbId = AuthRepository.getUserDbId()
+                if (!userDbId.isNullOrBlank()) {
+                    setSalespersonSub(userDbId)
+                    Log.d(TAG, "🔐 Cognito sub detected: $userDbId")
+                } else {
+                    Log.i(TAG, "ℹ️ No se encontró sub en el token")
+                }
                 val userId = AuthRepository.getUserId()
                 if (!userId.isNullOrBlank()) {
-                    setSalespersonSub(userId)
+                    setSalespersonId(userId)
                     Log.d(TAG, "🔐 Cognito sub detected: $userId")
                 } else {
                     Log.i(TAG, "ℹ️ No se encontró sub en el token")
@@ -54,9 +67,9 @@ class UserSessionManager @Inject constructor(
     /**
      * Set current salesperson (for login/authentication)
      */
-    fun setSalesperson(salesperson: Salesperson) {
-        _currentSalesperson.value = salesperson
-        Log.d(TAG, "setSalesperson -> id=${salesperson.id}")
+    fun setSalespersonId(id: String) {
+        _currentSalespersonId.value = id
+        Log.d(TAG, "setSalesperson -> id=${id}")
     }
 
     /**
@@ -112,6 +125,32 @@ class UserSessionManager @Inject constructor(
                 Log.e(TAG, "requireSalesperson - no salesperson logged in")
                 throw IllegalStateException("No salesperson logged in")
             }
+    }
+
+    suspend fun requireSalespersonSub(): Int {
+        return currentSalespersonId
+            .filterNotNull()                // esperamos a que no sea null
+            .map { it.toIntOrNull() }       // lo convertimos a Int?
+            .filterNotNull()                // esperamos a que la conversión sea válida
+            .first()                        // suspende hasta que haya valor
+    }
+
+    suspend fun requireSalespersonSubString(): String {
+        return currentSalespersonId
+            .filterNotNull()                // esperamos a que no sea null
+            .first()                        // suspende hasta que haya valor
+    }
+
+    /**
+     * Espera hasta tener un salespersonId válido.
+     * Debes llamarla SIEMPRE desde una corrutina.
+     */
+    suspend fun requireSalespersonId(): Int {
+        return currentSalespersonSub
+            .filterNotNull()                // esperamos a que no sea null
+            .map { it.toIntOrNull() }       // lo convertimos a Int?
+            .filterNotNull()                // esperamos a que la conversión sea válida
+            .first()                        // suspende hasta que haya valor
     }
 
     /**

@@ -73,49 +73,55 @@ class OrdersViewModel @Inject constructor(
         city: String? = null,
         isActive: Boolean? = true
     ) {
-        // TODO: Usar vendedor de la sesión cuando se implemente login
-        // Por ahora usa TEMP_SALESPERSON_ID = 2
-        getCustomersBySalespersonUseCase(
-            salespersonId = userSessionManager.getSalespersonId(),
-            isActive = isActive
-        )
-            .onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _state.update { it.copy(isLoading = true, error = null) }
-                    }
-                    is Resource.Success -> {
-                        // Aplicar filtros locales si es necesario
-                        val allCustomers = resource.data ?: emptyList()
-                        val filteredCustomers = allCustomers.filter { customer ->
-                            val matchesType = customerType == null || 
-                                customer.customerType.name.equals(customerType, ignoreCase = true)
-                            val matchesCity = city == null || 
-                                customer.city?.equals(city, ignoreCase = true) == true
-                            matchesType && matchesCity
+        viewModelScope.launch {
+            val salespersonId = userSessionManager.requireSalespersonId()
+            Log.d("HomeViewModel", "SalespersonId = $salespersonId")
+            getCustomersBySalespersonUseCase(
+                salespersonId = salespersonId,
+                isActive = isActive
+            )
+                .onEach { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            _state.update { it.copy(isLoading = true, error = null) }
                         }
-                        
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                customers = filteredCustomers,
-                                error = null,
-                                isRefreshing = false
-                            )
+                        is Resource.Success -> {
+                            // Aplicar filtros locales si es necesario
+                            val allCustomers = resource.data ?: emptyList()
+                            val filteredCustomers = allCustomers.filter { customer ->
+                                val matchesType = customerType == null ||
+                                        customer.customerType.name.equals(customerType, ignoreCase = true)
+                                val matchesCity = city == null ||
+                                        customer.city?.equals(city, ignoreCase = true) == true
+                                matchesType && matchesCity
+                            }
+
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    customers = filteredCustomers,
+                                    error = null,
+                                    isRefreshing = false
+                                )
+                            }
                         }
-                    }
-                    is Resource.Error -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                error = resource.message,
-                                isRefreshing = false
-                            )
+                        is Resource.Error -> {
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = resource.message,
+                                    isRefreshing = false
+                                )
+                            }
                         }
                     }
                 }
-            }
-            .launchIn(viewModelScope)
+                .launchIn(viewModelScope)
+            // aquí ya puedes usar el id con seguridad
+        }
+        // TODO: Usar vendedor de la sesión cuando se implemente login
+        // Por ahora usa TEMP_SALESPERSON_ID = 2
+
     }
     
     private fun refreshCustomers() {
@@ -367,10 +373,11 @@ class OrdersViewModel @Inject constructor(
      * Load orders for the current seller
      * TODO: Get sellerId from auth/session
      */
-    fun loadOrders(sellerId: String = "SELLER-001") {
+    fun loadOrders() {
         viewModelScope.launch {
+            val currentSellerId = userSessionManager.requireSalespersonSubString()
             getOrdersUseCase(
-                sellerId = sellerId,
+                sellerId = currentSellerId,
                 customerId = null,
                 status = null,
                 page = 1,

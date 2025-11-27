@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.data.remote.dto.customer.CreateCustomerRequest
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.usecase.customer.RegisterCustomerUseCase
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomerRegistrationViewModel @Inject constructor(
     private val registerCustomerUseCase: RegisterCustomerUseCase,
-    val localeManager: LocaleManager
+    val localeManager: LocaleManager,
+    private val userSessionManager: UserSessionManager
 ) : ViewModel() {
     
     companion object {
@@ -278,6 +280,9 @@ class CustomerRegistrationViewModel @Inject constructor(
             Log.d(TAG, "address: '${registrationData.address}'")
             Log.d(TAG, "city: '${registrationData.city}'")
             Log.d(TAG, "department: '${registrationData.department}'")
+
+            val currentSellerId = userSessionManager.requireSalespersonId()
+            Log.d(TAG, "SalespersonId = $currentSellerId")
             
             registerCustomerUseCase(
                 businessName = updatedState.businessName,
@@ -292,7 +297,8 @@ class CustomerRegistrationViewModel @Inject constructor(
                 department = updatedState.department.takeIf { it.isNotBlank() },
                 country = updatedState.country.takeIf { it.isNotBlank() } ?: "Colombia",
                 latitude = updatedState.latitudeValue,
-                longitude = updatedState.longitudeValue
+                longitude = updatedState.longitudeValue,
+                salespersonId = currentSellerId
             ).collect { resource ->
                 Log.d(TAG, "Respuesta del UseCase: ${resource.javaClass.simpleName}")
                 when (resource) {

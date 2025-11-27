@@ -13,6 +13,7 @@ import com.misw.medisupply.domain.repository.order.OrderItemRequest
 import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
 import com.misw.medisupply.domain.usecase.order.CreateOrderUseCase
 import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.session.UserSessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +32,8 @@ import javax.inject.Inject
 class OrderViewModel @Inject constructor(
     private val createOrderUseCase: CreateOrderUseCase,
     private val clearCartUseCase: ClearCartUseCase,
-    val localeManager: LocaleManager
+    val localeManager: LocaleManager,
+    private val userSessionManager: UserSessionManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OrderState())
@@ -66,54 +68,60 @@ class OrderViewModel @Inject constructor(
         // TODO: Get seller info from auth/session
         val sellerId = "SELLER-001" // Hardcoded for now
         val sellerName = "Vendedor Demo"
+        viewModelScope.launch {
+            val currentSellerId = userSessionManager.requireSalespersonSubString()
 
-        createOrderUseCase(
-            customerId = customer.id,
-            sellerId = sellerId,
-            sellerName = sellerName,
-            items = orderItems,
-            paymentTerms = paymentTerms,
-            paymentMethod = paymentMethod,
-            deliveryAddress = deliveryAddress ?: customer.address,
-            deliveryCity = deliveryCity ?: customer.city,
-            deliveryDepartment = deliveryDepartment ?: customer.department,
-            deliveryDate = deliveryDate,
-            preferredDistributionCenter = null,
-            notes = notes
-        ).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    _state.update {
-                        it.copy(
-                            isLoading = true,
-                            error = null,
-                            createdOrder = null
-                        )
+            createOrderUseCase(
+                customerId = customer.id,
+                sellerId = currentSellerId,
+                sellerName = sellerName,
+                items = orderItems,
+                paymentTerms = paymentTerms,
+                paymentMethod = paymentMethod,
+                deliveryAddress = deliveryAddress ?: customer.address,
+                deliveryCity = deliveryCity ?: customer.city,
+                deliveryDepartment = deliveryDepartment ?: customer.department,
+                deliveryDate = deliveryDate,
+                preferredDistributionCenter = null,
+                notes = notes
+            ).onEach { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = true,
+                                error = null,
+                                createdOrder = null
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = null,
+                                createdOrder = resource.data
+                            )
+                        }
+
+                        // Clear cart reservations after successful order creation
+                        clearCartReservations()
+                    }
+
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = resource.message
+                                    ?: localeManager.getLocalizedString(R.string.error_creating_order),
+                                createdOrder = null
+                            )
+                        }
                     }
                 }
-                is Resource.Success -> {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            error = null,
-                            createdOrder = resource.data
-                        )
-                    }
-                    
-                    // Clear cart reservations after successful order creation
-                    clearCartReservations()
-                }
-                is Resource.Error -> {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            error = resource.message ?: localeManager.getLocalizedString(R.string.error_creating_order),
-                            createdOrder = null
-                        )
-                    }
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
+        }
     }
 
     /**

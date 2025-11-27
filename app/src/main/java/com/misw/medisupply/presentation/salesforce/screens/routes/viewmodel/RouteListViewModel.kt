@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.session.UserSessionManager
@@ -43,9 +44,12 @@ class RouteListViewModel @Inject constructor(
                 val sellerId = 1
                 
                 val state = _uiState.value
+
+                val currentSellerId = userSessionManager.requireSalespersonId()
+                Log.d("HomeViewModel", "SalespersonId = $currentSellerId")
                 
                 val result = getSalespersonRoutesUseCase(
-                    salespersonId = sellerId,
+                    salespersonId = currentSellerId,
                     date = state.selectedDate,
                     status = state.selectedStatus,
                     page = 1,
@@ -110,11 +114,12 @@ class RouteListViewModel @Inject constructor(
             try {
                 // TODO: Obtener sellerId del UserSessionManager cuando login esté implementado
                 // Por ahora usar sellerId = 1 (hardcodeado temporalmente)
-                val sellerId = 1
+                val currentSellerId = userSessionManager.requireSalespersonId()
+                Log.d("HomeViewModel", "SalespersonId = $currentSellerId")
                 val nextPage = state.currentPage + 1
                 
                 val result = getSalespersonRoutesUseCase(
-                    salespersonId = sellerId,
+                    salespersonId = currentSellerId,
                     date = state.selectedDate,
                     status = state.selectedStatus,
                     page = nextPage,

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
+import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.data.repository.auth.AuthRepository
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
@@ -25,7 +26,8 @@ class MyOrdersViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
     private val getCustomersUseCase: GetCustomersUseCase,
     private val getCustomersBySalespersonEployeeIdUseCase: GetCustomersBySalespersonEployeeIdUseCase,
-    private val deleteOrderUseCase: DeleteOrderUseCase
+    private val deleteOrderUseCase: DeleteOrderUseCase,
+    private val userSessionManager: UserSessionManager,
 ) : ViewModel() {
 
     companion object {
@@ -35,7 +37,7 @@ class MyOrdersViewModel @Inject constructor(
     private val _state = MutableStateFlow(MyOrdersState())
     val state: StateFlow<MyOrdersState> = _state.asStateFlow()
 
-    private val currentSellerId: String = "SELLER-001"
+    //private val currentSellerId: String = "SELLER-001"
     private val maxResults: Int = 1000
 
     init {
@@ -95,7 +97,9 @@ class MyOrdersViewModel @Inject constructor(
 
     private fun loadOrders() {
         viewModelScope.launch {
-            Log.d(TAG, "loadOrders - start sellerId=$currentSellerId")
+            //Log.d(TAG, "loadOrders - start sellerId=$currentSellerId")
+            val currentSellerId = userSessionManager.requireSalespersonSubString()
+            Log.d("HomeViewModel", "SalespersonId = $currentSellerId")
             _state.update { it.copy(isLoading = true, error = null) }
 
             val currentState = _state.value
@@ -144,20 +148,13 @@ class MyOrdersViewModel @Inject constructor(
             Log.d(TAG, "loadCustomers - start")
             _state.update { it.copy(isLoadingCustomers = true) }
 
-            val salespersonId = try {
-                AuthRepository.getUserId()
-            } catch (e: Exception) {
-                Log.e(TAG, "loadCustomers - error fetching userId", e)
-                null
-            }
 
-            Log.d(TAG, "loadCustomers - salespersonId=$salespersonId")
-            if (salespersonId.isNullOrBlank()) {
-                Log.w(TAG, "loadCustomers - salespersonId is null or blank, proceeding with empty id")
-            }
+            val salespersonId = userSessionManager.requireSalespersonSubString()
+            Log.d("HomeViewModel", "SalespersonId = $salespersonId")
+
 
             getCustomersBySalespersonEployeeIdUseCase(
-                salespersonId = salespersonId ?: ""
+                salespersonId = salespersonId
             ).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {

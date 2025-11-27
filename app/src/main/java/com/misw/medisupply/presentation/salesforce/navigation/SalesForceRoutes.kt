@@ -14,6 +14,8 @@ object SalesForceRoutes {
     
     // Orders sub-navigation
     const val CUSTOMER_LIST = "salesforce_customer_list"
+
+    const val CREATE_CUSTOMER = "salesforce_create_customer"
     const val CREATE_ORDER = "salesforce_create_order"
     const val MY_ORDERS = "salesforce_my_orders"
     const val PRODUCT_SELECTION = "salesforce_product_selection"

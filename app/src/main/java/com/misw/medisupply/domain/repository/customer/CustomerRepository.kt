@@ -75,7 +75,8 @@ interface CustomerRepository {
         country: String = "Colombia",
         latitude: Double? = null,
         longitude: Double? = null,
-        customerType: String = "HOSPITAL"
+        customerType: String = "HOSPITAL",
+        salespersonId: Int? = null
     ): Flow<Resource<Customer>>
     
     /**

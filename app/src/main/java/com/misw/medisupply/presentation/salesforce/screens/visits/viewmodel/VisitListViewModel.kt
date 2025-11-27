@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.domain.usecase.customer.GetCustomersByIdsUseCase
 import com.misw.medisupply.domain.usecase.visit.GetVisitsUseCase
 import com.misw.medisupply.presentation.salesforce.screens.visits.state.VisitListUiState
@@ -23,7 +24,8 @@ import java.time.format.DateTimeFormatter
 class VisitListViewModel @Inject constructor(
     val localeManager: LocaleManager,
     private val getVisitsUseCase: GetVisitsUseCase,
-    private val getCustomersByIdsUseCase: GetCustomersByIdsUseCase
+    private val getCustomersByIdsUseCase: GetCustomersByIdsUseCase,
+    private val userSessionManager: UserSessionManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VisitListUiState())
@@ -33,10 +35,12 @@ class VisitListViewModel @Inject constructor(
         loadVisits()
     }
 
-    fun loadVisits(customerId: Int? = null, salespersonId: Int? = null, status: String? = null) {
+    fun loadVisits(customerId: Int? = null, status: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
+                val salespersonId = userSessionManager.requireSalespersonId()
+
                 val result = getVisitsUseCase(
                     customerId = customerId,
                     salespersonId = salespersonId,

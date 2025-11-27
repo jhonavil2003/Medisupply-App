@@ -16,6 +16,7 @@ import com.misw.medisupply.domain.usecase.order.CreateOrderUseCase
 import com.misw.medisupply.domain.usecase.cart.ClearCartUseCase
 import com.misw.medisupply.domain.usecase.cart.ClearCartResult
 import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.session.UserSessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -48,6 +49,8 @@ class OrderViewModelTest {
     private lateinit var clearCartUseCase: ClearCartUseCase
     private lateinit var localeManager: LocaleManager
     private lateinit var viewModel: OrderViewModel
+
+    private lateinit var userSessionManager: UserSessionManager
 
     private val testCustomer = Customer(
         id = 1,
@@ -137,7 +140,7 @@ class OrderViewModelTest {
             )))
         )
         
-        viewModel = OrderViewModel(createOrderUseCase, clearCartUseCase, localeManager)
+        viewModel = OrderViewModel(createOrderUseCase, clearCartUseCase, localeManager, userSessionManager)
     }
 
     @After

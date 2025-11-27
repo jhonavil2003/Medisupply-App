@@ -141,6 +141,7 @@ private fun SalesForceBottomNavigationBar(
                         val route = destination.route
                         route == SalesForceRoutes.ORDERS ||
                                 route == SalesForceRoutes.CUSTOMER_LIST ||
+                                route == SalesForceRoutes.CREATE_CUSTOMER ||
                                 route == SalesForceRoutes.CREATE_ORDER ||
                                 route == SalesForceRoutes.MY_ORDERS ||
                                 route == SalesForceRoutes.PRODUCT_SELECTION ||

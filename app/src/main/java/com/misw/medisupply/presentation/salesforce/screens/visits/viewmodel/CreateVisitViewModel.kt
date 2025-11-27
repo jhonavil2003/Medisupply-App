@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.salesforce.screens.visits.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.i18n.LocaleManager
@@ -59,7 +60,11 @@ class CreateVisitViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(isSearchingCustomers = true)
                 try {
                     // Get all customers from backend
-                    getCustomersUseCase().collect { resource ->
+                    val salespersonId = userSessionManager.requireSalespersonId()
+                    Log.d("HomeViewModel", "SalespersonId = $salespersonId")
+                    getCustomersUseCase(
+                        sellerId = salespersonId
+                    ).collect { resource ->
                         when (resource) {
                             is com.misw.medisupply.core.base.Resource.Success -> {
                                 val allCustomers = resource.data ?: emptyList()
@@ -258,20 +263,12 @@ class CreateVisitViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, error = null)
             try {
-                // Obtener vendedor de la sesión
-                val salesperson = try {
-                    userSessionManager.requireSalesperson()
-                } catch (e: IllegalStateException) {
-                    _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        error = "Error: Usuario no autenticado"
-                    )
-                    return@launch
-                }
+                val salespersonId = userSessionManager.requireSalespersonId()
+                Log.d("HomeViewModel", "SalespersonId = $salespersonId")
                 
                 val visit = com.misw.medisupply.domain.model.visit.Visit(
                     customerId = customer.id,
-                    salespersonId = salesperson.id,
+                    salespersonId = salespersonId,
                     visitDate = state.visitDate,
                     visitTime = state.visitTime,
                     contactedPersons = state.contactedPersons.takeIf { it.isNotBlank() },
@@ -301,7 +298,7 @@ class CreateVisitViewModel @Inject constructor(
                     val error = result.exceptionOrNull()?.message ?: "Error desconocido"
                     // Log: Failed to create visit: $error
                     val enhancedError = if (error.contains("Vendedor no encontrado") || error.contains("404")) {
-                        "Vendedor no encontrado (ID: ${salesperson.id}). Verifique la configuración del usuario."
+                        "Vendedor no encontrado (ID: ${salespersonId}, Nombre: ${salespersonId}). Verifique la configuración del usuario."
                     } else {
                         "Error al guardar la visita: $error"
                     }
@@ -372,13 +369,13 @@ class CreateVisitViewModel @Inject constructor(
         
         viewModelScope.launch {
             try {
-                val salesperson = userSessionManager.requireSalesperson()
-                android.util.Log.d("CreateVisitViewModel", "Auto-save for salesperson: ${salesperson.id} (${salesperson.fullName})")
+                val salesperson = userSessionManager.requireSalespersonId()
+                android.util.Log.d("CreateVisitViewModel", "Auto-save for salesperson: ${salesperson} (${salesperson})")
                 
                 val updatedVisit = com.misw.medisupply.domain.model.visit.Visit(
                     id = visitId,
                     customerId = customer.id,
-                    salespersonId = salesperson.id,
+                    salespersonId = salesperson,
                     visitDate = state.visitDate,
                     visitTime = state.visitTime,
                     contactedPersons = state.contactedPersons.takeIf { it.isNotBlank() },

@@ -56,7 +56,10 @@ data class CreateCustomerRequest(
     val creditDays: Int = 90,
        
     @SerializedName("customer_type")
-    val customerType: String = "hospital"
+    val customerType: String = "hospital",
+
+    @SerializedName("salesperson_id")
+    val salespersonId: Int? = null
 )
 
 /**

@@ -13,9 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -47,6 +49,7 @@ import com.misw.medisupply.presentation.salesforce.components.CustomerItem
 import com.misw.medisupply.presentation.common.components.ErrorView
 import com.misw.medisupply.presentation.common.components.LoadingIndicator
 import com.misw.medisupply.presentation.common.components.MedisupplyAppBar
+import com.misw.medisupply.presentation.navigation.MainRoutes
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersEvent
 import com.misw.medisupply.presentation.salesforce.viewmodel.orders.OrdersViewModel
 
@@ -60,16 +63,17 @@ fun CustomerListScreen(
     viewModel: OrdersViewModel = hiltViewModel(),
     screenViewModel: CustomerListScreenViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
-    onNavigateToCustomerDetail: (Customer) -> Unit = {}
+    onNavigateToCustomerDetail: (Customer) -> Unit = {},
+    onNavigateToCreateCustomer: () -> Unit = {},
 ) {
     // Obtener LocaleManager del ViewModel
     val localeManager = screenViewModel.localeManager
     val currentLanguage = localeManager.currentLanguage.collectAsState().value
-    
+
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
-    
+
     // Show error in snackbar
     LaunchedEffect(state.error) {
         state.error?.let { error ->
@@ -77,14 +81,34 @@ fun CustomerListScreen(
             viewModel.onEvent(OrdersEvent.ClearError)
         }
     }
-    
+
     Scaffold(
         topBar = {
             MedisupplyAppBar(
-                title = localizedStringResource(R.string.customer_consultation_title, localeManager),
-                subtitle = localizedStringResource(R.string.customer_consultation_subtitle, localeManager),
-                onNavigateBack = onNavigateBack
+                title = localizedStringResource(
+                    R.string.customer_consultation_title,
+                    localeManager
+                ),
+                subtitle = localizedStringResource(
+                    R.string.customer_consultation_subtitle,
+                    localeManager
+                ),
+                onNavigateBack = { onNavigateBack() }
             )
+        },
+
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onNavigateToCreateCustomer() }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = localizedStringResource(
+                        R.string.create_visit_fab,
+                        localeManager
+                    )
+                )
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -105,9 +129,9 @@ fun CustomerListScreen(
                     onQueryChange = { viewModel.onEvent(OrdersEvent.SearchCustomers(it)) },
                     localeManager = localeManager
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Filter chips
                 FilterChips(
                     customerTypes = viewModel.getCustomerTypes(),
@@ -115,20 +139,22 @@ fun CustomerListScreen(
                     onTypeSelected = { viewModel.onEvent(OrdersEvent.FilterByType(it)) },
                     localeManager = localeManager
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Content
                 when {
                     state.isLoading && !state.isRefreshing -> {
                         LoadingIndicator()
                     }
+
                     state.error != null && !state.hasCustomers() -> {
                         ErrorView(
                             message = state.error!!,
                             onRetry = { viewModel.onEvent(OrdersEvent.LoadCustomers) }
                         )
                     }
+
                     state.hasCustomers() -> {
                         CustomerList(
                             customers = state.getFilteredCustomers(),
@@ -139,6 +165,7 @@ fun CustomerListScreen(
                             }
                         )
                     }
+
                     else -> {
                         EmptyState(localeManager = localeManager)
                     }
@@ -162,11 +189,21 @@ private fun SearchBar(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier.fillMaxWidth(),
-        placeholder = { Text(localizedStringResource(R.string.customer_list_search_placeholder, localeManager)) },
+        placeholder = {
+            Text(
+                localizedStringResource(
+                    R.string.customer_list_search_placeholder,
+                    localeManager
+                )
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = localizedStringResource(R.string.customer_list_search_action, localeManager)
+                contentDescription = localizedStringResource(
+                    R.string.customer_list_search_action,
+                    localeManager
+                )
             )
         },
         singleLine = true
@@ -193,10 +230,17 @@ private fun FilterChips(
             FilterChip(
                 selected = selectedType == null,
                 onClick = { onTypeSelected(null) },
-                label = { Text(localizedStringResource(R.string.customer_list_filter_all, localeManager)) }
+                label = {
+                    Text(
+                        localizedStringResource(
+                            R.string.customer_list_filter_all,
+                            localeManager
+                        )
+                    )
+                }
             )
         }
-        
+
         // Type chips
         items(customerTypes) { type ->
             FilterChip(
@@ -255,7 +299,10 @@ private fun EmptyState(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = localizedStringResource(R.string.customer_list_no_customers_description, localeManager),
+                text = localizedStringResource(
+                    R.string.customer_list_no_customers_description,
+                    localeManager
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

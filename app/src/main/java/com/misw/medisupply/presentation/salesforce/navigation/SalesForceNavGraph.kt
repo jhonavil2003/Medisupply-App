@@ -26,6 +26,8 @@ import com.google.gson.Gson
 import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.model.order.CartItem
+import com.misw.medisupply.presentation.navigation.MainRoutes
+import com.misw.medisupply.presentation.registration.screens.CustomerRegistrationScreen
 import com.misw.medisupply.presentation.salesforce.screens.home.SalesForceHomeScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.OrdersScreen
 import com.misw.medisupply.presentation.salesforce.screens.orders.create.CreateOrderScreen
@@ -115,11 +117,28 @@ fun SalesForceNavGraph(
             CustomerListScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
-                    navController.popBackStack()
+                    navController.navigate(SalesForceRoutes.ORDERS)
                 },
                 onNavigateToCustomerDetail = { customer ->
                     val customerJson = Uri.encode(Gson().toJson(customer))
                     navController.navigate("${SalesForceRoutes.CUSTOMER_DETAIL}/$customerJson")
+                },
+                onNavigateToCreateCustomer = {
+                    navController.navigate(SalesForceRoutes.CREATE_CUSTOMER)
+                }
+            )
+        }
+
+        composable(route = SalesForceRoutes.CREATE_CUSTOMER) {
+            val viewModel: OrdersViewModel = hiltViewModel()
+            CustomerRegistrationScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onRegistrationComplete = {
+                    navController.navigate(SalesForceRoutes.CUSTOMER_LIST) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }

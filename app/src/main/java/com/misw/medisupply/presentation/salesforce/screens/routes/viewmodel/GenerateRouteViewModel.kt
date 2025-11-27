@@ -1,5 +1,6 @@
 package com.misw.medisupply.presentation.salesforce.screens.routes.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.core.i18n.LocaleManager
@@ -45,11 +46,13 @@ class GenerateRouteViewModel @Inject constructor(
             try {
                 // TODO: Obtener sellerId del UserSessionManager cuando login esté implementado
                 // Por ahora usar sellerId = 1 (hardcodeado temporalmente)
-                val sellerId = 1
+
+                val currentSellerId = userSessionManager.requireSalespersonId()
+                Log.d("HomeViewModel", "SalespersonId = $currentSellerId")
                 
                 getCustomersUseCase(
                     isActive = true,
-                    sellerId = sellerId
+                    sellerId = currentSellerId
                 ).collect { resource ->
                     when (resource) {
                         is com.misw.medisupply.core.base.Resource.Success -> {
@@ -244,7 +247,10 @@ class GenerateRouteViewModel @Inject constructor(
             try {
                 // TODO: Obtener sellerId y salesperson del UserSessionManager cuando login esté implementado
                 // Por ahora usar valores temporales (sellerId = 1)
-                val sellerId = 1
+
+                val currentSellerId = userSessionManager.requireSalespersonId()
+                val currentSellerSub = userSessionManager.requireSalespersonSubString()
+
                 val salespersonName = "Vendedor Demo" // Temporal
                 
                 // Preparar ubicación de inicio si está configurada
@@ -267,9 +273,9 @@ class GenerateRouteViewModel @Inject constructor(
                 } else null
                 
                 val result = generateRouteUseCase(
-                    salespersonId = sellerId,
+                    salespersonId = currentSellerId,
                     salespersonName = salespersonName,
-                    employeeId = sellerId.toString(), // Usar ID como employeeId
+                    employeeId = currentSellerSub, // Usar ID como employeeId
                     customerIds = state.selectedCustomerIds.toList(),
                     plannedDate = state.selectedDate,
                     optimizationStrategy = state.optimizationStrategy,

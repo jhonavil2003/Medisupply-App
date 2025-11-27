@@ -195,7 +195,8 @@ class CustomerRepositoryImpl @Inject constructor(
         country: String,
         latitude: Double?,
         longitude: Double?,
-        customerType: String
+        customerType: String,
+        salespersonId: Int?
     ): Flow<Resource<Customer>> = flow {
         try {
             Log.d(TAG, "=== REPOSITORY RECIBIÓ DATOS ===")
@@ -214,6 +215,7 @@ class CustomerRepositoryImpl @Inject constructor(
             Log.d(TAG, "latitude: $latitude")
             Log.d(TAG, "longitude: $longitude")
             Log.d(TAG, "customerType: '$customerType'")
+            Log.d(TAG, "salespersonId: $salespersonId")
             
             emit(Resource.Loading())
             
@@ -232,7 +234,8 @@ class CustomerRepositoryImpl @Inject constructor(
                 country = country,
                 latitude = latitude,
                 longitude = longitude,
-                customerType = customerType
+                customerType = customerType,
+                salespersonId = salespersonId
             )
             
             Log.d(TAG, "Request creado: $request")

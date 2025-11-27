@@ -50,7 +50,8 @@ class RegisterCustomerUseCase @Inject constructor(
         department: String? = null,
         country: String = "Colombia",
         latitude: Double? = null,
-        longitude: Double? = null
+        longitude: Double? = null,
+        salespersonId: Int? = null
     ): Flow<Resource<Customer>> {
         Log.d(TAG, "=== USECASE RECIBIÓ DATOS ===")
         Log.d(TAG, "businessName: '$businessName'")
@@ -107,7 +108,8 @@ class RegisterCustomerUseCase @Inject constructor(
             country = country.trim(),
             latitude = latitude,
             longitude = longitude,
-            customerType = "hospital" // Default customer type - lowercase as required by API
+            customerType = "hospital", // Default customer type - lowercase as required by API
+            salespersonId = salespersonId
         )
     }
     
