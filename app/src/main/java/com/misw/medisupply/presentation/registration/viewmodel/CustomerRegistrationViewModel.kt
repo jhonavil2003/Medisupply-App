@@ -7,8 +7,12 @@ import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.core.i18n.LocaleManager
 import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.data.remote.dto.customer.CreateCustomerRequest
+import com.misw.medisupply.data.repository.auth.AuthRepository
+import com.misw.medisupply.data.repository.auth.SignInOutcome
 import com.misw.medisupply.domain.model.customer.Customer
 import com.misw.medisupply.domain.usecase.customer.RegisterCustomerUseCase
+import com.misw.medisupply.presentation.login.viewmodel.LoginState
+import com.misw.medisupply.presentation.login.viewmodel.NextStep
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -269,7 +273,9 @@ class CustomerRegistrationViewModel @Inject constructor(
                 department = updatedState.department.takeIf { it.isNotBlank() },
                 country = updatedState.country.takeIf { it.isNotBlank() } ?: "Colombia",
                 latitude = updatedState.latitudeValue,
-                longitude = updatedState.longitudeValue
+                longitude = updatedState.longitudeValue,
+                username = updatedState.username,
+                password = updatedState.password
             )
             
             Log.d(TAG, "Datos a enviar al UseCase:")
@@ -283,7 +289,9 @@ class CustomerRegistrationViewModel @Inject constructor(
 
             val currentSellerId = userSessionManager.requireSalespersonId()
             Log.d(TAG, "SalespersonId = $currentSellerId")
-            
+
+            AuthRepository.
+
             registerCustomerUseCase(
                 businessName = updatedState.businessName,
                 tradeName = updatedState.tradeName.takeIf { it.isNotBlank() },

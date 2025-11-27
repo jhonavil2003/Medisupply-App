@@ -59,7 +59,13 @@ data class CreateCustomerRequest(
     val customerType: String = "hospital",
 
     @SerializedName("salesperson_id")
-    val salespersonId: Int? = null
+    val salespersonId: Int? = null,
+
+    @SerializedName("username")
+    val username: String,
+
+    @SerializedName("password")
+    val password: String
 )
 
 /**

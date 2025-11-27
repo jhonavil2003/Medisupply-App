@@ -38,6 +38,7 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+
     fun confirm(response: String) = viewModelScope.launch {
         _state.value = LoginState(loading = true)
         when (val res = AuthRepository.confirmNextStep(response)) {

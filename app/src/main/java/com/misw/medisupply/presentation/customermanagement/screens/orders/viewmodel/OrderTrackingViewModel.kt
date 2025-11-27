@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.misw.medisupply.R
 import com.misw.medisupply.core.base.Resource
 import com.misw.medisupply.core.i18n.LocaleManager
+import com.misw.medisupply.core.session.UserSessionManager
 import com.misw.medisupply.domain.model.order.Order
 import com.misw.medisupply.domain.model.order.OrderStatus
 import com.misw.medisupply.domain.repository.order.OrderRepository
@@ -26,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderTrackingViewModel @Inject constructor(
     private val orderRepository: OrderRepository,
-    val localeManager: LocaleManager
+    val localeManager: LocaleManager,
+    private val userSessionManager: UserSessionManager
 ) : ViewModel() {
     
     companion object {
@@ -56,8 +58,9 @@ class OrderTrackingViewModel @Inject constructor(
         Log.d(TAG, "orderDateTo: ${currentState.orderDateTo}")
         
         viewModelScope.launch {
+            val customerId = userSessionManager.requireSalespersonId()
             orderRepository.getOrders(
-                customerId = CUSTOMER_ID,
+                customerId = customerId,
                 status = currentState.selectedStatus?.takeIf { it != "todos" },
                 page = 1,
                 perPage = 100  // Load all orders for customer tracking (customers don't have many orders)
